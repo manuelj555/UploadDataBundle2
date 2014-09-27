@@ -10,6 +10,10 @@ upload_data_upload_show:
     path:     /{type}/show/{id}
     defaults: { _controller: UploadDataBundle:Upload:show }
 
+upload_data_upload_show_item:
+    path:     /{type}/show-item/{id}
+    defaults: { _controller: UploadDataBundle:Upload:showItem }
+
 upload_data_upload_new:
     path:     /{type}/new
     defaults: { _controller: UploadDataBundle:Upload:new }

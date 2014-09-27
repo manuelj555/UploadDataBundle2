@@ -1,11 +1,12 @@
-{#{% set is_ajax = app.request.isXmlHttpRequest() %}#}
-{#{% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}#}
-{% extends '@UploadData/base.html.twig' %}
+{% set is_ajax = app.request.isXmlHttpRequest() %}
+{% extends is_ajax ? '@UploadData/base_ajax.html.twig' : '@UploadData/base.html.twig' %}
+{#{% extends '@UploadData/base.html.twig' %}#}
 
 {% block headline %}Show
     <small>{{ upload.filename }}</small>{% endblock %}
 
 {% from _self import errors %}
+{% from '@UploadData/macros.html.twig' import bs_icon, bs_upload_status as status %}
 
 {% block head_style %}
     {{ parent() }}
@@ -13,61 +14,107 @@
         .popover { max-width: 600px }
     </style>
 {% endblock %}
+
+{% set show_detail = upload_config.columnsMapper.labels > 6 %}
+
 {% block content %}
-    {# La idea acá es obtener la config de este tipo de upload para asi mostrar los datos. #}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                {% for label in upload_config.columnsMapper.labels %}
-                    <th>{{ label|title }}</th>
-                {% endfor %}
-                <th>Errors</th>
-            </tr>
-        </thead>
-        {% for item in upload.items %}
-            <tr>
-                {% for name in upload_config.columnsMapper.names %}
-                    <td>{{ item.data[name]|default }}</td>
-                {% endfor %}
-                <td>
-                    {% if item.errors|length > 0 -%}
-                        <span class="btn btn-danger btn-xs"
-                              data-toggle="popover"
-                              data-content="{{ errors(item.errors, upload_config.columnsMapper)|escape }}">
-                            Detalle
+    <div id="show-container" data-url="{{ app.request.getRequestUri() }}">
+        <div class="row" id="show-container" data-url="{{ app.request.getRequestUri() }}">
+            <div class="col-sm-6">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            {#<th>Uploaded</th>#}
+                            <th>Items</th>
+                            <th>Valids</th>
+                            <th>Invalids</th>
+                            <th>Readed</th>
+                            <th>Validated</th>
+                            <th>Transfered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set params = {type: type, id: upload.id} %}
+                        <tr class="upload-row">
+                            {#<td>{{ upload.uploadedAt|date('Y-m-d H:i:s') }}</td>#}
+                            <td class="text-right">{{ upload.total is not none ? upload.total|number_format(0) : '--' }}</td>
+                            <td class="text-right">{{ upload.valids is not none ? upload.valids|number_format(0) : '--' }}</td>
+                            <td class="text-right">{{ upload.invalids is not none ? upload.invalids|number_format(0) : '--' }}</td>
+                            <td>{{ status(upload, upload.readed, upload.readedAt, upload.isReadable(), path('upload_data_upload_read', params)) }}</td>
+                            <td>{{ status(upload, upload.validated, upload.validatedAt, upload.isValidatable(), path('upload_data_upload_validate', params)) }}</td>
+                            <td>{{ status(upload, upload.transfered, upload.transferedAt, upload.isTransferable(), path('upload_data_upload_transfer', params)) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    {% for num, label in upload_config.columnsMapper.labels if num < 7 %}
+                        <th>{{ label|title }}</th>
+                    {% endfor %}
+                    <th>Errors</th>
+                </tr>
+            </thead>
+            {% for item in upload.items %}
+                <tr>
+                    {% for name in upload_config.columnsMapper.names %}
+                        <td>{{ item.data[name]|default }}</td>
+                    {% endfor %}
+                    <td>
+                        {% if show_detail %}
+                            <a class="btn btn-info btn-xs"
+                               href="{{ path('upload_data_upload_show_item', {type: type, id: item.id}) }}"
+                               data-ajax data-after="showModal">
+                                Detalle
+                            </a>
+                        {%- endif %}
+                        {% if item.errors|length > 0 -%}
+                            <span class=" pull-right btn btn-danger btn-xs"
+                                  data-toggle="popover"
+                                  data-content="{{ errors(item.errors, upload_config.columnsMapper)|escape }}">
+                            Errores
                         </span>
-                    {%- else -%}
-                        ------
-                    {%- endif %}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+                        {%- endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 
-    {#{% if not is_ajax %}#}
-    {#&#123;&#35;<input type="submit" class="btn btn-primary">&#35;&#125;#}
-    {#<div class="progress" id="upload-progress" style="display: none">#}
-    {#<div class="progress-bar" style="width: 60%;"></div>#}
-    {#</div>#}
-    {#{% endif %}#}
-    <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default">Volver al Listado</a>
-
+    {% if not is_ajax %}
+        <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default">Volver al Listado</a>
+    {% endif %}
 {% endblock %}
 
 {#{% block modal_footer %}#}
-    {#{{ parent() }}#}
-    {#&#123;&#35;<input type="submit" class="btn btn-primary">&#35;&#125;#}
+{#{{ parent() }}#}
+{#&#123;&#35;<input type="submit" class="btn btn-primary">&#35;&#125;#}
 {#{% endblock %}#}
 
-{% block foot_script %}
-    {{ parent() }}
+{% block ajax_script %}
     <script>
         $('[data-toggle="popover"]').popover({
             html: true,
             placement: 'left',
             trigger: 'click hover'
         });
+
+        function showModal(html) {
+            $("#show_item_modal").remove();
+            $('body').append(html);
+            $("#show_item_modal").modal();
+        }
+
     </script>
+{% endblock %}
+
+{% block foot_script %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/uploaddata/js/upload.js') }}"></script>
+    {{ block('ajax_script') }}
 {% endblock %}
 
 {%- macro errors(errors, mapper) -%}

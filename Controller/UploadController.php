@@ -98,4 +98,12 @@ class UploadController extends Controller
             'type' => $type,
         )));
     }
+
+    public function showItemAction($type, UploadedItem $item)
+    {
+        return $this->render('@UploadData/Upload/show_item.html.twig', $this->mergeParams($type, array(
+            'item' => $item,
+            'type' => $type,
+        )));
+    }
 }

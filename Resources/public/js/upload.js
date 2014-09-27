@@ -7,6 +7,16 @@
     var url_list = $container.data('url');
     var $processing = $('<span class="label label-info"/>').html('<i class="glyphicon glyphicon-refresh"></i> Processing...');
 
+    if ($container.size()) {
+        window.reloadList = function reloadList() {
+            $container.load(url_list);
+        }
+
+        setInterval(reloadList, 10000);
+    }else{
+        $container = $('body');
+    }
+
     $container.on('click', '.upload-process', function (e) {
         e.preventDefault();
         var $a = $(this);
@@ -17,18 +27,15 @@
         $.ajax({
             url: $a.attr('href'),
             complete: function () {
-                reloadList();
-//                $row.find('a.upload-process').removeClass('disabled');
+                if($container.is(':not(body)')){
+                    reloadList();
+                }else{
+                    $("#show-container").load($("#show-container").data('url'));
+                }
             },
-            error:function(){
+            error: function () {
                 alert('Ups!!, Ocurrió un Error!!!');
             }
         });
     });
-
-    window.reloadList = function reloadList() {
-        $container.load(url_list);
-    }
-
-    setInterval(reloadList, 10000);
 })(jQuery);

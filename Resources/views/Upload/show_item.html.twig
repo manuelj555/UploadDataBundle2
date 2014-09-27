@@ -1,0 +1,53 @@
+{% set is_ajax = app.request.isXmlHttpRequest() %}
+{% set modal_id = 'show_item_modal' %}
+{% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
+
+{% block headline %}Show
+    <small>#{{ item.upload.id }}-{{ item.upload.filename }}</small> Item #{{ item.id }}{% endblock %}
+
+{#{% from _self import errors %}#}
+
+{#{% block head_style %}#}
+    {#{{ parent() }}#}
+    {#<style>#}
+        {#.popover { max-width: 600px }#}
+    {#</style>#}
+{#{% endblock %}#}
+
+
+{% block content %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Columna</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        {% for name, value in item.data %}
+            <tr>
+                <td><strong>{{ upload_config.columnsMapper.getLabel(name)|title }}</strong></td>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{#{% block modal_footer %}#}
+    {#{{ parent() }}#}
+    {#&#123;&#35;<input type="submit" class="btn btn-primary">&#35;&#125;#}
+{#{% endblock %}#}
+
+{#{%- macro errors(errors, mapper) -%}#}
+    {#<table class="table table-bordered table-condensed">#}
+        {#{%- for column, errors in errors -%}#}
+            {#<tr>#}
+                {#<td><strong>{{ mapper.getLabel(column)|title }}</strong></td>#}
+                {#<td>#}
+                    {#<ul>#}
+                        {#<li>{{ errors|join('</li><li>')|raw }}</li>#}
+                    {#</ul>#}
+                {#</td>#}
+            {#</tr>#}
+        {#{%- endfor -%}#}
+    {#</table>#}
+{#{%- endmacro -%}#}
