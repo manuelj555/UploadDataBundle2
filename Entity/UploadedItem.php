@@ -3,12 +3,14 @@
 namespace Manuelj555\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * UploadedItem
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class UploadedItem
 {
@@ -45,15 +47,15 @@ class UploadedItem
     /**
      * @var boolean
      *
-     * @ORM\Column(name="isValid", type="boolean")
+     * @ORM\Column(name="isValid", type="boolean", nullable=true)
      */
-    private $isValid = true;
+    private $isValid;
 
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -64,6 +66,7 @@ class UploadedItem
      * Set upload
      *
      * @param string $upload
+     *
      * @return UploadedItem
      */
     public function setUpload($upload)
@@ -76,7 +79,7 @@ class UploadedItem
     /**
      * Get upload
      *
-     * @return string 
+     * @return string
      */
     public function getUpload()
     {
@@ -87,6 +90,7 @@ class UploadedItem
      * Set data
      *
      * @param array $data
+     *
      * @return UploadedItem
      */
     public function setData($data)
@@ -99,7 +103,7 @@ class UploadedItem
     /**
      * Get data
      *
-     * @return array 
+     * @return array
      */
     public function getData()
     {
@@ -110,6 +114,7 @@ class UploadedItem
      * Set errors
      *
      * @param array $errors
+     *
      * @return UploadedItem
      */
     public function setErrors($errors)
@@ -122,7 +127,7 @@ class UploadedItem
     /**
      * Get errors
      *
-     * @return array 
+     * @return array
      */
     public function getErrors()
     {
@@ -133,6 +138,7 @@ class UploadedItem
      * Set isValid
      *
      * @param boolean $isValid
+     *
      * @return UploadedItem
      */
     public function setIsValid($isValid)
@@ -145,10 +151,30 @@ class UploadedItem
     /**
      * Get isValid
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getIsValid()
     {
         return $this->isValid;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function adjustValues()
+    {
+        if ($this->errors instanceof ConstraintViolationListInterface) {
+            $errors = array();
+
+            foreach ($this->errors as $error) {
+                isset($errors[$error->getPropertyPath()]) || $errors[$error->getPropertyPath()] = array();
+                $errors[$error->getPropertyPath()][] = $error->getMessage();
+            }
+
+            $this->setErrors($errors);
+        }
+
+        $this->setIsValid(count($this->errors) == 0);
     }
 }

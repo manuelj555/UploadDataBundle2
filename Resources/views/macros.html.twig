@@ -26,6 +26,10 @@
         {%- endif -%}
     {%- elseif status == constant('STATUS_IN_PROGRESS', upload) -%}
         <span class="label label-info">{{ this.bs_icon('refresh') }} Processing...</span>
+    {%- elseif link and url -%}
+        <a class="upload-process btn btn-info btn-xs" href="{{ url }}">
+            {{ this.bs_icon('ok') }} {{ date|date('Y-m-d H:i:s') }}
+        </a>
     {%- else -%}
         <span class="label label-success">{{ this.bs_icon('ok') }} {{ date|date('Y-m-d H:i:s') }}</span>
     {%- endif -%}

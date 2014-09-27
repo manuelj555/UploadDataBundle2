@@ -6,6 +6,7 @@
 
 namespace Manuelj555\Bundle\UploadDataBundle;
 
+use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 
@@ -22,5 +23,23 @@ class VentasConfig extends UploadConfig
             ->add('email')
             ->add('years');
     }
+
+    public function configureValidations(ValidationBuilder $builder)
+    {
+        $builder
+            ->with('name')
+                ->assertNotBlank()
+            ->end()
+            ->with('email')
+                ->assertNotBlank()
+                ->assertEmail()
+            ->end()
+            ->with('years')
+                ->assertNotBlank()
+                ->assertType('numeric')
+            ->end()
+        ;
+    }
+
 
 } 

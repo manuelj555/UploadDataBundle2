@@ -49,7 +49,8 @@
             progress: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
                 $('#upload-progress .progress-bar').css('width', progress + '%');
-                console.log('MMM');
+                $("#{{ modal_id }}").modal('hide');
+                reloadList();
             }
         });
         //        console.log('MMMM', $('#fileupload'));

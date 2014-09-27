@@ -53,12 +53,28 @@ class Upload
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $file;
+
     /**
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255)
      */
     private $type;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $valids;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $invalids;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $total;
 
     /**
      * @var \DateTime
@@ -440,5 +456,29 @@ class Upload
     public function getItems()
     {
         return $this->items;
+    }
+
+    /**
+     * Set fullFilename
+     *
+     * @param string $fullFilename
+     *
+     * @return Upload
+     */
+    public function setFullFilename($fullFilename)
+    {
+        $this->fullFilename = $fullFilename;
+
+        return $this;
+    }
+
+    /**
+     * Get fullFilename
+     *
+     * @return string
+     */
+    public function getFullFilename()
+    {
+        return $this->fullFilename;
     }
 }

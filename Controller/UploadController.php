@@ -60,37 +60,33 @@ class UploadController extends Controller
         $this->getConfig($type)
             ->processRead($upload);
 
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Readed!');
+
         return new Response('Ok');
     }
 
     public function validateAction($type, Upload $upload)
     {
-        $em = $this->getDoctrine()->getManager();
+        $this->getConfig($type)
+            ->processValidation($upload);
 
-        $upload->setValidated(Upload::STATUS_IN_PROGRESS);
-        $em->persist($upload);
-        $em->flush();
-
-        $upload->setValidated(Upload::STATUS_COMPLETE);
-        $upload->setValidatedAt(new \DateTime());
-        $em->persist($upload);
-        $em->flush();
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Validated!');
 
         return new Response('Ok');
     }
 
     public function transferAction($type, Upload $upload)
     {
-        $em = $this->getDoctrine()->getManager();
+        $this->getConfig($type)
+            ->processTransfer($upload);
 
-        $upload->setTransfered(Upload::STATUS_IN_PROGRESS);
-        $em->persist($upload);
-        $em->flush();
-
-        $upload->setTransfered(Upload::STATUS_COMPLETE);
-        $upload->setTransferedAt(new \DateTime());
-        $em->persist($upload);
-        $em->flush();
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Transfered!');
 
         return new Response('Ok');
     }

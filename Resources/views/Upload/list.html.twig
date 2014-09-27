@@ -23,6 +23,7 @@
 {% endblock %}
 
 {% block content %}
+    {% if is_ajax %}{{ include('@UploadData/flash.html.twig') }}{% endif %}
     <div {% if not is_ajax %}id="upload-list-container" data-url="{{ app.request.getRequestUri() }}"{% endif %}>
         <table class="table table-bordered">
             <thead>
@@ -41,17 +42,16 @@
             <tbody>
                 {% for item in items %}
                     {% set params = {type: type, id: item.id} %}
-                    <tr>
+                    <tr class="upload-row">
                         <td>{{ item.id }}</td>
                         <td>
                             <a href="{{ path('upload_data_upload_show', {type: type, id: item.id}) }}"
                                class="btn btn-link btn-xs {{ item.filename?'':'btn-danger' }}">{{ item.filename|default('Not Found!') }}</a>
                         </td>
                         <td>{{ item.uploadedAt|date }}</td>
-                        <td>{{ 0 }}</td>
-                        <td>{{ 0 }}</td>
-                        <td>{{ 0     }}</td>
-                        {#<td>{{ status(date(item.uploadedAt) > date('-20 years'), item.uploadedAt) }}</td>#}
+                        <td class="text-right">{{ item.total is not none ? item.total|number_format(0) : '--' }}</td>
+                        <td class="text-right">{{ item.valids is not none ? item.valids|number_format(0) : '--' }}</td>
+                        <td class="text-right">{{ item.invalids is not none ? item.invalids|number_format(0) : '--' }}</td>
                         <td>{{ status(item, item.readed, item.readedAt, item.isReadable(), path('upload_data_upload_read', params)) }}</td>
                         <td>{{ status(item, item.validated, item.validatedAt, item.isValidatable(), path('upload_data_upload_validate', params)) }}</td>
                         <td>{{ status(item, item.transfered, item.transferedAt, item.isTransferable(), path('upload_data_upload_transfer', params)) }}</td>

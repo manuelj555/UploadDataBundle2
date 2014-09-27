@@ -53,12 +53,28 @@ class Upload
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $file;
+
     /**
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255)
      */
     private $type;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $valids;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $invalids;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $total;
 
     /**
      * @var \DateTime
@@ -325,7 +341,7 @@ class Upload
     {
         return $this->getUploadedAt() !== null
         and $this->getReaded() == self::STATUS_COMPLETE
-        and $this->getValidated() == self::STATUS_NOT_COMPLETE
+        and $this->getValidated() != self::STATUS_IN_PROGRESS
         and $this->getTransfered() == self::STATUS_NOT_COMPLETE;
     }
 
@@ -446,6 +462,7 @@ class Upload
      * Set fullFilename
      *
      * @param string $fullFilename
+     *
      * @return Upload
      */
     public function setFullFilename($fullFilename)
@@ -458,10 +475,82 @@ class Upload
     /**
      * Get fullFilename
      *
-     * @return string 
+     * @return string
      */
     public function getFullFilename()
     {
         return $this->fullFilename;
+    }
+
+    /**
+     * Set valids
+     *
+     * @param integer $valids
+     *
+     * @return Upload
+     */
+    public function setValids($valids)
+    {
+        $this->valids = $valids;
+
+        return $this;
+    }
+
+    /**
+     * Get valids
+     *
+     * @return integer
+     */
+    public function getValids()
+    {
+        return $this->valids;
+    }
+
+    /**
+     * Set invalids
+     *
+     * @param integer $invalids
+     *
+     * @return Upload
+     */
+    public function setInvalids($invalids)
+    {
+        $this->invalids = $invalids;
+
+        return $this;
+    }
+
+    /**
+     * Get invalids
+     *
+     * @return integer
+     */
+    public function getInvalids()
+    {
+        return $this->invalids;
+    }
+
+    /**
+     * Set total
+     *
+     * @param integer $total
+     *
+     * @return Upload
+     */
+    public function setTotal($total)
+    {
+        $this->total = $total;
+
+        return $this;
+    }
+
+    /**
+     * Get total
+     *
+     * @return integer
+     */
+    public function getTotal()
+    {
+        return $this->total;
     }
 }

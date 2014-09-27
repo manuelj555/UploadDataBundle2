@@ -1,0 +1,11 @@
+{% if app.session.flashbag.peekAll|length > 0 %}
+    <div class="row">
+        <div class="col-sm-12">
+            {% for type, messages in app.session.flashbag %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

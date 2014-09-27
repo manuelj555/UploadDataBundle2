@@ -37,4 +37,9 @@ class ColumnsMapper
     {
         return $this->labels;
     }
+
+    public function getLabel($name)
+    {
+        return isset($this->labels[$name]) ? $this->labels[$name] : null;
+    }
 }
