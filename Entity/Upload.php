@@ -1,0 +1,467 @@
+<?php
+
+namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Upload
+ *
+ * @ORM\Table()
+ * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Upload
+{
+    const STATUS_NOT_COMPLETE = 0;
+    const STATUS_IN_PROGRESS = 1;
+    const STATUS_COMPLETE = 2;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $filename;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $fullFilename;
+
+    /**
+     * @var string
+     *
+     * @ORM\OneToMany(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem", mappedBy="upload")
+     */
+    private $items;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $file;
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=255)
+     */
+    private $type;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="uploadedAt", type="datetime", nullable=true)
+     */
+    private $uploadedAt;
+
+    /**
+     * @var smallint
+     *
+     * @ORM\Column(type="smallint")
+     */
+    private $readed;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="readedAt", type="datetime", nullable=true)
+     */
+    private $readedAt;
+
+    /**
+     * @var smallint
+     *
+     * @ORM\Column(type="smallint")
+     */
+    private $validated;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="validatedAt", type="datetime", nullable=true)
+     */
+    private $validatedAt;
+
+    /**
+     * @var smallint
+     *
+     * @ORM\Column(type="smallint")
+     */
+    private $transfered;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="transferedAt", type="datetime", nullable=true)
+     */
+    private $transferedAt;
+
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     *
+     * @return Upload
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set uploadedAt
+     *
+     * @param \DateTime $uploadedAt
+     *
+     * @return Upload
+     */
+    public function setUploadedAt($uploadedAt)
+    {
+        $this->uploadedAt = $uploadedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get uploadedAt
+     *
+     * @return \DateTime
+     */
+    public function getUploadedAt()
+    {
+        return $this->uploadedAt;
+    }
+
+    /**
+     * Set readed
+     *
+     * @param integer $readed
+     *
+     * @return Upload
+     */
+    public function setReaded($readed)
+    {
+        $this->readed = $readed;
+
+        return $this;
+    }
+
+    /**
+     * Get readed
+     *
+     * @return integer
+     */
+    public function getReaded()
+    {
+        return $this->readed;
+    }
+
+    /**
+     * Set readedAt
+     *
+     * @param \DateTime $readedAt
+     *
+     * @return Upload
+     */
+    public function setReadedAt($readedAt)
+    {
+        $this->readedAt = $readedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get readedAt
+     *
+     * @return \DateTime
+     */
+    public function getReadedAt()
+    {
+        return $this->readedAt;
+    }
+
+    /**
+     * Set validated
+     *
+     * @param integer $validated
+     *
+     * @return Upload
+     */
+    public function setValidated($validated)
+    {
+        $this->validated = $validated;
+
+        return $this;
+    }
+
+    /**
+     * Get validated
+     *
+     * @return integer
+     */
+    public function getValidated()
+    {
+        return $this->validated;
+    }
+
+    /**
+     * Set validatedAt
+     *
+     * @param \DateTime $validatedAt
+     *
+     * @return Upload
+     */
+    public function setValidatedAt($validatedAt)
+    {
+        $this->validatedAt = $validatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get validatedAt
+     *
+     * @return \DateTime
+     */
+    public function getValidatedAt()
+    {
+        return $this->validatedAt;
+    }
+
+    /**
+     * Set transfered
+     *
+     * @param integer $transfered
+     *
+     * @return Upload
+     */
+    public function setTransfered($transfered)
+    {
+        $this->transfered = $transfered;
+
+        return $this;
+    }
+
+    /**
+     * Get transfered
+     *
+     * @return integer
+     */
+    public function getTransfered()
+    {
+        return $this->transfered;
+    }
+
+    /**
+     * Set transferedAt
+     *
+     * @param \DateTime $transferedAt
+     *
+     * @return Upload
+     */
+    public function setTransferedAt($transferedAt)
+    {
+        $this->transferedAt = $transferedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get transferedAt
+     *
+     * @return \DateTime
+     */
+    public function getTransferedAt()
+    {
+        return $this->transferedAt;
+    }
+
+    public function isReadable()
+    {
+        return $this->getUploadedAt() !== null
+        and $this->getReaded() == self::STATUS_NOT_COMPLETE
+        and $this->getValidated() == self::STATUS_NOT_COMPLETE
+        and $this->getTransfered() == self::STATUS_NOT_COMPLETE;
+    }
+
+    public function isValidatable()
+    {
+        return $this->getUploadedAt() !== null
+        and $this->getReaded() == self::STATUS_COMPLETE
+        and $this->getValidated() == self::STATUS_NOT_COMPLETE
+        and $this->getTransfered() == self::STATUS_NOT_COMPLETE;
+    }
+
+    public function isTransferable()
+    {
+        return $this->getUploadedAt() !== null
+        and $this->getReaded() == self::STATUS_COMPLETE
+        and $this->getValidated() == self::STATUS_COMPLETE
+        and $this->getTransfered() == self::STATUS_NOT_COMPLETE;
+    }
+
+    /**
+     * Set file
+     *
+     * @param string $file
+     *
+     * @return Upload
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Get file
+     *
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set filename
+     *
+     * @param string $filename
+     *
+     * @return Upload
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Get filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     */
+    public function prePersist()
+    {
+        $this->setUploadedAt(new \DateTime());
+        $this->setReaded(self::STATUS_NOT_COMPLETE);
+        $this->setValidated(self::STATUS_NOT_COMPLETE);
+        $this->setTransfered(self::STATUS_NOT_COMPLETE);
+    }
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add items
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items
+     *
+     * @return Upload
+     */
+    public function addItem(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items)
+    {
+        $this->items[] = $items;
+
+        $items->setUpload($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove items
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items
+     */
+    public function removeItem(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items)
+    {
+        $this->items->removeElement($items);
+
+        $items->setUpload(null);
+    }
+
+    /**
+     * Get items
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    /**
+     * Set fullFilename
+     *
+     * @param string $fullFilename
+     * @return Upload
+     */
+    public function setFullFilename($fullFilename)
+    {
+        $this->fullFilename = $fullFilename;
+
+        return $this;
+    }
+
+    /**
+     * Get fullFilename
+     *
+     * @return string 
+     */
+    public function getFullFilename()
+    {
+        return $this->fullFilename;
+    }
+}

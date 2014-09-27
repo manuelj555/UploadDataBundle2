@@ -1,0 +1,62 @@
+{% set is_ajax = app.request.isXmlHttpRequest() %}
+{% set modal_id = 'new_upload' %}
+{% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
+
+{% block headline %}Nueva Carga{% endblock %}
+
+{#{% block head_style %}#}
+    {#{{ parent() }}#}
+    {#<style>#}
+        {#.bar {#}
+            {#height: 18px;#}
+            {#background: green;#}
+        {#}#}
+    {#</style>#}
+{#{% endblock %}#}
+
+{% block content %}
+    <input type="file" id="fileupload" name="file">
+
+    {% if not is_ajax %}
+        {#<input type="submit" class="btn btn-primary">#}
+        <div class="progress" id="upload-progress" style="display: none">
+            <div class="progress-bar" style="width: 60%;"></div>
+        </div>
+        <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">Volver al Listado</a>
+    {% endif %}
+
+{% endblock %}
+
+{% block modal_footer %}
+    {{ parent() }}
+    {#<input type="submit" class="btn btn-primary">#}
+{% endblock %}
+
+{% block ajax_script %}
+    <script>
+        //        $("#new_upload").modal();
+        $('#fileupload').fileupload({
+            url: '{{ path('upload_data_upload_new', {type: app.request.get('type')}) }}',
+            dataType: 'json',
+            start: function(){$('#upload-progress').show()},
+            always: function(){$('#upload-progress').hide()},
+            done: function (e, data) {
+                console.log(data);
+//                $.each(data.result.files, function (index, file) {
+//                    $('<p/>').text(file.name).appendTo(document.body);
+//                });
+            },
+            progress: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#upload-progress .progress-bar').css('width', progress + '%');
+                console.log('MMM');
+            }
+        });
+        //        console.log('MMMM', $('#fileupload'));
+    </script>
+{% endblock %}
+
+{% block foot_script %}
+    {{ parent() }}
+    {{ block('ajax_script') }}
+{% endblock %}

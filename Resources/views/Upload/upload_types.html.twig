@@ -1,0 +1,34 @@
+<div class="col-sm-6">
+    {% embed '@UploadData/panel.html.twig' %}
+
+        {% block header %}Listado de Tipos de Carga{% endblock %}
+        {% block body %}
+            <ul class="list-group">
+                {% for type, label in types %}
+                    <li class="list-group-item clearfix">
+                        {#<div class="row">#}
+                        {#<div class="col-xs-5">#}
+                        {{ label }}
+                        {#</div>#}
+                        {#<div class="col-xs-7">#}
+                        <span class="pull-right">
+                                <a class="btn btn-link btn-sm"
+                                   href="{{ path('upload_data_upload_list', {type: type}) }}">
+                                    <i class="glyphicon glyphicon-list"></i>
+                                    Listar
+                                </a>
+                                <a class="btn btn-link btn-sm"
+                                   href="{{ path('upload_data_upload_new', {type: type}) }}">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                    Subir Nuevo
+                                </a>
+                        </span>
+                        {#</div>#}
+                        {#</div>#}
+
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endblock %}
+    {% endembed %}
+</div>

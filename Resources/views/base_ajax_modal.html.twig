@@ -1,0 +1,22 @@
+{% block content_row %}
+    <div class="modal fade" id="{{ modal_id|default }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">{% block headline %}{% endblock headline %}</h4>
+                </div>
+                <div class="modal-body">
+                    {% block content %}{% endblock content %}
+                </div>
+                <div class="modal-footer">
+                    {% block modal_footer %}
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content_row %}
+{% block ajax_script %}{% endblock ajax_script %}

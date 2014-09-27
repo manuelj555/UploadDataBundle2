@@ -1,0 +1,7 @@
+{% extends '@UploadData/base.html.twig' %}
+
+{% block headline %}Carga de Archivos{% endblock %}
+
+{% block content %}
+    {{ sonata_block_render({type: 'upload_data.block.upload_list'}) }}
+{% endblock %}

@@ -1,0 +1,75 @@
+{% set is_ajax = app.request.isXmlHttpRequest() %}
+{% extends is_ajax ? '@UploadData/base_ajax.html.twig' :'@UploadData/base.html.twig' %}
+
+{% block headline %}Listado{% endblock %}
+
+{% from '@UploadData/macros.html.twig' import bs_icon, bs_upload_status as status %}
+
+{% set type = app.request.get('type') %}
+
+{% block content_row %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <a class="btn btn-primary" data-ajax data-after="showModal"
+               href="{{ path('upload_data_upload_new', {type: type}) }}">Cargar Nuevo</a>
+        </div>
+    </div>
+    {{ parent() }}
+
+    <div class="progress fade" id="upload-progress">
+        <div class="progress-bar" style="width: 0%;"></div>
+    </div>
+
+{% endblock %}
+
+{% block content %}
+    <div {% if not is_ajax %}id="upload-list-container" data-url="{{ app.request.getRequestUri() }}"{% endif %}>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Filename</th>
+                    <th>Uploaded</th>
+                    <th>Items</th>
+                    <th>Valids</th>
+                    <th>Invalids</th>
+                    <th>Readed</th>
+                    <th>Validated</th>
+                    <th>Transfered</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    {% set params = {type: type, id: item.id} %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>
+                            <a href="{{ path('upload_data_upload_show', {type: type, id: item.id}) }}"
+                               class="btn btn-link btn-xs {{ item.filename?'':'btn-danger' }}">{{ item.filename|default('Not Found!') }}</a>
+                        </td>
+                        <td>{{ item.uploadedAt|date }}</td>
+                        <td>{{ 0 }}</td>
+                        <td>{{ 0 }}</td>
+                        <td>{{ 0     }}</td>
+                        {#<td>{{ status(date(item.uploadedAt) > date('-20 years'), item.uploadedAt) }}</td>#}
+                        <td>{{ status(item, item.readed, item.readedAt, item.isReadable(), path('upload_data_upload_read', params)) }}</td>
+                        <td>{{ status(item, item.validated, item.validatedAt, item.isValidatable(), path('upload_data_upload_validate', params)) }}</td>
+                        <td>{{ status(item, item.transfered, item.transferedAt, item.isTransferable(), path('upload_data_upload_transfer', params)) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+ {% block foot_script %}
+     {{ parent() }}
+     <script src="{{ asset('bundles/uploaddata/js/upload.js') }}"></script>
+     <script>
+         function showModal(html) {
+             $("#new_upload").remove();
+             $('body').append(html);
+             $("#new_upload").modal();
+         }
+     </script>
+ {% endblock %}

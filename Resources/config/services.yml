@@ -1,0 +1,21 @@
+services:
+#    upload_data.example:
+#        class: Manuelj555\Bundle\UploadDataBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
+
+    upload_data.config_provider:
+        class: Manuelj555\Bundle\UploadDataBundle\ConfigProvider
+        arguments: [@service_container, []]
+
+    upload_config_test:
+        class: Manuelj555\Bundle\UploadDataBundle\VentasConfig
+        tags:
+            - { name: upload_data.config, id: ventas, label: Ventas }
+
+    upload_data.block.upload_list:
+        class: Manuelj555\Bundle\UploadDataBundle\Block\UploadListBlockService
+        arguments: [upload_data.block.upload_list, @templating]
+        calls:
+            - [setUploadTypes, [%upload_data.upload_types%]]
+        tags:
+            - { name: sonata.block }
