@@ -19,7 +19,11 @@ class VentasConfig extends UploadConfig
 
     public function configureColumns(ColumnsMapper $mapper)
     {
-        $mapper->add('name')
+        $mapper
+            ->add('name', array(
+                'aliases' => array('AAA', 'BBB', 'Name'),
+                'similar' => true,
+            ))
             ->add('email')
             ->add('years');
     }
@@ -28,17 +32,16 @@ class VentasConfig extends UploadConfig
     {
         $builder
             ->with('name')
-                ->assertNotBlank()
+            ->assertNotBlank()
             ->end()
             ->with('email')
-                ->assertNotBlank()
-                ->assertEmail()
+            ->assertNotBlank()
+            ->assertEmail()
             ->end()
             ->with('years')
-                ->assertNotBlank()
-                ->assertType('numeric')
-            ->end()
-        ;
+            ->assertNotBlank()
+            ->assertType('numeric')
+            ->end();
     }
 
 

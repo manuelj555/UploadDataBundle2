@@ -1,0 +1,11 @@
+{% for item in uploads %}
+    <tr class="upload-row">
+        {% for name, column in columns if not is_show or column.options.use_show %}
+            {{ include(column.template, {
+            item: item,
+            column: column,
+            upload_type: upload_type,
+            }) }}
+        {% endfor %}
+    </tr>
+{% endfor %}

@@ -7,10 +7,69 @@ services:
         class: Manuelj555\Bundle\UploadDataBundle\ConfigProvider
         arguments: [@service_container, []]
 
+    upload_data.column_list_factory:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory
+        arguments: [@service_container, []]
+
+    upload_data.list_mapper:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper
+        arguments: [@upload_data.column_list_factory]
+        public: false
+
+    upload_data.column_list.text:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\TextColumn
+        tags:
+            - { name: upload_data.column_list, alias: text }
+
+    upload_data.column_list.link:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\LinkColumn
+        tags:
+            - { name: upload_data.column_list, alias: link }
+
+    upload_data.column_list.datetime:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\DatetimeColumn
+        tags:
+            - { name: upload_data.column_list, alias: datetime }
+
+    upload_data.column_list.number:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\NumberColumn
+        tags:
+            - { name: upload_data.column_list, alias: number }
+
+    upload_data.column_list.action:
+        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\ActionColumn
+        tags:
+            - { name: upload_data.column_list, alias: action }
+
+    upload_data.csv_reader:
+        class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\CsvReader
+        tags:
+            - { name: upload_data.reader, route_config: upload_data_upload_read_csv }
+
+    upload_data.reader_loader:
+        class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
+#
+#    upload_data.twig.callable_extension:
+#        class: Manuelj555\Bundle\UploadDataBundle\Twig\Extention\CallbackExtension
+#        tags:
+#            - { name: twig.extension }
+
     upload_config_test:
         class: Manuelj555\Bundle\UploadDataBundle\VentasConfig
         tags:
             - { name: upload_data.config, id: ventas, label: Ventas }
+
+    upload_data.block.column_list:
+        class: Manuelj555\Bundle\UploadDataBundle\Block\ColumnListBlockService
+        arguments: [upload_data.block.column_list, @templating]
+        tags:
+            - { name: sonata.block }
+
+    upload_data.block.header_column_list:
+        class: Manuelj555\Bundle\UploadDataBundle\Block\HeaderColumnListBlockService
+        arguments: [upload_data.block.header_column_list, @templating]
+        tags:
+            - { name: sonata.block }
 
     upload_data.block.upload_list:
         class: Manuelj555\Bundle\UploadDataBundle\Block\UploadListBlockService

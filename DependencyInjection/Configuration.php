@@ -25,7 +25,7 @@ class Configuration implements ConfigurationInterface
         // more information on that topic.
 
         $rootNode->children()
-                ->scalarNode('files_dir')->defaultValue('%kernel.root_dir%/cache/uploads/')->end()
+                ->scalarNode('files_dir')->defaultValue('%kernel.root_dir%/cache/uploads/data/')->end()
             ->end();
 
         return $treeBuilder;

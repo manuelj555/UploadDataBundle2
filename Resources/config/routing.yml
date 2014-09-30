@@ -29,3 +29,11 @@ upload_data_upload_validate:
 upload_data_upload_transfer:
     path:     /{type}/transfer/{id}
     defaults: { _controller: UploadDataBundle:Upload:transfer }
+
+upload_data_upload_read_csv:
+    path:     /upload/read/csv/{id}
+    defaults: { _controller: UploadDataBundle:CsvRead:separator }
+
+upload_data_upload_select_columns_csv:
+    path:     /upload/select-columns/csv/{id}
+    defaults: { _controller: UploadDataBundle:CsvRead:selectColumns }

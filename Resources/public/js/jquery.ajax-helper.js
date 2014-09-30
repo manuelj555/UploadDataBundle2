@@ -23,13 +23,13 @@
                 return;
             }
 
-            var afterWrap = function(response) {
+            var afterWrap = function(response, status, jqXhr) {
 
                 if (container.size()) {
                     container.html(response);
                 }
 
-                after(response, $this, container);
+                after(response, $this, container, jqXhr);
             };
 
             $.get(url, afterWrap);
@@ -47,12 +47,12 @@
                 return;
             }
 
-            var afterWrap = function(response) {
+            var afterWrap = function(response, status, jqXhr) {
                 if (container.size()) {
                     container.html(response);
                 }
 
-                after(response, $this, container);
+                after(response, $this, container, jqXhr);
             };
 
             $.ajax({
@@ -74,13 +74,13 @@
                 return;
             }
 
-            var afterWrap = function(response) {
+            var afterWrap = function(response, status, jqXhr) {
 
                 if (container.size()) {
                     container.html(response);
                 }
 
-                after(response, $this, container);
+                after(response, $this, container, jqXhr);
             };
 
             $.get(url, {value: $this.val()}, afterWrap);
@@ -119,13 +119,13 @@
                 return;
             }
 
-            var afterWrap = function(response) {
+            var afterWrap = function(response, status, jqXhr) {
 
                 if (container.size()) {
                     container.html(response);
                 }
 
-                after(response, $this, container);
+                after(response, $this, container, jqXhr);
             };
 
             $.get(url, afterWrap);

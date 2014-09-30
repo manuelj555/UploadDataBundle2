@@ -1,0 +1,143 @@
+<?php
+
+namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * UploadAttribute
+ *
+ * @ORM\Table(name="upload_data_upload_attribute")
+ * @ORM\Entity
+ */
+class UploadAttribute
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\Upload", inversedBy="attributes")
+     */
+    private $upload;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=255)
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="form_label", type="string", length=255, nullable=true)
+     */
+    private $formLabel;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $label;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="value", type="string", length=255, nullable=true)
+     */
+    private $value;
+
+    function __construct($name = null)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return UploadAttribute
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set value
+     *
+     * @param string $value
+     *
+     * @return UploadAttribute
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get value
+     *
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * Set upload
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\Upload $upload
+     *
+     * @return UploadAttribute
+     */
+    public function setUpload(\Manuelj555\Bundle\UploadDataBundle\Entity\Upload $upload = null)
+    {
+        $this->upload = $upload;
+
+        return $this;
+    }
+
+    /**
+     * Get upload
+     *
+     * @return \Manuelj555\Bundle\UploadDataBundle\Entity\Upload
+     */
+    public function getUpload()
+    {
+        return $this->upload;
+    }
+}

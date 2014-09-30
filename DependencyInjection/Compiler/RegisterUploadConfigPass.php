@@ -66,5 +66,8 @@ class RegisterUploadConfigPass implements CompilerPassInterface
         $definition->addMethodCall('setUploadDir', array('%upload_data.files_dir%'));
         $definition->addMethodCall('setType', array($type));
         $definition->addMethodCall('setValidator', array(new Reference('validator')));
+        $definition->addMethodCall('setColumnListFactory', array(new Reference('upload_data.column_list_factory')));
+        $definition->addMethodCall('setListMapper', array(new Reference('upload_data.list_mapper')));
+        $definition->addMethodCall('setReaderLoader', array(new Reference('upload_data.reader_loader')));
     }
 }

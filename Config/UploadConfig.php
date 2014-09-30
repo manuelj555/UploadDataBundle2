@@ -9,9 +9,12 @@ namespace Manuelj555\Bundle\UploadDataBundle\Config;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
+use Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
+use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
+use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -24,6 +27,12 @@ class UploadConfig
 {
     protected $columnsMapper;
     protected $validationBuilder;
+    protected $listMapper;
+    /**
+     * @var ReaderLoader
+     */
+    protected $readerLoader;
+    protected $columnListFactory;
     private $processed = false;
     protected $uploadDir = false;
     protected $type = false;
@@ -49,6 +58,30 @@ class UploadConfig
     public function setObjectManager($objectManager)
     {
         $this->objectManager = $objectManager;
+    }
+
+    /**
+     * @param \Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper $listMapper
+     */
+    public function setListMapper($listMapper)
+    {
+        $this->listMapper = $listMapper;
+    }
+
+    /**
+     * @param mixed $columnListFactory
+     */
+    public function setColumnListFactory($columnListFactory)
+    {
+        $this->columnListFactory = $columnListFactory;
+    }
+
+    /**
+     * @param mixed $readerLoader
+     */
+    public function setReaderLoader($readerLoader)
+    {
+        $this->readerLoader = $readerLoader;
     }
 
     /**
@@ -93,11 +126,41 @@ class UploadConfig
 
         $this->configureColumns($this->columnsMapper);
         $this->configureValidations($this->validationBuilder);
+        $this->configureList($this->listMapper);
     }
 
     public function configureColumns(ColumnsMapper $mapper)
     {
 
+    }
+
+    public function configureList(ListMapper $mapper)
+    {
+        $mapper->add('id', null, array('use_show' => true,));
+        $mapper->add('filename', 'link', array(
+            'route' => 'upload_data_upload_show',
+            'condition' => function (Upload $upload) { return $upload->getTotal() > 0; },
+        ));
+        $mapper->add('uploadedAt', 'datetime');
+        $mapper->add('total', 'number', array('use_show' => true,));
+        $mapper->add('valids', 'number', array('use_show' => true,));
+        $mapper->add('invalids', 'number', array('use_show' => true,));
+        $mapper->addAction('read', array(
+            'condition' => function (Upload $upload) { return $upload->isReadable(); },
+            'status' => function (Upload $upload) { return $upload->getReaded(); },
+            'route' => 'upload_data_upload_read',
+            'modal' => true,
+        ));
+        $mapper->addAction('validate', array(
+            'condition' => function (Upload $upload) { return $upload->isValidatable(); },
+            'status' => function (Upload $upload) { return $upload->getValidated(); },
+            'route' => 'upload_data_upload_validate',
+        ));
+        $mapper->addAction('transfer', array(
+            'condition' => function (Upload $upload) { return $upload->isTransferable(); },
+            'status' => function (Upload $upload) { return $upload->getTransfered(); },
+            'route' => 'upload_data_upload_transfer',
+        ));
     }
 
     public function configureValidations(ValidationBuilder $builder)
@@ -110,9 +173,19 @@ class UploadConfig
         return $this->columnsMapper;
     }
 
+    /**
+     * @return \Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper
+     */
+    public function getListMapper()
+    {
+        return $this->listMapper;
+    }
+
     public function getInstance()
     {
-        return new Upload();
+        $upload = new Upload();
+
+        return $upload;
     }
 
     public function processUpload(UploadedFile $file)
@@ -141,29 +214,22 @@ class UploadConfig
 
     }
 
-    public function processRead(Upload $upload)
+    public function processRead(Upload $upload, array $options)
     {
-        $upload->setReaded(Upload::STATUS_IN_PROGRESS);
+        if (!$upload->isReadable()) {
+            return false;
+        }
+
+        $action = $upload->getAction('read');
+        $action->setInProgress();
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
         $this->onPreRead($upload);
 
-        $data = array(
-            array(
-                'name' => 'Name 1',
-                'email' => 'programador.manuel@gmail.com',
-                'years' => '25',
-            ),
-            array(
-                'name' => 'Name 2',
-                'email' => 'no email',
-                'years' => '',
-            ),
-            array(
-                'name' => 'Name 3',
-            ),
-        );
+        $reader = $this->readerLoader->get($upload->getFullFilename());
+
+        $data = $reader->getData($upload->getFullFilename(), $options);
 
         foreach ($data as $item) {
 
@@ -174,8 +240,7 @@ class UploadConfig
             $this->objectManager->persist($uploadedItem);
         }
 
-        $upload->setReaded(Upload::STATUS_COMPLETE);
-        $upload->setReadedAt(new \DateTime());
+        $action->setComplete();
         $upload->setTotal(count($data));
 
         $this->objectManager->persist($upload);
@@ -186,7 +251,12 @@ class UploadConfig
 
     public function processValidation(Upload $upload)
     {
-        $upload->setValidated(Upload::STATUS_IN_PROGRESS);
+        if (!$upload->isValidatable()) {
+            return false;
+        }
+
+        $action = $upload->getAction('validate');
+        $action->setInProgress();
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
@@ -217,8 +287,7 @@ class UploadConfig
             $this->objectManager->persist($item);
         }
 
-        $upload->setValidated(Upload::STATUS_COMPLETE);
-        $upload->setValidatedAt(new \DateTime());
+        $action->setComplete();
         $upload->setValids($valids);
         $upload->setInvalids($invalids);
 
@@ -230,19 +299,28 @@ class UploadConfig
 
     public function processTransfer(Upload $upload)
     {
-        $upload->setTransfered(Upload::STATUS_IN_PROGRESS);
+        if (!$upload->isTransferable()) {
+            return false;
+        }
+
+        $action = $upload->getAction('read');
+        $action->setInProgress();
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
         $this->transfer($upload, $upload->getItems());
 
-        $upload->setTransfered(Upload::STATUS_COMPLETE);
-        $upload->setTransferedAt(new \DateTime());
+        $action->setComplete();
 
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
         $this->onPostRead($upload);
+    }
+
+    public function processAction(Upload $upload, $name)
+    {
+
     }
 
     public function onPreUpload(Upload $upload, File $file) { }

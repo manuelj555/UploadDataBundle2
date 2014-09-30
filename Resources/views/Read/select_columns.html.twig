@@ -1,0 +1,67 @@
+<form class="form-horizontal" data-ajax data-before="validateColumnsForm"
+      data-after="closeColumnsModal"
+      action="{{ app.request.getRequestUri() }}" method="post">
+    <div class="modal-body">
+        <table class="table table-bordered system-headers form-horizontal">
+            <thead>
+                <tr>
+                    <th class="text-center">Columnas Esperadas</th>
+                    <th class="text-center">Columnas del Archivo</th>
+                </tr>
+            </thead>
+            {% for name, options in columns %}
+                <tr>
+                    <td style="width: 50%">
+                        <label class="control-label">{{ options.label|title }}</label>
+                    </td>
+                    <td>
+                        <select name="columns[{{ name }}]" class="form-control file-header"
+                                {% if options.required %}required="required" {% endif %}>
+                            <option value="">- Seleccione -</option>
+                            {% for index, file_header in file_headers %}
+                                <option {% if matches[name] is defined and file_header == matches[name] %}selected="selected"
+                                        {% endif %}value="{{ index }}">{{ file_header|title }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="modal-footer">
+        <input type="submit" class="btn btn-primary" value="Procesar">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+
+</form>
+
+<script>
+    function validateColumnsForm($form) {
+        $("select.file-header").each(function () {
+            var $select = $(this);
+            var isBreak = false;
+            if (!$select.val()) {
+                return;
+            }
+            $("select.file-header").not($select).each(function () {
+                if ($(this).val() == $select.val()) {
+                    alert('No pueden haber selects con el mismo valor seleccionado');
+                    $(this).focus();
+                    isBreak = true;
+                    return false;
+                }
+            });
+
+            if (isBreak) {
+                return false;
+            }
+        });
+    }
+
+    function closeColumnsModal(content, $form, $container, jqXhr) {
+        if (jqXhr.getResponseHeader('X-Close-Modal')) {
+            $(".modal").modal('hide');
+        }
+    }
+</script>

@@ -18,34 +18,12 @@
 {% set show_detail = upload_config.columnsMapper.labels > 6 %}
 
 {% block content %}
-    <div id="show-container" data-url="{{ app.request.getRequestUri() }}">
+    <div id="show-container">
         <div class="row" id="show-container" data-url="{{ app.request.getRequestUri() }}">
             <div class="col-sm-6">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            {#<th>Uploaded</th>#}
-                            <th>Items</th>
-                            <th>Valids</th>
-                            <th>Invalids</th>
-                            <th>Readed</th>
-                            <th>Validated</th>
-                            <th>Transfered</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% set params = {type: type, id: upload.id} %}
-                        <tr class="upload-row">
-                            {#<td>{{ upload.uploadedAt|date('Y-m-d H:i:s') }}</td>#}
-                            <td class="text-right">{{ upload.total is not none ? upload.total|number_format(0) : '--' }}</td>
-                            <td class="text-right">{{ upload.valids is not none ? upload.valids|number_format(0) : '--' }}</td>
-                            <td class="text-right">{{ upload.invalids is not none ? upload.invalids|number_format(0) : '--' }}</td>
-                            <td>{{ status(upload, upload.readed, upload.readedAt, upload.isReadable(), path('upload_data_upload_read', params)) }}</td>
-                            <td>{{ status(upload, upload.validated, upload.validatedAt, upload.isValidatable(), path('upload_data_upload_validate', params)) }}</td>
-                            <td>{{ status(upload, upload.transfered, upload.transferedAt, upload.isTransferable(), path('upload_data_upload_transfer', params)) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                {{ include('@UploadData/Upload/uploads_table.html.twig', {
+                config: upload_config, items: [upload], is_show: true
+                }) }}
             </div>
         </div>
 
@@ -115,6 +93,12 @@
     {{ parent() }}
     <script src="{{ asset('bundles/uploaddata/js/upload.js') }}"></script>
     {{ block('ajax_script') }}
+    <script>
+        new UploadData({
+            container: $('#show-container'),
+            url_refresh: '{{ app.request.getRequestUri() }}'
+        });
+    </script>
 {% endblock %}
 
 {%- macro errors(errors, mapper) -%}

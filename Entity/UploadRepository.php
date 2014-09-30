@@ -2,7 +2,9 @@
 
 namespace Manuelj555\Bundle\UploadDataBundle\Entity;
 
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 
 /**
  * UploadRepository
@@ -12,10 +14,28 @@ use Doctrine\ORM\EntityRepository;
  */
 class UploadRepository extends EntityRepository
 {
-    public function getQueryForType($type)
+    public function getQueryForType($type, $order = 'DESC')
     {
         return $this->createQueryBuilder('upload')
+            ->select('upload, actions, attributes')
+            ->leftJoin('upload.actions', 'actions')
+            ->leftJoin('upload.attributes', 'attributes')
             ->where('upload.type = :type')
-            ->setParameter('type', $type);
+            ->setParameter('type', $type)
+            ->orderBy('upload.id ', $order);
     }
+
+    public function find($id, $lockMode = LockMode::NONE, $lockVersion = null)
+    {
+        return $this->createQueryBuilder('upload')
+            ->select('upload, actions, attributes')
+            ->leftJoin('upload.actions', 'actions')
+            ->leftJoin('upload.attributes', 'attributes')
+            ->where('upload.id = :id')
+            ->setParameter('id', $id, \PDO::PARAM_INT)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
 }

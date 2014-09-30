@@ -1,41 +1,66 @@
 /**
  * Created by Manuel Aguirre on 26/09/14.
  */
-;
-(function ($) {
-    var $container = $('#upload-list-container');
-    var url_list = $container.data('url');
-    var $processing = $('<span class="label label-info"/>').html('<i class="glyphicon glyphicon-refresh"></i> Processing...');
+var UploadData = function (opts) {
+    var $ = jQuery;
+    var $processing = $('<span class="label label-warning"/>').html('<i class="glyphicon glyphicon-refresh"></i>...');
 
-    if ($container.size()) {
-        window.reloadList = function reloadList() {
-            $container.load(url_list);
-        }
+    var options = {
+        container: $('body'),
+        url_refresh: null,
+        refresh_complete: function () {
+        },
+        error: function () {
+            alert('Ups!!, Ocurrió un Error!!!');
+        },
+        auto_reload: false,
+        auto_reload_time: 10000
+    };
 
-        setInterval(reloadList, 10000);
-    }else{
-        $container = $('body');
+    options = $.extend(options, opts);
+
+    this.reload = function () {
+        options.container.load(options.url_refresh, options.refresh_complete);
+    };
+
+    if (options.auto_reload) {
+        setInterval(this.reload, options.auto_reload_time);
     }
 
-    $container.on('click', '.upload-process', function (e) {
-        e.preventDefault();
-        var $a = $(this);
-        var $row = $a.closest('.upload-row');
-        $a.parent().html($processing.clone());
-        $row.find('a.upload-process').addClass('disabled');
-        console.log($row, $row.find('a'))
-        $.ajax({
-            url: $a.attr('href'),
-            complete: function () {
-                if($container.is(':not(body)')){
-                    reloadList();
-                }else{
-                    $("#show-container").load($("#show-container").data('url'));
-                }
-            },
-            error: function () {
-                alert('Ups!!, Ocurrió un Error!!!');
+    var upload = this;
+
+    options.container.on('click', '.upload-process', function (e) {
+            e.preventDefault();
+            var $a = $(this);
+            var $row = $a.closest('.upload-row');
+
+            if (!$a.is('[data-modal]')) {
+                $a.parent().html($processing.clone());
+                $row.find('a.upload-process').addClass('disabled');
             }
-        });
+            $.ajax({
+                url: $a.attr('href'),
+                success: function (content) {
+                    if ($a.is('[data-modal]')) {
+                        $('#upload-ajax-extra-content').html(content);
+                    } else {
+                        upload.reload();
+                    }
+                },
+                error: function () {
+                    options.error();
+                }
+            });
+        }
+    );
+
+    $.ajaxSetup({
+        complete: function (xhr) {
+            if (xhr.getResponseHeader('X-Reload')) {
+                upload.reload();
+            }
+        }
     });
-})(jQuery);
+
+    $('body').append('<div id="upload-ajax-extra-content" />');
+};

@@ -8,7 +8,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 /**
  * UploadedItem
  *
- * @ORM\Table()
+ * @ORM\Table(name="upload_data_uploaded_item")
  * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
  * @ORM\HasLifecycleCallbacks()
  */

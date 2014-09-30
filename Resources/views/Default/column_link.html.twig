@@ -1,0 +1,9 @@
+{% set use_link = column.callOption('condition', [item]) %}
+<td>
+    {% if use_link %}
+        <a href="{{ path(column.options.route, {id: item.id, type: upload_type}) }}"
+           class="btn btn-link btn-xs">{{ attribute(item, name) }}</a>
+    {% else %}
+        {{ attribute(item, name) }}
+    {% endif %}
+</td>

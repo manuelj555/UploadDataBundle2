@@ -50,7 +50,7 @@
                 var progress = parseInt(data.loaded / data.total * 100, 10);
                 $('#upload-progress .progress-bar').css('width', progress + '%');
                 $("#{{ modal_id }}").modal('hide');
-                reloadList();
+                upload.reload();
             }
         });
         //        console.log('MMMM', $('#fileupload'));

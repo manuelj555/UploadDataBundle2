@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Upload
  *
- * @ORM\Table()
+ * @ORM\Table(name="upload_data_upload")
  * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository")
  * @ORM\HasLifecycleCallbacks()
  */
@@ -125,6 +125,26 @@ class Upload
      */
     private $transferedAt;
 
+    /**
+     * @ORM\OneToMany(
+     *      targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute",
+     *      cascade={"all"},
+     *      mappedBy="upload",
+     *      orphanRemoval=true
+     * )
+     */
+    private $attributes;
+
+    /**
+     * @ORM\OneToMany(
+     *      targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction",
+     *      cascade={"all"},
+     *      mappedBy="upload",
+     *      orphanRemoval=true,
+     * )
+     * @ORM\OrderBy(value={"position": "ASC"})
+     */
+    private $actions;
 
     /**
      * Get id
@@ -341,7 +361,7 @@ class Upload
     {
         return $this->getUploadedAt() !== null
         and $this->getReaded() == self::STATUS_COMPLETE
-        and $this->getValidated() == self::STATUS_NOT_COMPLETE
+        and $this->getValidated() != self::STATUS_IN_PROGRESS
         and $this->getTransfered() == self::STATUS_NOT_COMPLETE;
     }
 
@@ -350,7 +370,8 @@ class Upload
         return $this->getUploadedAt() !== null
         and $this->getReaded() == self::STATUS_COMPLETE
         and $this->getValidated() == self::STATUS_COMPLETE
-        and $this->getTransfered() == self::STATUS_NOT_COMPLETE;
+        and $this->getTransfered() == self::STATUS_NOT_COMPLETE
+        and $this->getValids() > 0;
     }
 
     /**
@@ -413,14 +434,6 @@ class Upload
     }
 
     /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-    /**
      * Add items
      *
      * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items
@@ -480,5 +493,189 @@ class Upload
     public function getFullFilename()
     {
         return $this->fullFilename;
+    }
+
+    /**
+     * Set valids
+     *
+     * @param integer $valids
+     *
+     * @return Upload
+     */
+    public function setValids($valids)
+    {
+        $this->valids = $valids;
+
+        return $this;
+    }
+
+    /**
+     * Get valids
+     *
+     * @return integer
+     */
+    public function getValids()
+    {
+        return $this->valids;
+    }
+
+    /**
+     * Set invalids
+     *
+     * @param integer $invalids
+     *
+     * @return Upload
+     */
+    public function setInvalids($invalids)
+    {
+        $this->invalids = $invalids;
+
+        return $this;
+    }
+
+    /**
+     * Get invalids
+     *
+     * @return integer
+     */
+    public function getInvalids()
+    {
+        return $this->invalids;
+    }
+
+    /**
+     * Set total
+     *
+     * @param integer $total
+     *
+     * @return Upload
+     */
+    public function setTotal($total)
+    {
+        $this->total = $total;
+
+        return $this;
+    }
+
+    /**
+     * Get total
+     *
+     * @return integer
+     */
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    /**
+     * Add attributes
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
+     *
+     * @return Upload
+     */
+    public function addAttribute(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
+    {
+        $this->attributes[] = $attributes;
+
+        $attributes->setUpload($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove attributes
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
+     */
+    public function removeAttribute(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
+    {
+        $this->attributes->removeElement($attributes);
+
+        $attributes->setUpload(null);
+    }
+
+    /**
+     * Get attributes
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Add actions
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions
+     *
+     * @return Upload
+     */
+    public function addAction(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions)
+    {
+        $this->actions[] = $actions;
+
+        $actions->setUpload($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove actions
+     *
+     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions
+     */
+    public function removeAction(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions)
+    {
+        $this->actions->removeElement($actions);
+
+        $actions->setUpload(null);
+    }
+
+    /**
+     * Get actions
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    public function getAction($name)
+    {
+        static $loadeds = array();
+        $name = strtolower($name);
+
+        if (isset($loadeds[$name])) {
+            return $loadeds[$name];
+        }
+
+        return $this->getActions()->filter(function (UploadAction $action) use ($name, $loadeds) {
+            if (strtolower($action->getName()) == strtolower($name)) {
+                $loadeds[$name] = $action;
+
+                return $action;
+            }
+        });
+    }
+
+    public function getAttribute($name)
+    {
+        static $loadeds = array();
+        $name = strtolower($name);
+
+        if (isset($loadeds[$name])) {
+            return $loadeds[$name];
+        }
+
+        return $this->getAttributes()->filter(function (UploadAttribute $item) use ($name, $loadeds) {
+            if (strtolower($item->getName()) == strtolower($name)) {
+                $loadeds[$name] = $item;
+
+                return $item;
+            }
+        });
     }
 }

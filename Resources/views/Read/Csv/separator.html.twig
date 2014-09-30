@@ -1,0 +1,44 @@
+{% extends '@UploadData/base_ajax_modal.html.twig' %}
+{% set modal_id = 'csv_form' %}
+
+{#{% form_theme form#}
+{#'@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'#}
+{#%}#}
+
+{#{% form_theme form.attributes#}
+{% form_theme form
+'@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'
+_self %}
+
+{% block headline %}
+    Lectura del Archivo
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form, {attr: {'data-ajax': "##{modal_id} .modal-body-container" }}) }}
+    <div class="modal-body">
+        {% embed '@UploadData/panel.html.twig' %}
+            {% block body %}
+                Este formulario permite establecer opciones para la lecura de archivos <strong>CSV</strong>
+            {% endblock %}
+        {% endembed %}
+        {{ form_widget(form.attributes) }}
+    </div>
+    <div class="modal-footer">
+        {{ form_widget(form.enviar) }}
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block upload_attribute_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block form_label_class -%}
+    col-sm-6
+{%- endblock form_label_class %}
+
+{% block form_group_class -%}
+    col-sm-6
+{%- endblock form_group_class %}

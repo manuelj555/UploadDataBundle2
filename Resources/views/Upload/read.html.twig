@@ -1,0 +1,40 @@
+{% set is_ajax = app.request.isXmlHttpRequest() %}
+{% set modal_id = 'show_read_modal' %}
+{% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
+
+{% block headline %}Read
+    <small>#{{ upload.id }}-{{ upload.filename }}</small>{% endblock %}
+{% block content %}
+    Acá se creará el proceso de lectura del archivo<br>
+    dependiendo del formato del archivo, se mostrarán
+    opciones diferentes acá,<br/>
+    si es un csv, se debe pedir el separador de las columnas, que por defecto será |<br/>
+    si es un xls, se debe pedir el numero de fila que representa los titulos de las columnas.
+
+    <hr>
+
+    Luego de esto se debe proceder a mostrar las columnas que se encontraron en el excel
+    y mostrar las columnas que se esperaban encontrar, para así el usuario pueda proceder
+    a seleccionar que columna del excel va con cada una de las esperadas.
+
+{% endblock %}
+
+{#{% block modal_footer %}#}
+    {#{{ parent() }}#}
+    {#&#123;&#35;<input type="submit" class="btn btn-primary">&#35;&#125;#}
+{#{% endblock %}#}
+
+{#{%- macro errors(errors, mapper) -%}#}
+    {#<table class="table table-bordered table-condensed">#}
+        {#{%- for column, errors in errors -%}#}
+            {#<tr>#}
+                {#<td><strong>{{ mapper.getLabel(column)|title }}</strong></td>#}
+                {#<td>#}
+                    {#<ul>#}
+                        {#<li>{{ errors|join('</li><li>')|raw }}</li>#}
+                    {#</ul>#}
+                {#</td>#}
+            {#</tr>#}
+        {#{%- endfor -%}#}
+    {#</table>#}
+{#{%- endmacro -%}#}

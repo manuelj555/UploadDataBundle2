@@ -1,0 +1,26 @@
+{% from '@UploadData/macros.html.twig' import bs_icon %}
+{% set action = item.getAction(name) %}
+{% set status = action.getStatus() %}
+{% set is_actionable = column.callOption('condition', [item]) %}
+<td class="text-center">
+    {%- if action.isInProgress() -%}
+        <span class="label label-warning">{{ bs_icon('refresh') }}...</span>
+    {%- elseif is_actionable -%}
+        <a class="upload-process upload-process-{{ name }} btn btn-{{ action.isComplete() ? 'success' : 'info' }} btn-xs"
+           href="{{ path(column.options.route, {id: item.id, type: upload_type}) }}"
+                {% if column.options.modal -%}data-modal{%- endif -%}>
+        {{ bs_icon(action.isComplete() ? 'refresh' : 'eject') }}
+            {#{{ bs_icon('eject') }}#}
+        </a>
+    {%- elseif action.isComplete() -%}
+        <span class="label label-success">{{ bs_icon('ok') }}</span>
+    {%- else -%}
+        <span class="label label-danger">{{ bs_icon('remove') }}</span>
+    {%- endif -%}
+</td>
+
+{#
+
+Determinar acá si se debe mostrar un modal
+
+#}
