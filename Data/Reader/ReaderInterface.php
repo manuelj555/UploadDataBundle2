@@ -14,6 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 interface ReaderInterface
 {
+    const EXTRA_FIELDS_NAME = '__EXTRA__';
+
     public function getData($filename, $options);
     public function getRowHeaders($filename, $options);
 

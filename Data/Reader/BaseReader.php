@@ -36,7 +36,9 @@ abstract class BaseReader implements ReaderInterface
 
     public function setDefaultOptions(OptionsResolverInterface $resolver, $headers = false)
     {
-
+        if (!$headers) {
+            $resolver->setRequired(array('header_mapping'));
+        }
     }
 
     protected function resolveOptions($options, $headers = false)

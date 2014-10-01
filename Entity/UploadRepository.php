@@ -25,6 +25,13 @@ class UploadRepository extends EntityRepository
             ->orderBy('upload.id ', $order);
     }
 
+    /**
+     * @param mixed $id
+     * @param int   $lockMode
+     * @param null  $lockVersion
+     *
+     * @return mixed|null|Upload
+     */
     public function find($id, $lockMode = LockMode::NONE, $lockVersion = null)
     {
         return $this->createQueryBuilder('upload')

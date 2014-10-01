@@ -13,8 +13,7 @@ var UploadData = function (opts) {
         error: function () {
             alert('Ups!!, Ocurrió un Error!!!');
         },
-        auto_reload: false,
-        auto_reload_time: 10000
+        auto_reload: false
     };
 
     options = $.extend(options, opts);
@@ -24,7 +23,7 @@ var UploadData = function (opts) {
     };
 
     if (options.auto_reload) {
-        setInterval(this.reload, options.auto_reload_time);
+        setInterval(this.reload, options.auto_reload);
     }
 
     var upload = this;

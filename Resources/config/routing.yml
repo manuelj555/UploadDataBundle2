@@ -37,3 +37,15 @@ upload_data_upload_read_csv:
 upload_data_upload_select_columns_csv:
     path:     /upload/select-columns/csv/{id}
     defaults: { _controller: UploadDataBundle:CsvRead:selectColumns }
+
+upload_data_upload_read_excel:
+    path:     /upload/read/excel/{id}
+    defaults: { _controller: UploadDataBundle:ExcelRead:selectRowHeaders }
+
+upload_data_upload_read_excel_preview_headers:
+    path:     /upload/read/excel/{id}/headers-preview
+    defaults: { _controller: UploadDataBundle:ExcelRead:previewHeaders }
+
+upload_data_upload_select_columns_excel:
+    path:     /upload/select-columns/excel/{id}
+    defaults: { _controller: UploadDataBundle:ExcelRead:selectColumns }

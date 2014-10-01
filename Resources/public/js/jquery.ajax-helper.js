@@ -18,8 +18,9 @@
             var container = $($this.data('ajax'));
             var before = window[$this.data('before')] ? window[$this.data('before')] : $.noop;
             var after = window[$this.data('after')] ? window[$this.data('after')] : $.noop;
+            var parameters = {};
 
-            if (false === before($this, event, container)) {
+            if (false === before($this, event, container, parameters)) {
                 return;
             }
 
@@ -32,7 +33,7 @@
                 after(response, $this, container, jqXhr);
             };
 
-            $.get(url, afterWrap);
+            $.get(url, parameters, afterWrap);
 
         }).on('submit', 'form[data-ajax]', function(event) {
             event.preventDefault();
@@ -69,8 +70,9 @@
             var container = $($this.data('ajax'));
             var before = window[$this.data('before')] ? window[$this.data('before')] : $.noop;
             var after = window[$this.data('after')] ? window[$this.data('after')] : $.noop;
+            var parameters = {};
 
-            if (false === before($this, event, container)) {
+            if (false === before($this, event, container, parameters)) {
                 return;
             }
 
@@ -83,7 +85,7 @@
                 after(response, $this, container, jqXhr);
             };
 
-            $.get(url, {value: $this.val()}, afterWrap);
+            $.get(url, $.extend(parameters, {value: $this.val()}), afterWrap);
         }).on('click', '[data-ajax-container] a, [data-ajax-container] :button, [data-ajax-container] :submit, [data-ajax-container] :reset', function(event) {
             event.preventDefault();
             var $this = $(this);

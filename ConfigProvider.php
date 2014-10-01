@@ -6,6 +6,7 @@
 
 namespace Manuelj555\Bundle\UploadDataBundle;
 
+use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 
@@ -26,6 +27,12 @@ class ConfigProvider
         $this->configs = $configs;
     }
 
+    /**
+     * @param $type
+     *
+     * @return UploadConfig
+     * @throws \InvalidArgumentException
+     */
     public function get($type)
     {
         if (!$this->has($type)){

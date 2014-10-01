@@ -32,10 +32,14 @@ class CsvReader extends BaseReader
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
 
-        foreach ($data as  $rowIndex => $row) {
+        foreach ($data as $rowIndex => $row) {
             $formattedRow = array();
             foreach ($row as $index => $column) {
-                $formattedRow[$names[$index]] = $column;
+                if (isset($names[$index])) {
+                    $formattedRow[$names[$index]] = $column;
+                } else {
+                    $formattedRow[self::EXTRA_FIELDS_NAME][$index] = $column;
+                }
             }
             $formattedData[$rowIndex] = $formattedRow;
         }
@@ -45,26 +49,26 @@ class CsvReader extends BaseReader
         return $formattedData;
     }
 
-    public function supports($filename)
+    public
+    function supports($filename)
     {
-        return pathinfo($filename, PATHINFO_EXTENSION) === 'csv';
+        return strtolower(pathinfo($filename, PATHINFO_EXTENSION)) === 'csv';
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver, $headers = false)
+    public
+    function setDefaultOptions(OptionsResolverInterface $resolver, $headers = false)
     {
+        parent::setDefaultOptions($resolver, $headers);
+
         $resolver->setDefaults(array(
             'delimiter' => '|',
         ));
 
         $resolver->setRequired(array('row_headers'));
-
-        if (!$headers) {
-            $resolver->setRequired(array('header_mapping'));
-        }
-
     }
 
-    public function getRowHeaders($filename, $options)
+    public
+    function getRowHeaders($filename, $options)
     {
         $this->verifyFile($filename);
 

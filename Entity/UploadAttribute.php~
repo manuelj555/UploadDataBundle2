@@ -3,12 +3,14 @@
 namespace Manuelj555\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * UploadAttribute
  *
  * @ORM\Table(name="upload_data_upload_attribute")
  * @ORM\Entity
+ * @UniqueEntity(fields={"name", "upload"})
  */
 class UploadAttribute
 {
@@ -33,11 +35,6 @@ class UploadAttribute
      */
     private $name;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="form_label", type="string", length=255, nullable=true)
-     */
     private $formLabel;
 
     /**
@@ -50,13 +47,21 @@ class UploadAttribute
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="string", length=255, nullable=true)
+     * @ORM\Column(name="value", type="text", nullable=true)
      */
     private $value;
 
-    function __construct($name = null)
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="is_array", type="boolean", nullable=true)
+     */
+    private $isArray = 0;
+
+    function __construct($name = null, $value = null)
     {
-        $this->name = $name;
+        $this->setName($name);
+        $this->value = $value;
     }
 
     /**
@@ -78,7 +83,7 @@ class UploadAttribute
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->name = strtolower($name);
 
         return $this;
     }
@@ -102,6 +107,10 @@ class UploadAttribute
      */
     public function setValue($value)
     {
+        if (is_array($value)) {
+            $value = serialize($value);
+        }
+
         $this->value = $value;
 
         return $this;
@@ -114,6 +123,10 @@ class UploadAttribute
      */
     public function getValue()
     {
+        if (is_array($this->value)) {
+            $this->value = unserialize($this->value);
+        }
+
         return $this->value;
     }
 
@@ -139,5 +152,53 @@ class UploadAttribute
     public function getUpload()
     {
         return $this->upload;
+    }
+
+    /**
+     * Set formLabel
+     *
+     * @param string $formLabel
+     *
+     * @return UploadAttribute
+     */
+    public function setFormLabel($formLabel)
+    {
+        $this->formLabel = $formLabel;
+
+        return $this;
+    }
+
+    /**
+     * Get formLabel
+     *
+     * @return string
+     */
+    public function getFormLabel()
+    {
+        return $this->formLabel;
+    }
+
+    /**
+     * Set label
+     *
+     * @param string $label
+     *
+     * @return UploadAttribute
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * Get label
+     *
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
     }
 }

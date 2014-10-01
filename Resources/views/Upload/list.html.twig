@@ -40,11 +40,8 @@
         var upload = new UploadData({
             container: $('#upload-list-container'),
             url_refresh: '{{ app.request.getRequestUri() }}',
-            auto_reload: false,
-            auto_reload_time: 20000
+            auto_reload: 5000
         });
-        //
-        //        alert('JAJA');
         function showModal(html) {
             $("#new_upload").remove();
             $('body').append(html);

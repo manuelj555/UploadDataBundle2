@@ -214,9 +214,9 @@ class UploadConfig
 
     }
 
-    public function processRead(Upload $upload, array $options)
+    public function processRead(Upload $upload)
     {
-        if (!$upload->isReadable()) {
+        if (!$upload->isReadable() or !$upload->getAttribute('config_read')) {
             return false;
         }
 
@@ -229,7 +229,7 @@ class UploadConfig
 
         $reader = $this->readerLoader->get($upload->getFullFilename());
 
-        $data = $reader->getData($upload->getFullFilename(), $options);
+        $data = $reader->getData($upload->getFullFilename(), $upload->getAttribute('config_read')->getValue());
 
         foreach ($data as $item) {
 

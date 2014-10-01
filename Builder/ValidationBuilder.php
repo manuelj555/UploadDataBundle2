@@ -42,7 +42,7 @@ class ValidationBuilder
         }
     }
 
-    protected function addConstraint($constraint)
+    public function addConstraint($constraint)
     {
         $this->verifyIn();
 

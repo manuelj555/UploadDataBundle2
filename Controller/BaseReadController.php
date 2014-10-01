@@ -4,10 +4,15 @@ namespace Manuelj555\Bundle\UploadDataBundle\Controller;
 
 use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
+use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 
 class BaseReadController extends Controller
 {
@@ -20,49 +25,13 @@ class BaseReadController extends Controller
             ->get($upload->getType());
     }
 
-    public function selectColumnsAction(Request $request, Upload $upload)
+    protected function processRead(Upload $upload)
     {
-        //la idea acá es leer las columnas del archivo y mostrarlas
-        //para que el usuario haga un mapeo de ellas con las esperadas
-        //por el sistema.
+        $config = $this->getConfig($upload);
 
-        $options = array(
-            'delimiter' => $upload->getAttribute('separator')->getValue(),
-            'row_headers' => 0,
-        );
-
-        $headers = $this->get('upload_data.csv_reader')
-            ->getRowHeaders($upload->getFullFilename(), $options);
-
-        $a = $this->getConfig($upload);
-        $columnsMapper = $a->getColumnsMapper();
-
-        $columns = $columnsMapper->getColumns();
-        $matches = $columnsMapper->match($headers);
-
-        if ($request->isMethod('POST') and $request->request->has('columns')) {
-            $this->processRead($upload
-                , $columnsMapper->mapForm($request->request->get('columns'), $headers)
-                , $options);
-
-            return Response::create('Ok', 203, array(
-                'X-Close-Modal' => true,
-                'X-Reload' => true,
-            ));
-        }
-
-        return $this->render('@UploadData/Read/select_columns.html.twig', array(
-            'file_headers' => $headers,
-            'columns' => $columns,
-            'matches' => $matches,
-        ));
-    }
-
-    protected function processRead(Upload $upload, $mappedData, $options)
-    {
-        $this->getConfig($upload)
-            ->processRead($upload, array(
-                    'header_mapping' => $mappedData,
-                ) + $options);
+        $this->get('event_dispatcher')->addListener('kernel.terminate'
+            , function () use ($config, $upload) {
+                $config->processRead($upload);
+            });
     }
 }

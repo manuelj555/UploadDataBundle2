@@ -1,0 +1,9 @@
+<table class="table table-bordered">
+    {% for row in headers|batch(3, '') %}
+        <tr>
+            {% for header in row %}
+                <td>{{ header }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>

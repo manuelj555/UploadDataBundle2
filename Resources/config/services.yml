@@ -46,6 +46,11 @@ services:
         tags:
             - { name: upload_data.reader, route_config: upload_data_upload_read_csv }
 
+    upload_data.excel_reader:
+        class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\ExcelReader
+        tags:
+            - { name: upload_data.reader, route_config: upload_data_upload_read_excel }
+
     upload_data.reader_loader:
         class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
 #
@@ -78,3 +83,9 @@ services:
             - [setUploadTypes, [%upload_data.upload_types%]]
         tags:
             - { name: sonata.block }
+
+    upload_data.upload_repository:
+        class: Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository
+        factory_service: doctrine.orm.entity_manager
+        factory_method: getRepository
+        arguments: [UploadDataBundle:Upload]

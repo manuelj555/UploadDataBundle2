@@ -65,20 +65,17 @@ class UploadController extends Controller
         return $this->redirect($this->generateUrl($reader->getRouteConfig(), array(
             'id' => $upload->getId(),
         )));
-
-        if ($request->isMethod('POST')) {
-            $this->getConfig($type)
-                ->processRead($upload);
-//        $this->get('session')
-//            ->getFlashBag()
-//            ->add('success', 'Readed!');
-
-            return new Response('Ok');
-        }
-
-        return $this->render('@UploadData/Upload/read.html.twig', $this->mergeParams($type, array(
-            'upload' => $upload,
-        )));
+//
+//        if ($request->isMethod('POST')) {
+//            $this->getConfig($type)
+//                ->processRead($upload);
+//
+//            return new Response('Ok');
+//        }
+//
+//        return $this->render('@UploadData/Upload/read.html.twig', $this->mergeParams($type, array(
+//            'upload' => $upload,
+//        )));
     }
 
     public function validateAction($type, Upload $upload)

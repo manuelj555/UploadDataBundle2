@@ -14,6 +14,7 @@
     {#</style>#}
 {#{% endblock %}#}
 
+{% set extraName = constant('Manuelj555\\Bundle\\UploadDataBundle\\Data\\Reader\\ReaderInterface::EXTRA_FIELDS_NAME') %}
 
 {% block content %}
     <table class="table table-bordered">
@@ -23,13 +24,43 @@
                 <th>Valor</th>
             </tr>
         </thead>
-        {% for name, value in item.data %}
+        {% for name, value in item.data if name != extraName %}
             <tr>
                 <td><strong>{{ upload_config.columnsMapper.getLabel(name)|title }}</strong></td>
                 <td>{{ value }}</td>
             </tr>
         {% endfor %}
     </table>
+    {% if item.data[extraName] is defined and item.data[extraName] is iterable %}
+        <hr>
+        <h4 class="upload-item-extra-fields-toggle" style="cursor: pointer">Campos Adicionales</h4>
+        <div class="upload-item-extra-fields" style="display: none">
+            {#{{ dump(item.data) }}#}
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Columna</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                {% for name, value in item.data[extraName] %}
+                    <tr>
+                        <td><strong>{{ name }}</strong></td>
+                        <td>{{ value }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block ajax_script %}
+    <script>
+        $(".upload-item-extra-fields-toggle").on('click', function(e){
+            e.preventDefault();
+            $(".upload-item-extra-fields").slideToggle();
+        });
+    </script>
 {% endblock %}
 
 {#{% block modal_footer %}#}

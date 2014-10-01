@@ -25,6 +25,9 @@
                 config: upload_config, items: [upload], is_show: true
                 }) }}
             </div>
+            <div class="col-sm-6 text-right">
+                <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default btn-sm ">Volver al Listado</a>
+            </div>
         </div>
 
         <table class="table table-bordered">
@@ -61,10 +64,6 @@
             {% endfor %}
         </table>
     </div>
-
-    {% if not is_ajax %}
-        <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default">Volver al Listado</a>
-    {% endif %}
 {% endblock %}
 
 {#{% block modal_footer %}#}

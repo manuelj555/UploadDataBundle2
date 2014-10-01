@@ -77,9 +77,11 @@ class ColumnsMapper
             $header = strtolower($header);
         });
 
+
         foreach ($this->columns as $name => $options) {
-            if (in_array(strtolower($this->labels[$name]), $fileHeaders)) {
-                $pos = array_search($this->labels[$name], $fileHeaders);
+            $lbl = strtolower($this->labels[$name]);
+            if (in_array($lbl, $fileHeaders)) {
+                $pos = array_search($lbl, $fileHeaders);
                 $this->matches[$name] = $originals[$pos];
                 continue;
             }

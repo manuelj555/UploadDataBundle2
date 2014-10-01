@@ -9,6 +9,7 @@ namespace Manuelj555\Bundle\UploadDataBundle;
 use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
+use Symfony\Component\Validator\Constraints\CardScheme;
 
 
 /**
@@ -20,28 +21,45 @@ class VentasConfig extends UploadConfig
     public function configureColumns(ColumnsMapper $mapper)
     {
         $mapper
-            ->add('name', array(
-                'aliases' => array('AAA', 'BBB', 'Name'),
-                'similar' => true,
+            ->add('sales_id', array(
+                'label' => 'Sales ID',
             ))
-            ->add('email')
-            ->add('years');
+            ->add('first_name', array(
+                'similar' => true,
+                'label' => 'First Name',
+            ))
+            ->add('last_name', array(
+                'similar' => true,
+                'label' => 'Last Name',
+            ))
+            ->add('card_number', array(
+                'similar' => true,
+                'label' => 'Card Number',
+            ));
     }
 
     public function configureValidations(ValidationBuilder $builder)
     {
         $builder
-            ->with('name')
-            ->assertNotBlank()
+            ->with('sales_id')
+                ->assertNotBlank()
             ->end()
-            ->with('email')
-            ->assertNotBlank()
-            ->assertEmail()
+            ->with('first_name')
+                ->assertNotBlank()
             ->end()
-            ->with('years')
-            ->assertNotBlank()
-            ->assertType('numeric')
-            ->end();
+            ->with('last_name')
+                ->assertNotBlank()
+            ->end()
+            ->with('card_number')
+                ->assertNotBlank()
+                ->addConstraint(new CardScheme(array("MASTERCARD")))
+            ->end()
+            ;
+    }
+
+    public function onPreValidate()
+    {
+        //sleep(15);
     }
 
 

@@ -7,47 +7,69 @@ use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\AttributeType;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class CsvReadController extends BaseReadController
+class ExcelReadController extends BaseReadController
 {
 
-    public function separatorAction(Request $request, Upload $upload)
+    public function selectRowHeadersAction(Request $request, Upload $upload)
     {
-        if (!$separatorAttribute = $upload->getAttribute('separator')) {
-            $separatorAttribute = new UploadAttribute('separator', '|');
-            $upload->addAttribute($separatorAttribute);
+        if (!$attr = $upload->getAttribute('row_headers')) {
+            $attr = new UploadAttribute('row_headers', 1);
+            $upload->addAttribute($attr);
         }
 
-        $separatorAttribute->setFormLabel('Caracter separador');
+        $attr->setFormLabel('Número de Fila de las Cabeceras');
 
         $form = $this->createFormBuilder()
             ->setAction($request->getRequestUri())
+            ->setMethod('post')
             ->add('attributes', 'collection', array(
                 'type' => new AttributeType(),
-                'data' => array($separatorAttribute),
+                'data' => array($attr),
             ))
-            ->add('enviar', 'submit', array(
+            ->add('preview', 'button', array(
+                'attr' => array('class' => 'btn-info'),
+                'label' => 'Previsualizar Fila',
+            ))
+            ->add('send', 'submit', array(
                 'attr' => array('class' => 'btn-primary'),
                 'label' => 'Siguiente Paso',
             ))
             ->getForm();
 
         $form->handleRequest($request);
-
         if ($form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($upload);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('upload_data_upload_select_columns_csv', array(
+            return $this->redirect($this->generateUrl('upload_data_upload_select_columns_excel', array(
                 'id' => $upload->getId(),
             )));
         }
 
-        return $this->render('@UploadData/Read/Csv/separator.html.twig', array(
+        return $this->render('@UploadData/Read/Excel/select_row_headers.html.twig', array(
             'form' => $form->createView(),
+            'upload' => $upload,
         ));
     }
+
+    public function previewHeadersAction(Request $request, Upload $upload)
+    {
+        $row = $request->get('row', 1);
+
+        //previsualizamos las cabeceras
+        $headers = $this->get('upload_data.excel_reader')
+            ->getRowHeaders($upload->getFullFilename(), array(
+                'row_headers' => $row,
+            ));
+
+        return $this->render('@UploadData/Read/Excel/preview_headers.html.twig', array(
+            'headers' => $headers,
+        ));
+    }
+
 
     public function selectColumnsAction(Request $request, Upload $upload)
     {
@@ -56,11 +78,11 @@ class CsvReadController extends BaseReadController
         //por el sistema.
 
         $options = array(
-            'delimiter' => $upload->getAttribute('separator')->getValue(),
-            'row_headers' => 0,
+            'row_headers' => $upload->getAttribute('row_headers')->getValue(),
         );
 
-        $headers = $this->get('upload_data.csv_reader')
+        $headers = $this->get('upload_data.reader_loader')
+            ->get($upload->getFullFilename())
             ->getRowHeaders($upload->getFullFilename(), $options);
 
         $a = $this->getConfig($upload);
@@ -73,6 +95,8 @@ class CsvReadController extends BaseReadController
 
             $options['header_mapping'] = $columnsMapper
                 ->mapForm($request->request->get('columns'), $headers);
+
+//            var_dump($options['header_mapping']);
 
             if ($attr = $upload->getAttribute('config_read')) {
                 $attr->setValue($options);

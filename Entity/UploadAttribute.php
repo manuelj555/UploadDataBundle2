@@ -11,6 +11,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="upload_data_upload_attribute")
  * @ORM\Entity
  * @UniqueEntity(fields={"name", "upload"})
+ * @ORM\HasLifecycleCallbacks()
  */
 class UploadAttribute
 {
@@ -47,9 +48,16 @@ class UploadAttribute
     /**
      * @var string
      *
-     * @ORM\Column(name="value", type="string", length=255, nullable=true)
+     * @ORM\Column(name="value", type="text", nullable=true)
      */
     private $value;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="is_array", type="boolean", nullable=true)
+     */
+    private $isArray = 0;
 
     function __construct($name = null, $value = null)
     {
@@ -185,5 +193,53 @@ class UploadAttribute
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * Set isArray
+     *
+     * @param boolean $isArray
+     *
+     * @return UploadAttribute
+     */
+    public function setIsArray($isArray)
+    {
+        $this->isArray = $isArray;
+
+        return $this;
+    }
+
+    /**
+     * Get isArray
+     *
+     * @return boolean
+     */
+    public function getIsArray()
+    {
+        return $this->isArray;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function arrayToString()
+    {
+        if (is_array($this->value)) {
+            $this->setIsArray(true);
+            $this->setValue(serialize($this->value));
+        }
+    }
+
+    /**
+     * @ORM\PostLoad()
+     * @ORM\PostPersist()
+     * @ORM\PostUpdate()
+     */
+    public function stringToArray()
+    {
+        if ($this->isArray) {
+            $this->setValue(unserialize($this->getValue()));
+        }
     }
 }

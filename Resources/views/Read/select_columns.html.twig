@@ -42,7 +42,8 @@
             var $select = $(this);
             var isBreak = false;
             if (!$select.val()) {
-                return;
+                isBreak = true;
+                return false;
             }
             $("select.file-header").not($select).each(function () {
                 if ($(this).val() == $select.val()) {
