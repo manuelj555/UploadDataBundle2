@@ -12,6 +12,7 @@
         {% stylesheets filter='cssrewrite'
         'bundles/uploaddata/css/bootstrap.min.css'
         'bundles/uploaddata/css/jquery-ui.min.css' %}
+        {#'bundles/manuelajaxflash/vendor/pnotify/pnotify.custom.min.css'#}
         <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen"/>
         {% endstylesheets %}
     {% endblock head_style %}
@@ -26,6 +27,8 @@
         'bundles/uploaddata/js/jquery.fileupload.js'
         'bundles/uploaddata/js/jquery-ui.min.js'
         %}
+        {#'bundles/manuelajaxflash/vendor/pnotify/pnotify.custom.min.js'#}
+        {#'bundles/manuelajaxflash/js/plugin.js'#}
         <script src="{{ asset_url }}" type="text/javascript"></script>
         {% endjavascripts %}
     {% endblock head_script %}

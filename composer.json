@@ -1,0 +1,20 @@
+{
+    "name": "manuelj555/upload-data-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony UploadDataBundle",
+    "keywords": ["excel", "upload", "bundle"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Manuel Aguirre",
+            "email": "programador.manuel@gmail.com",
+            "homepage": "http://manuelj555.github.io/"
+        }
+    ],
+    "require": {
+        "symfony/symfony": "~2.3"
+    },
+    "autoload": {
+        "psr-4": { "Manuelj555\\Bundle\\UploadDataBundle\\": "" }
+    }
+}

@@ -29,15 +29,18 @@ class ExcelReader extends BaseReader
     public function getData($filename, $options)
     {
         $this->verifyFile($filename);
-        var_dump("HOLA");
+
         $options = $this->resolveOptions($options);
 
-        $excel = $this->load($filename);
+        $sheet = $this->load($filename)->getActiveSheet();
 
-        $iterator = $excel->getActiveSheet()
-            ->getRowIterator($options['row_headers'] + 1);
+        $lastColumn = $sheet->getHighestColumn($options['row_headers']);
 
-//        $iterator->next(); //la primera son los headers, por lo que pasamos a la segunda.
+        $excelHeaders = $sheet->rangeToArray('A' . $options['row_headers']
+            . ':' . $lastColumn . $options['row_headers'], null, true, true, true);
+        $excelHeaders = current($excelHeaders);
+
+        $iterator = $sheet->getRowIterator($options['row_headers'] + 1);
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
@@ -50,7 +53,9 @@ class ExcelReader extends BaseReader
                 if (isset($names[$cell->getColumn()])) {
                     $formattedRow[$names[$cell->getColumn()]] = $cell->getValue();
                 } else {
-                    $formattedRow[self::EXTRA_FIELDS_NAME][$cell->getColumn()] = $cell->getValue();
+                    $formattedRow[self::EXTRA_FIELDS_NAME]
+                    [$excelHeaders[$cell->getColumn()]]
+                        = $cell->getValue();
                 }
             }
             if (array_filter($formattedRow)) {

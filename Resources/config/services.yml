@@ -64,17 +64,17 @@ services:
         tags:
             - { name: upload_data.config, id: ventas, label: Ventas }
 
-    upload_data.block.column_list:
-        class: Manuelj555\Bundle\UploadDataBundle\Block\ColumnListBlockService
-        arguments: [upload_data.block.column_list, @templating]
-        tags:
-            - { name: sonata.block }
-
-    upload_data.block.header_column_list:
-        class: Manuelj555\Bundle\UploadDataBundle\Block\HeaderColumnListBlockService
-        arguments: [upload_data.block.header_column_list, @templating]
-        tags:
-            - { name: sonata.block }
+#    upload_data.block.column_list:
+#        class: Manuelj555\Bundle\UploadDataBundle\Block\ColumnListBlockService
+#        arguments: [upload_data.block.column_list, @templating]
+#        tags:
+#            - { name: sonata.block }
+#
+#    upload_data.block.header_column_list:
+#        class: Manuelj555\Bundle\UploadDataBundle\Block\HeaderColumnListBlockService
+#        arguments: [upload_data.block.header_column_list, @templating]
+#        tags:
+#            - { name: sonata.block }
 
     upload_data.block.upload_list:
         class: Manuelj555\Bundle\UploadDataBundle\Block\UploadListBlockService

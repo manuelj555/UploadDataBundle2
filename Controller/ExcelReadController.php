@@ -96,8 +96,6 @@ class ExcelReadController extends BaseReadController
             $options['header_mapping'] = $columnsMapper
                 ->mapForm($request->request->get('columns'), $headers);
 
-//            var_dump($options['header_mapping']);
-
             if ($attr = $upload->getAttribute('config_read')) {
                 $attr->setValue($options);
             } else {
@@ -109,6 +107,10 @@ class ExcelReadController extends BaseReadController
             $em->flush();
 
             $this->processRead($upload, $options);
+
+            $this->get('session')
+                ->getFlashBag()
+                ->add('success', 'Readed!');
 
             return Response::create('Ok', 203, array(
                 'X-Close-Modal' => true,

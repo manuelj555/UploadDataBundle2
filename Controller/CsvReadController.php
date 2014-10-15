@@ -86,6 +86,10 @@ class CsvReadController extends BaseReadController
 
             $this->processRead($upload, $options);
 
+            $this->get('session')
+                ->getFlashBag()
+                ->add('success', 'Readed!');
+
             return Response::create('Ok', 203, array(
                 'X-Close-Modal' => true,
                 'X-Reload' => true,

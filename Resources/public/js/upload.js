@@ -63,3 +63,8 @@ var UploadData = function (opts) {
 
     $('body').append('<div id="upload-ajax-extra-content" />');
 };
+//$(function () {
+//    $.ajaxFlash('*', function (m, t) {
+//        new PNotify({title: 'title', type: t, text: m, styling: 'bootstrap3', animation: 'none'})
+//    });
+//});

@@ -83,9 +83,9 @@ class UploadController extends Controller
         $this->getConfig($type)
             ->processValidation($upload);
 
-//        $this->get('session')
-//            ->getFlashBag()
-//            ->add('success', 'Validated!');
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Validated!');
 
         return new Response('Ok');
     }
@@ -95,9 +95,9 @@ class UploadController extends Controller
         $this->getConfig($type)
             ->processTransfer($upload);
 
-//        $this->get('session')
-//            ->getFlashBag()
-//            ->add('success', 'Transfered!');
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Transfered!');
 
         return new Response('Ok');
     }

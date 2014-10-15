@@ -32,19 +32,21 @@ class CsvReader extends BaseReader
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
 
+        $fileHeaders = $formattedData[$options['row_headers']];
+
         foreach ($data as $rowIndex => $row) {
             $formattedRow = array();
             foreach ($row as $index => $column) {
                 if (isset($names[$index])) {
                     $formattedRow[$names[$index]] = $column;
                 } else {
-                    $formattedRow[self::EXTRA_FIELDS_NAME][$index] = $column;
+                    $formattedRow[self::EXTRA_FIELDS_NAME][$fileHeaders[$index]] = $column;
                 }
             }
             $formattedData[$rowIndex] = $formattedRow;
         }
 
-        unset($formattedData[$options['row_headers']]);
+        unset($formattedData[$options['row_headers']], $fileHeaders);
 
         return $formattedData;
     }
