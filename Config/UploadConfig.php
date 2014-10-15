@@ -274,7 +274,7 @@ class UploadConfig
             $data = $item->getData();
             foreach ($validations as $column => $constraints) {
                 $value = array_key_exists($column, $data) ? $data[$column] : null;
-                $context->atPath($column)->validate($value, $constraints, array($validationGroup));
+                $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
             }
 
             $violations = $context->getViolations();
