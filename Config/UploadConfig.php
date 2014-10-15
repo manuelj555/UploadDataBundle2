@@ -256,6 +256,9 @@ class UploadConfig
         }
 
         $action = $upload->getAction('validate');
+
+        $validationGroup = $action->isComplete() ? 'upload-revalidate' : 'upload-validate';
+
         $action->setInProgress();
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
@@ -271,7 +274,7 @@ class UploadConfig
             $data = $item->getData();
             foreach ($validations as $column => $constraints) {
                 $value = array_key_exists($column, $data) ? $data[$column] : null;
-                $context->atPath($column)->validate($value, $constraints);
+                $context->atPath($column)->validate($value, $constraints, array($validationGroup));
             }
 
             $violations = $context->getViolations();
