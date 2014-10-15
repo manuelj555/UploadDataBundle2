@@ -17,6 +17,8 @@ use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
@@ -279,6 +281,8 @@ class UploadConfig
 
             $violations = $context->getViolations();
 
+            $this->validateItem($data, $violations, $upload);
+
             if (count($violations)) {
                 $item->setErrors($context->getViolations());
                 ++$invalids;
@@ -335,6 +339,8 @@ class UploadConfig
     public function onPostRead() { }
 
     public function onPreValidate() { }
+
+    public function validateItem(array $data, ConstraintViolationListInterface $violations , Upload $upload) { }
 
     public function onPostValidate() { }
 
