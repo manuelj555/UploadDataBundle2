@@ -12,7 +12,11 @@
         }
     ],
     "require": {
-        "symfony/symfony": "~2.3"
+        "symfony/symfony": "~2.5",
+        "knplabs/knp-paginator-bundle": "~2.4",
+        "lexik/form-filter-bundle": "~2.0",
+        "liuggio/excelbundle": "~2.0",
+        "manuelj555/ajax-flash-bundle": "1.0.*@dev"
     },
     "autoload": {
         "psr-4": { "Manuelj555\\Bundle\\UploadDataBundle\\": "" }
