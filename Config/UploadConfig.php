@@ -13,6 +13,7 @@ use Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
+use Manuelj555\Bundle\UploadDataBundle\Form\Type\UploadType;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
@@ -192,7 +193,12 @@ class UploadConfig
         return $upload;
     }
 
-    public function processUpload(UploadedFile $file)
+    public function createUploadForm()
+    {
+        return new UploadType();
+    }
+
+    public function processUpload(UploadedFile $file, array $formData = array())
     {
         $upload = $this->getInstance();
 
@@ -201,7 +207,7 @@ class UploadConfig
 
         $this->objectManager->beginTransaction();
 
-        $this->onPreUpload($upload, $file);
+        $this->onPreUpload($upload, $file, $formData);
 
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
@@ -211,7 +217,7 @@ class UploadConfig
         $upload->setFile($file->getFilename());
         $upload->setFullFilename($file->getLinkTarget());
 
-        $this->onPostUpload($upload, $file);
+        $this->onPostUpload($upload, $file, $formData);
 
         $this->objectManager->flush();
         $this->objectManager->commit();
@@ -332,9 +338,9 @@ class UploadConfig
 
     }
 
-    public function onPreUpload(Upload $upload, File $file) { }
+    public function onPreUpload(Upload $upload, File $file, array $formData = array()) { }
 
-    public function onPostUpload(Upload $upload, File $file) { }
+    public function onPostUpload(Upload $upload, File $file, array $formData = array()) { }
 
     public function onPreRead() { }
 
@@ -342,7 +348,7 @@ class UploadConfig
 
     public function onPreValidate() { }
 
-    public function validateItem(array $data, ConstraintViolationListInterface $violations , Upload $upload) { }
+    public function validateItem(array $data, ConstraintViolationListInterface $violations, Upload $upload) { }
 
     public function onPostValidate() { }
 

@@ -4,14 +4,20 @@
 
 {% block headline %}Nueva Carga{% endblock %}
 
+{% form_theme form '@UploadData/Form/form_bootstrap_3.2.x_layout.html.twig' %}
+
 {% block content %}
-    <input type="file" id="fileupload" name="file">
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+    {#<input type="file" id="fileupload" name="file">#}
+    {{ form_end(form) }}
 
     {% if not is_ajax %}
         {#<input type="submit" class="btn btn-primary">#}
-        <div class="progress" id="upload-progress" style="display: none">
-            <div class="progress-bar" style="width: 60%;"></div>
-        </div>
+        {#<div class="progress" id="upload-progress" style="display: none">#}
+        {#<div class="progress-bar" style="width: 60%;"></div>#}
+        {#</div>#}
         <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">Volver
             al Listado</a>
     {% endif %}
@@ -25,9 +31,9 @@
 {% block ajax_script %}
     <script>
 
-        var noty = null
+        var noty = null;
 
-        $('#fileupload').fileupload({
+        $('#{{ form.file.vars.id }}').fileupload({
             url: '{{ path('upload_data_upload_new', {type: app.request.get('type')}) }}',
             dataType: 'json',
             start: function () {
@@ -47,7 +53,8 @@
                 if (noty) {
                     noty.update({type: 'success', text: 'Carga Completa!'});
                 }
-                {% if is_ajax %}$("#{{ modal_id }}").modal('hide'){% endif %}
+                {% if is_ajax %}$("#{{ modal_id }}").modal('hide')
+                {% endif %}
             },
             done: function (e, data) {
 //                console.log(data);

@@ -67,19 +67,25 @@ class UploadController extends Controller
     public function newAction($type, Request $request)
     {
         $response = null;
+        $config = $this->getConfig($type);
 
-        if ($request->isMethod('POST') and $request->files->has('file')) {
-            $file = $request->files->get('file');
+        $form = $this->createForm($config->createUploadForm());
+        $form->handleRequest($request);
+
+        if ($request->isMethod('POST') and $form->isValid()) {
+            $file = $form['file']->getData();
 
             $this->getConfig($type)
-                ->processUpload($file);
+                ->processUpload($file, $form->getData());
 
             $response = new Response(null, 200, array(
                 'X-Reload' => true,
             ));
         }
 
-        return $this->render('@UploadData/Upload/new.html.twig', $this->mergeParams($type, array()), $response);
+        return $this->render('@UploadData/Upload/new.html.twig', $this->mergeParams($type, array(
+            'form' => $form->createView(),
+        )), $response);
     }
 
     /**
