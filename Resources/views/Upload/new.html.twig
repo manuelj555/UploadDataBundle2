@@ -12,7 +12,8 @@
         <div class="progress" id="upload-progress" style="display: none">
             <div class="progress-bar" style="width: 60%;"></div>
         </div>
-        <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">Volver al Listado</a>
+        <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">Volver
+            al Listado</a>
     {% endif %}
 
 {% endblock %}
@@ -29,31 +30,39 @@
         $('#fileupload').fileupload({
             url: '{{ path('upload_data_upload_new', {type: app.request.get('type')}) }}',
             dataType: 'json',
-            start: function(){
+            start: function () {
                 $('#upload-progress').show();
-                noty = new PNotify({
-                    title: 'Cargando Archivo',
-                    text: '0 %',
-                    animation: 'none',
-                    styling: "bootstrap3",
-                    type: 'info'
-                });
+                if (window['PNotify'] != undefined) {
+                    noty = new PNotify({
+                        title: 'Cargando Archivo',
+                        text: '0 %',
+                        animation: 'none',
+                        styling: "bootstrap3",
+                        type: 'info'
+                    });
+                }
             },
-            always: function(){
+            always: function () {
 //                $('#upload-progress').hide()
-                noty.update({type: 'success', text: 'Carga Completa!'});
+                if (noty) {
+                    noty.update({type: 'success', text: 'Carga Completa!'});
+                }
+                {% if is_ajax %}$("#{{ modal_id }}").modal('hide'){% endif %}
             },
             done: function (e, data) {
 //                console.log(data);
-                noty.update({type: 'success', text: 'Carga Completa!'});
+                if (noty) {
+                    noty.update({type: 'success', text: 'Carga Completa!'});
+                }
 //                $.each(data.result.files, function (index, file) {
 //                    $('<p/>').text(file.name).appendTo(document.body);
 //                });
             },
             progress: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
-
-                noty.update(progress + ' %');
+                if (noty) {
+                    noty.update(progress + ' %');
+                }
 
                 {#$('#upload-progress .progress-bar').css('width', progress + '%');#}
                 {#$("#{{ modal_id }}").modal('hide');#}
