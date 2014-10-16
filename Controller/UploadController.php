@@ -5,10 +5,14 @@ namespace Manuelj555\Bundle\UploadDataBundle\Controller;
 use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @Route("/{type}")
+ */
 class UploadController extends Controller
 {
     /**
@@ -30,6 +34,14 @@ class UploadController extends Controller
         ));
     }
 
+    /**
+     * @Route("/list", name="upload_data_upload_list")
+     *
+     * @param         $type
+     * @param Request $request
+     *
+     * @return Response
+     */
     public function listAction($type, Request $request)
     {
         $query = $this->getDoctrine()
@@ -44,6 +56,14 @@ class UploadController extends Controller
         )));
     }
 
+    /**
+     * @Route("/new", name="upload_data_upload_new")
+     *
+     * @param         $type
+     * @param Request $request
+     *
+     * @return Response
+     */
     public function newAction($type, Request $request)
     {
         if ($request->isMethod('POST') and $request->files->has('file')) {
@@ -56,6 +76,15 @@ class UploadController extends Controller
         return $this->render('@UploadData/Upload/new.html.twig', $this->mergeParams($type, array()));
     }
 
+    /**
+     * @Route("/read/{id}", name="upload_data_upload_read")
+     *
+     * @param         $type
+     * @param Upload  $upload
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function readAction($type, Upload $upload, Request $request)
     {
 
@@ -65,19 +94,16 @@ class UploadController extends Controller
         return $this->redirect($this->generateUrl($reader->getRouteConfig(), array(
             'id' => $upload->getId(),
         )));
-//
-//        if ($request->isMethod('POST')) {
-//            $this->getConfig($type)
-//                ->processRead($upload);
-//
-//            return new Response('Ok');
-//        }
-//
-//        return $this->render('@UploadData/Upload/read.html.twig', $this->mergeParams($type, array(
-//            'upload' => $upload,
-//        )));
     }
 
+    /**
+     * @Route("/validate/{id}", name="upload_data_upload_validate")
+     *
+     * @param        $type
+     * @param Upload $upload
+     *
+     * @return Response
+     */
     public function validateAction($type, Upload $upload)
     {
         $this->getConfig($type)
@@ -90,6 +116,14 @@ class UploadController extends Controller
         return new Response('Ok');
     }
 
+    /**
+     * @Route("/transfer/{id}", name="upload_data_upload_transfer")
+     *
+     * @param        $type
+     * @param Upload $upload
+     *
+     * @return Response
+     */
     public function transferAction($type, Upload $upload)
     {
         $this->getConfig($type)
@@ -102,6 +136,14 @@ class UploadController extends Controller
         return new Response('Ok');
     }
 
+    /**
+     * @Route("/show/{id}", name="upload_data_upload_show")
+     *
+     * @param        $type
+     * @param Upload $upload
+     *
+     * @return Response
+     */
     public function showAction($type, Upload $upload)
     {
         return $this->render('@UploadData/Upload/show.html.twig', $this->mergeParams($type, array(
@@ -109,6 +151,14 @@ class UploadController extends Controller
         )));
     }
 
+    /**
+     * @Route("/show-item/{id}", name="upload_data_upload_show_item")
+     *
+     * @param              $type
+     * @param UploadedItem $item
+     *
+     * @return Response
+     */
     public function showItemAction($type, UploadedItem $item)
     {
         return $this->render('@UploadData/Upload/show_item.html.twig', $this->mergeParams($type, array(
