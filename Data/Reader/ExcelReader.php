@@ -43,7 +43,7 @@ class ExcelReader extends BaseReader
         $sheet->garbageCollect();
         $maxRow = $sheet->getHighestRow();
 
-        $excelData = $sheet->rangeToArray('A1:' . $lastColumn . $maxRow,
+        $excelData = $sheet->rangeToArray('A' . ($options['row_headers'] + 1) . ':' . $lastColumn . $maxRow,
             null, true, true, true);
 
         list($names, $headers) = $options['header_mapping'];
