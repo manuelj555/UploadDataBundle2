@@ -8,6 +8,7 @@
     {%- elseif is_actionable -%}
         <a class="upload-process upload-process-{{ name }} btn btn-{{ action.isComplete() ? 'success' : 'info' }} btn-xs"
            href="{{ path(column.options.route, {id: item.id, type: upload_type}) }}"
+                {% if column.options.confirm -%}data-confirm="{{ column.options.confirm_text|trans }}"{%- endif -%}
                 {% if column.options.modal -%}data-modal{%- endif -%}>
         {{ bs_icon(action.isComplete() ? 'refresh' : 'eject') }}
             {#{{ bs_icon('eject') }}#}

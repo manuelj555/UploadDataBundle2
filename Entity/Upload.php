@@ -43,7 +43,7 @@ class Upload
     /**
      * @var string
      *
-     * @ORM\OneToMany(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem", mappedBy="upload")
+     * @ORM\OneToMany(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem", mappedBy="upload", orphanRemoval=true)
      */
     private $items;
 
@@ -230,6 +230,11 @@ class Upload
         and $this->getValids() > 0;
     }
 
+    public function isDeletable()
+    {
+        return $this->getAction('transfer')->isNotComplete();
+    }
+
     /**
      * Set file
      *
@@ -291,6 +296,7 @@ class Upload
         $this->addAction(new UploadAction('read', 0));
         $this->addAction(new UploadAction('validate', 100));
         $this->addAction(new UploadAction('transfer', 200));
+        $this->addAction(new UploadAction('delete', 1000));
     }
 
     /**

@@ -149,19 +149,21 @@ class UploadConfig
         $mapper->add('invalids', 'number', array('use_show' => true,));
         $mapper->addAction('read', array(
             'condition' => function (Upload $upload) { return $upload->isReadable(); },
-            'status' => function (Upload $upload) { return $upload->getReaded(); },
             'route' => 'upload_data_upload_read',
             'modal' => true,
         ));
         $mapper->addAction('validate', array(
             'condition' => function (Upload $upload) { return $upload->isValidatable(); },
-            'status' => function (Upload $upload) { return $upload->getValidated(); },
             'route' => 'upload_data_upload_validate',
         ));
         $mapper->addAction('transfer', array(
             'condition' => function (Upload $upload) { return $upload->isTransferable(); },
-            'status' => function (Upload $upload) { return $upload->getTransfered(); },
             'route' => 'upload_data_upload_transfer',
+        ));
+        $mapper->addAction('delete', array(
+            'condition' => function (Upload $upload) { return $upload->isDeletable(); },
+            'route' => 'upload_data_upload_delete',
+            'confirm_text' => 'upload_data.confirm_delete'
         ));
     }
 
@@ -310,7 +312,7 @@ class UploadConfig
             return false;
         }
 
-        $action = $upload->getAction('read');
+        $action = $upload->getAction('transfer');
         $action->setInProgress();
         $this->objectManager->persist($upload);
         $this->objectManager->flush();

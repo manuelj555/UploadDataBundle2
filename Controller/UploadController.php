@@ -66,11 +66,17 @@ class UploadController extends Controller
      */
     public function newAction($type, Request $request)
     {
+        $response = null;
+
         if ($request->isMethod('POST') and $request->files->has('file')) {
             $file = $request->files->get('file');
 
             $this->getConfig($type)
                 ->processUpload($file);
+
+            $response = new Response(null, 200, array(
+                'X-Reload' => true,
+            ));
         }
 
         return $this->render('@UploadData/Upload/new.html.twig', $this->mergeParams($type, array()));
@@ -164,5 +170,27 @@ class UploadController extends Controller
         return $this->render('@UploadData/Upload/show_item.html.twig', $this->mergeParams($type, array(
             'item' => $item,
         )));
+    }
+
+    /**
+     * @Route("/delete/{id}", name="upload_data_upload_delete")
+     *
+     * @param        $type
+     * @param Upload $upload
+     *
+     * @return Response
+     */
+    public function deleteAction($type, Upload $upload)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $em->remove($upload);
+        $em->flush();
+
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Deleted!');
+
+        return new Response('Ok');
     }
 }

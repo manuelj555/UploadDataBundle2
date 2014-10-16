@@ -6,6 +6,7 @@
 
 namespace Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList;
 
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 
@@ -28,15 +29,14 @@ class ActionColumn extends AbstractColumn
             'template' => '@UploadData/Default/column_action.html.twig',
             'use_show' => true,
             'modal' => false,
+            'confirm' => function (Options $options) {
+                return isset($options['confirm_text']) and $options['confirm_text'];
+            },
+            'confirm_text' => false,
         ));
 
         $resolver->setRequired(array(
             'route',
-            'status',
-        ));
-
-        $resolver->setAllowedTypes(array(
-            'status' => 'Closure',
         ));
 
         $resolver->setOptional(array('condition', 'modal_route'));

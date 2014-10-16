@@ -33,6 +33,12 @@ var UploadData = function (opts) {
             var $a = $(this);
             var $row = $a.closest('.upload-row');
 
+            if ($a.is('[data-confirm]')) {
+                if (!confirm($a.data('confirm'))) {
+                    return;
+                }
+            }
+
             if (!$a.is('[data-modal]')) {
                 $a.parent().html($processing.clone());
                 $row.find('a.upload-process').addClass('disabled');
