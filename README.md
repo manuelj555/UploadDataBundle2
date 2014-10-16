@@ -42,4 +42,36 @@ _upload_data:
     prefix:   /uploads
 ``` 
 
+Por ultimo se debe crear la base de datos (si no se ha hecho aun) y agregar a la bd las tablas competentes al bundle, por lo que se deben ejecutar los siguientes comandos de consola:
+
+    app\console doctrine:database:create
+    console doctrine:schema:update --force
+
+Además ejecutar el comando 
+    
+    app/console assets:install
+
 Con esto ya se ha instalado correctamente el bundle.
+
+
+Configurando el bundle AjaxFlashBundle:
+___________
+
+Este bundle nos permite ver mensajes flash en nuestras peticiones con ajax, y por defecto ofrece 2 plugins de javascript a usar, lo configuracion es la siguiente:
+
+```yaml
+manuel_ajax_flash:
+    auto_assets:
+       pnotify:   # por defecto activamos pnotify
+           animation: none
+       # sticky:
+#    mapping:
+#        success:
+#            title: Información
+#            icon: my-icon
+#        info:
+#            title: Información
+```
+
+Para mayor información sobre como usar el bundle, ver: [AjaxFlashBundle](https://github.com/manuelj555/AjaxFlashBundle)
+
