@@ -58,11 +58,11 @@ services:
 #        class: Manuelj555\Bundle\UploadDataBundle\Twig\Extention\CallbackExtension
 #        tags:
 #            - { name: twig.extension }
-
-    upload_config_test:
-        class: Manuelj555\Bundle\UploadDataBundle\VentasConfig
-        tags:
-            - { name: upload_data.config, id: ventas, label: Ventas }
+#
+#    upload_config_test:
+#        class: Manuelj555\Bundle\UploadDataBundle\VentasConfig
+#        tags:
+#            - { name: upload_data.config, id: ventas, label: Ventas }
 
 #    upload_data.block.column_list:
 #        class: Manuelj555\Bundle\UploadDataBundle\Block\ColumnListBlockService
