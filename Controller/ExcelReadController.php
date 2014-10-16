@@ -6,12 +6,24 @@ use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\AttributeType;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @Route("/read/xls/{id}")
+ */
 class ExcelReadController extends BaseReadController
 {
 
+    /**
+     * @Route("/select-row", name="upload_data_upload_read_excel")
+     *
+     * @param Request $request
+     * @param Upload  $upload
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
     public function selectRowHeadersAction(Request $request, Upload $upload)
     {
         if (!$attr = $upload->getAttribute('row_headers')) {
@@ -55,6 +67,14 @@ class ExcelReadController extends BaseReadController
         ));
     }
 
+    /**
+     * @Route("/preview-headers", name="upload_data_upload_read_excel_preview_headers")
+     *
+     * @param Request $request
+     * @param Upload  $upload
+     *
+     * @return Response
+     */
     public function previewHeadersAction(Request $request, Upload $upload)
     {
         $row = $request->get('row', 1);
@@ -70,7 +90,14 @@ class ExcelReadController extends BaseReadController
         ));
     }
 
-
+    /**
+     * @Route("/select-columns", name="upload_data_upload_select_columns_excel")
+     *
+     * @param Request $request
+     * @param Upload  $upload
+     *
+     * @return Response
+     */
     public function selectColumnsAction(Request $request, Upload $upload)
     {
         //la idea acá es leer las columnas del archivo y mostrarlas

@@ -6,22 +6,10 @@ _upload_controller:
     resource: @UploadDataBundle/Controller/UploadController.php
     type: annotation
 
-upload_data_upload_read_csv:
-    path:     /upload/read/csv/{id}
-    defaults: { _controller: UploadDataBundle:CsvRead:separator }
+_upload_csv_read_controller:
+    resource: @UploadDataBundle/Controller/CsvReadController.php
+    type: annotation
 
-upload_data_upload_select_columns_csv:
-    path:     /upload/select-columns/csv/{id}
-    defaults: { _controller: UploadDataBundle:CsvRead:selectColumns }
-
-upload_data_upload_read_excel:
-    path:     /upload/read/excel/{id}
-    defaults: { _controller: UploadDataBundle:ExcelRead:selectRowHeaders }
-
-upload_data_upload_read_excel_preview_headers:
-    path:     /upload/read/excel/{id}/headers-preview
-    defaults: { _controller: UploadDataBundle:ExcelRead:previewHeaders }
-
-upload_data_upload_select_columns_excel:
-    path:     /upload/select-columns/excel/{id}
-    defaults: { _controller: UploadDataBundle:ExcelRead:selectColumns }
+_upload_excel_read_controller:
+    resource: @UploadDataBundle/Controller/ExcelReadController.php
+    type: annotation

@@ -6,11 +6,20 @@ use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\AttributeType;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @Route("/read/csv/{id}")
+ */
 class CsvReadController extends BaseReadController
 {
 
+    /**
+     * @Route("/separator", name="upload_data_upload_read_csv")
+     *
+     * @param Upload $upload
+     */
     public function separatorAction(Request $request, Upload $upload)
     {
         if (!$separatorAttribute = $upload->getAttribute('separator')) {
@@ -49,6 +58,14 @@ class CsvReadController extends BaseReadController
         ));
     }
 
+    /**
+     * @Route("/select-columns", name="upload_data_upload_select_columns_csv")
+     *
+     * @param Request $request
+     * @param Upload  $upload
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function selectColumnsAction(Request $request, Upload $upload)
     {
         //la idea acá es leer las columnas del archivo y mostrarlas
