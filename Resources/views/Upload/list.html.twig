@@ -40,7 +40,7 @@
         var upload = new UploadData({
             container: $('#upload-list-container'),
             url_refresh: '{{ app.request.getRequestUri() }}',
-            auto_reload: 5000
+            auto_reload: 30000
         });
         function showModal(html) {
             $("#new_upload").remove();

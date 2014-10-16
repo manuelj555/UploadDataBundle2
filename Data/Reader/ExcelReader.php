@@ -40,28 +40,28 @@ class ExcelReader extends BaseReader
             . ':' . $lastColumn . $options['row_headers'], null, true, true, true);
         $excelHeaders = current($excelHeaders);
 
-        $iterator = $sheet->getRowIterator($options['row_headers'] + 1);
+        $sheet->garbageCollect();
+        $maxRow = $sheet->getHighestRow();
+
+        $excelData = $sheet->rangeToArray('A1:' . $lastColumn . $maxRow,
+            null, true, true, true);
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
 
-        foreach ($iterator as $rowCell) {
-            /* @var $rowCell \PHPExcel_Worksheet_Row */
+        foreach ($excelData as $rowIndex => $excelRow) {
+            if (!array_filter($excelRow)) {
+                continue;
+            }
             $formattedRow = array();
-            foreach ($rowCell->getCellIterator() as $cell) {
-                /* @var $cell \PHPExcel_Cell */
-                if (isset($names[$cell->getColumn()])) {
-                    $formattedRow[$names[$cell->getColumn()]] = $cell->getValue();
-                } else {
-                    $formattedRow[self::EXTRA_FIELDS_NAME]
-                    [$excelHeaders[$cell->getColumn()]]
-                        = $cell->getValue();
+            foreach ($excelRow as $columName => $value) {
+                if (isset($names[$columName])) {
+                    $formattedRow[$names[$columName]] = $value;
+                } elseif (isset($excelHeaders[$columName])) {
+                    $formattedRow[self::EXTRA_FIELDS_NAME][$excelHeaders[$columName]] = $value;
                 }
             }
-            if (array_filter($formattedRow)) {
-                //solo si hay datos, lo llenamos
-                $formattedData[$rowCell->getRowIndex()] = $formattedRow;
-            }
+            $formattedData[$rowIndex] = $formattedRow;
         }
 
         return $formattedData;
