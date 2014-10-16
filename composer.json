@@ -15,7 +15,7 @@
         "symfony/symfony": "~2.5",
         "knplabs/knp-paginator-bundle": "~2.4",
         "phpoffice/phpexcel": "~1.8.0",
-        "manuelj555/ajax-flash-bundle": "1.0.*"
+        "manuelj555/ajax-flash-bundle": "1.0.*@dev"
     },
     "autoload": {
         "psr-4": { "Manuelj555\\Bundle\\UploadDataBundle\\": "" }
