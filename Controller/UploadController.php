@@ -79,7 +79,7 @@ class UploadController extends Controller
             ));
         }
 
-        return $this->render('@UploadData/Upload/new.html.twig', $this->mergeParams($type, array()));
+        return $this->render('@UploadData/Upload/new.html.twig', $this->mergeParams($type, array()), $response);
     }
 
     /**

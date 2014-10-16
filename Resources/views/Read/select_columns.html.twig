@@ -38,26 +38,24 @@
 
 <script>
     function validateColumnsForm($form) {
-        $("select.file-header").each(function () {
-            var $select = $(this);
+        var $selectHeaders = $("select.file-header").toArray();
+
+        for (var sh in $selectHeaders) {
+            var $current = $($selectHeaders[sh]);
             var isBreak = false;
-            if (!$select.val()) {
-                isBreak = true;
+            if (!$current.val()) {
                 return false;
             }
-            $("select.file-header").not($select).each(function () {
-                if ($(this).val() == $select.val()) {
+            var $otherSelects = $("select.file-header").not($current).toArray();
+            for (var sh2 in $otherSelects) {
+                if ($($otherSelects[sh2]).val() == $current.val()) {
                     alert('No pueden haber selects con el mismo valor seleccionado');
-                    $(this).focus();
-                    isBreak = true;
+                    $($otherSelects[sh2]).focus();
                     return false;
                 }
-            });
-
-            if (isBreak) {
-                return false;
             }
-        });
+
+        }
     }
 
     function closeColumnsModal(content, $form, $container, jqXhr) {

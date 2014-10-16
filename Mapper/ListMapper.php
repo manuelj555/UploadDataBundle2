@@ -47,6 +47,13 @@ class ListMapper
         return $this;
     }
 
+    public function remove($name)
+    {
+        unset($this->columns[$name]);
+
+        return $this;
+    }
+
     /**
      * @return array
      */
