@@ -13,6 +13,7 @@
                 <tr>
                     <td style="width: 50%">
                         <label class="control-label">{{ options.label|title }}</label>
+                        {% if options.required %}<span class="text-danger">*</span>{% endif %}
                     </td>
                     <td>
                         <select name="columns[{{ name }}]" class="form-control file-header"
@@ -43,12 +44,12 @@
         for (var sh in $selectHeaders) {
             var $current = $($selectHeaders[sh]);
             var isBreak = false;
-            if (!$current.val()) {
+            if (!$current.val() && $current.is['[required]']) {
                 return false;
             }
             var $otherSelects = $("select.file-header").not($current).toArray();
             for (var sh2 in $otherSelects) {
-                if ($($otherSelects[sh2]).val() == $current.val()) {
+                if ($current.val() && $($otherSelects[sh2]).val() == $current.val()) {
                     alert('No pueden haber selects con el mismo valor seleccionado');
                     $($otherSelects[sh2]).focus();
                     return false;
