@@ -33,3 +33,13 @@ public function registerBundles()
     ...
 }
 ```
+
+En el **app/config/routing.yml** agregar:
+
+```yaml
+_upload_data:
+    resource: "@UploadDataBundle/Resources/config/routing.yml"
+    prefix:   /uploads
+``` 
+
+Con esto ya se ha instalado correctamente el bundle.
