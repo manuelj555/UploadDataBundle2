@@ -1,7 +1,8 @@
+{% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% extends is_ajax ? '@UploadData/base_ajax.html.twig' :'@UploadData/base.html.twig' %}
 
-{% block headline %}Listado{% endblock %}
+{% block headline %}{{ 'title.list'|trans }}{% endblock %}
 
 {% from '@UploadData/macros.html.twig' import bs_icon, bs_upload_status as status %}
 
@@ -12,7 +13,7 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <a class="btn btn-primary" data-ajax data-after="showModal"
-               href="{{ path('upload_data_upload_new', {type: type}) }}">Cargar Nuevo</a>
+               href="{{ path('upload_data_upload_new', {type: type}) }}">{{ 'link.new_upload'|trans }}</a>
         </div>
     </div>
     {{ parent() }}
@@ -27,7 +28,6 @@
     {% if is_ajax %}{{ include('@UploadData/flash.html.twig') }}{% endif %}
     <div {% if not is_ajax %}id="upload-list-container"{% endif %}>
         {{ include('@UploadData/Upload/uploads_table.html.twig', {config: upload_config}) }}
-        {#{{ include('@UploadData/Upload/uploads_table.html.twig', {config: upload_config, items: items}) }}#}
         {{ knp_pagination_render(items) }}
     </div>
 {% endblock %}

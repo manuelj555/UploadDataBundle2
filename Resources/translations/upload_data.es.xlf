@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>upload_data.confirm_delete</source>
+                <target>¿Realmente desea realizar esta acción?</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>title.list</source>
+                <target>Listado</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>link.new_upload</source>
+                <target>Cargar Nuevo</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>link.back_to_list</source>
+                <target>Volver al listado</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>label.loading_file</source>
+                <target>Cargando Archivo</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>label.upload_complete</source>
+                <target>Carga Completa</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>title.new_upload</source>
+                <target>Nueva Carga</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>link.close</source>
+                <target>Cerrar</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>label.file</source>
+                <target>Archivo</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>Filename</source>
+                <target>Archivo</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>Uploadedat</source>
+                <target>Fecha de carga</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>Total</source>
+                <target>Total</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>Valids</source>
+                <target>Validos</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>Invalids</source>
+                <target>Invalidos</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>Read</source>
+                <target>Leer</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>Validate</source>
+                <target>Validar</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>Transfer</source>
+                <target>Transferir</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Delete</source>
+                <target>Eliminar</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>title.file_read</source>
+                <target>Lectura del Archivo</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>info.read_excel_options</source>
+                <target><![CDATA[Este formulario permite establecer opciones para la lectura de archivos <strong>Excel</strong>]]></target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>button.preview_row</source>
+                <target>Previsualizar Fila</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>button.next_step</source>
+                <target>Siguiente Paso</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>label.header_number_row</source>
+                <target>Número de Fila de las Cabeceras</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>table.expected_columns</source>
+                <target>Columnas Esperadas</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>table.file_columns</source>
+                <target>Columnas del Archivo</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>button.process</source>
+                <target>Procesar</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>table.errors</source>
+                <target>Errores</target>
+            </trans-unit>
+            <trans-unit id="28">
+                <source>link.errors</source>
+                <target>Errores</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>link.detail</source>
+                <target>Detalle</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

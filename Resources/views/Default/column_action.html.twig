@@ -1,3 +1,4 @@
+{% trans_default_domain 'upload_data' %}
 {% from '@UploadData/macros.html.twig' import bs_icon %}
 {% set action = item.getAction(name) %}
 {% set status = action.getStatus() %}
@@ -11,7 +12,6 @@
                 {% if column.options.confirm -%}data-confirm="{{ column.options.confirm_text|trans }}"{%- endif -%}
                 {% if column.options.modal -%}data-modal{%- endif -%}>
         {{ bs_icon(action.isComplete() ? 'refresh' : 'eject') }}
-            {#{{ bs_icon('eject') }}#}
         </a>
     {%- elseif action.isComplete() -%}
         <span class="label label-success">{{ bs_icon('ok') }}</span>

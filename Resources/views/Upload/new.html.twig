@@ -1,8 +1,9 @@
+{% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% set modal_id = 'new_upload' %}
 {% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
 
-{% block headline %}Nueva Carga{% endblock %}
+{% block headline %}{{ 'title.new_upload'|trans }}{% endblock %}
 
 {% form_theme form '@UploadData/Form/form_bootstrap_3.2.x_layout.html.twig' %}
 
@@ -10,16 +11,10 @@
 
     {{ form_start(form) }}
         {{ form_widget(form) }}
-    {#<input type="file" id="fileupload" name="file">#}
     {{ form_end(form) }}
 
     {% if not is_ajax %}
-        {#<input type="submit" class="btn btn-primary">#}
-        {#<div class="progress" id="upload-progress" style="display: none">#}
-        {#<div class="progress-bar" style="width: 60%;"></div>#}
-        {#</div>#}
-        <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">Volver
-            al Listado</a>
+        <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">{{ 'link.back_to_list'|trans }}</a>
     {% endif %}
 
 {% endblock %}
@@ -40,7 +35,7 @@
                 $('#upload-progress').show();
                 if (window['PNotify'] != undefined) {
                     noty = new PNotify({
-                        title: 'Cargando Archivo',
+                        title: '{{ 'label.loading_file'|trans }}',
                         text: '0 %',
                         animation: 'none',
                         styling: "bootstrap3",
@@ -49,34 +44,24 @@
                 }
             },
             always: function () {
-//                $('#upload-progress').hide()
                 if (noty) {
-                    noty.update({type: 'success', text: 'Carga Completa!'});
+                    noty.update({type: 'success', text: '{{ 'label.upload_complete'|trans }}!'});
                 }
                 {% if is_ajax %}$("#{{ modal_id }}").modal('hide')
                 {% endif %}
             },
             done: function (e, data) {
-//                console.log(data);
                 if (noty) {
-                    noty.update({type: 'success', text: 'Carga Completa!'});
+                    noty.update({type: 'success', text: '{{ 'label.upload_complete'|trans }}!'});
                 }
-//                $.each(data.result.files, function (index, file) {
-//                    $('<p/>').text(file.name).appendTo(document.body);
-//                });
             },
             progress: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
                 if (noty) {
                     noty.update(progress + ' %');
                 }
-
-                {#$('#upload-progress .progress-bar').css('width', progress + '%');#}
-                {#$("#{{ modal_id }}").modal('hide');#}
-                {#upload.reload();#}
             }
         });
-        //        console.log('MMMM', $('#fileupload'));
     </script>
 {% endblock %}
 

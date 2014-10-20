@@ -542,6 +542,18 @@ class Upload
     }
 
     /**
+     * @param $name
+     *
+     * @return mixed|null
+     */
+    public function getAttributeValue($name)
+    {
+        if ($attr = $this->getAttribute($name)) {
+            return $attr->getValue();
+        }
+    }
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -551,4 +563,11 @@ class Upload
         $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
+    public function getValidItems()
+    {
+        return $this->getItems()
+            ->filter(function (UploadedItem $item) {
+                return $item->getIsValid();
+            });
+    }
 }

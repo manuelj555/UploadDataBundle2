@@ -12,7 +12,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
  * @ORM\HasLifecycleCallbacks()
  */
-class UploadedItem
+class UploadedItem implements \ArrayAccess
 {
     /**
      * @var integer
@@ -127,7 +127,7 @@ class UploadedItem
     /**
      * Get errors
      *
-     * @return array
+     * @return array|ConstraintViolationListInterface
      */
     public function getErrors()
     {
@@ -176,5 +176,27 @@ class UploadedItem
         }
 
         $this->setIsValid(count($this->errors) == 0);
+    }
+
+    public function offsetExists($offset)
+    {
+        return array_key_exists($offset, $this->data);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->offsetExists($offset) ? $this->data[$offset] : null;
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->data[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        if ($this->offsetExists($offset)) {
+            unset($this->data[$offset]);
+        }
     }
 }

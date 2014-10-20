@@ -1,10 +1,11 @@
+{% trans_default_domain 'upload_data' %}
 {% block content_row %}
     <div class="modal fade" id="{{ modal_id|default('ajax_modal') }}">
         <div class="modal-dialog {{ modal_size is defined ? 'modal-'~modal_size : '' }}">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span
-                                aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                aria-hidden="true">&times;</span><span class="sr-only">{{ 'link.close'|trans }}</span></button>
                     <h4 class="modal-title">{% block headline %}{% endblock headline %}</h4>
                 </div>
                 <div class="modal-body-container">
@@ -14,7 +15,7 @@
                         </div>
                         <div class="modal-footer">
                             {% block modal_footer %}
-                                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{ 'link.close'|trans }}</button>
                             {% endblock %}
                         </div>
                     {% endblock %}

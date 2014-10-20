@@ -31,9 +31,11 @@ class ExcelReadController extends BaseReadController
             $upload->addAttribute($attr);
         }
 
-        $attr->setFormLabel('Número de Fila de las Cabeceras');
+        $attr->setFormLabel('label.header_number_row');
 
-        $form = $this->createFormBuilder()
+        $form = $this->createFormBuilder(null, array(
+            'translation_domain' => 'upload_data'
+        ))
             ->setAction($request->getRequestUri())
             ->setMethod('post')
             ->add('attributes', 'collection', array(
@@ -42,11 +44,11 @@ class ExcelReadController extends BaseReadController
             ))
             ->add('preview', 'button', array(
                 'attr' => array('class' => 'btn-info'),
-                'label' => 'Previsualizar Fila',
+                'label' => 'button.preview_row',
             ))
             ->add('send', 'submit', array(
                 'attr' => array('class' => 'btn-primary'),
-                'label' => 'Siguiente Paso',
+                'label' => 'button.next_step',
             ))
             ->getForm();
 

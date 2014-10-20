@@ -1,18 +1,12 @@
+{% trans_default_domain 'upload_data' %}
 {% extends '@UploadData/base_ajax_modal.html.twig' %}
 {% set modal_id = 'csv_form' %}
 
-{#{% form_theme form#}
-{#'@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'#}
-{#%}#}
-
-{#{% form_theme form.attributes#}
 {% form_theme form
 '@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'
 _self %}
 
-{% block headline %}
-    Lectura del Archivo
-{% endblock %}
+{% block headline %}{{ 'title.file_read'|trans }}{% endblock %}
 
 {% block body %}
     {{ form_start(form, {attr: {'data-ajax': "##{modal_id} .modal-body-container" }}) }}

@@ -1,8 +1,9 @@
+{% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% extends is_ajax ? '@UploadData/base_ajax.html.twig' : '@UploadData/base.html.twig' %}
 {#{% extends '@UploadData/base.html.twig' %}#}
 
-{% block headline %}Show
+{% block headline %}{{ 'title.show'|trans }}
     <small>{{ upload.filename }}</small>{% endblock %}
 
 {% from _self import errors %}
@@ -26,7 +27,7 @@
                 }) }}
             </div>
             <div class="col-sm-6 text-right">
-                <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default btn-sm ">Volver al Listado</a>
+                <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
             </div>
         </div>
 
@@ -34,9 +35,9 @@
             <thead>
                 <tr>
                     {% for num, label in upload_config.columnsMapper.labels if num < 7 %}
-                        <th>{{ label|title }}</th>
+                        <th>{{ label|title|trans }}</th>
                     {% endfor %}
-                    <th>Errors</th>
+                    <th>{{ 'table.errors'|trans }}</th>
                 </tr>
             </thead>
             {% for item in upload.items %}
@@ -49,14 +50,14 @@
                             <a class="btn btn-info btn-xs"
                                href="{{ path('upload_data_upload_show_item', {type: type, id: item.id}) }}"
                                data-ajax data-after="showModal">
-                                Detalle
+                                {{ 'link.detail'|trans }}
                             </a>
                         {%- endif %}
                         {% if item.errors|length > 0 -%}
                             <span class=" pull-right btn btn-danger btn-xs"
                                   data-toggle="popover"
                                   data-content="{{ errors(item.errors, upload_config.columnsMapper)|escape }}">
-                            Errores
+                            {{ 'link.errors'|trans }}
                         </span>
                         {%- endif %}
                     </td>

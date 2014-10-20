@@ -220,4 +220,10 @@ class UploadAction
     {
         $this->setStatus(self::STATUS_IN_PROGRESS);
     }
+
+    public function setNotComplete()
+    {
+        $this->setStatus(self::STATUS_NOT_COMPLETE);
+        $this->setCompletedAt(null);
+    }
 }

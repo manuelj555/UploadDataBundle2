@@ -28,14 +28,15 @@ class ColumnsMapper
             'name' => $name,
             'required' => true,
             'similar' => false,
+            'formatter' => function ($value) { return $value; },
         ));
         $resolver->setNormalizers(array(
             'aliases' => function (Options $options, $value) {
-                    $value[] = $options['label'];
-                    $value[] = $options['name'];
+                $value[] = $options['label'];
+                $value[] = $options['name'];
 
-                    return array_map(function ($alias) { return strtolower($alias); }, $value);
-                },
+                return array_map(function ($alias) { return strtolower($alias); }, $value);
+            },
         ));
 
         $options = $resolver->resolve($options);

@@ -11,7 +11,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\UploadType;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
@@ -19,14 +18,14 @@ use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
-class UploadConfig
+abstract class UploadConfig
 {
     protected $columnsMapper;
     protected $validationBuilder;
@@ -132,10 +131,12 @@ class UploadConfig
         $this->configureList($this->listMapper);
     }
 
-    public function configureColumns(ColumnsMapper $mapper)
+    public function getViewPrefix()
     {
-
+        return '@UploadData/Upload';
     }
+
+    abstract public function configureColumns(ColumnsMapper $mapper);
 
     public function configureList(ListMapper $mapper)
     {
@@ -168,10 +169,7 @@ class UploadConfig
         ));
     }
 
-    public function configureValidations(ValidationBuilder $builder)
-    {
-
-    }
+    abstract public function configureValidations(ValidationBuilder $builder);
 
     public function getColumnsMapper()
     {
@@ -231,32 +229,53 @@ class UploadConfig
         }
 
         $action = $upload->getAction('read');
-        $action->setInProgress();
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
 
-        $this->onPreRead($upload);
+        try {
+            $action->setInProgress();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
 
-        $reader = $this->readerLoader->get($upload->getFullFilename());
+            $this->onPreRead($upload);
 
-        $data = $reader->getData($upload->getFullFilename(), $upload->getAttribute('config_read')->getValue());
+            $reader = $this->readerLoader->get($upload->getFullFilename());
 
-        foreach ($data as $item) {
+            $data = $reader->getData($upload->getFullFilename(), $upload->getAttribute('config_read')->getValue());
 
-            $uploadedItem = new UploadedItem();
-            $uploadedItem->setData($item);
-            $upload->addItem($uploadedItem);
+            $columnsMapper = $this->columnsMapper->getColumns();
 
-            $this->objectManager->persist($uploadedItem);
+            foreach ($data as $item) {
+                $formattedItem = array();
+
+                foreach ($item as $colName => $value) {
+                    if (isset($columnsMapper[$colName])) {
+                        $formattedItem[$colName] = call_user_func(
+                            $columnsMapper[$colName]['formatter'],
+                            $value
+                        );
+                    }
+                }
+
+                $uploadedItem = new UploadedItem();
+                $uploadedItem->setData($item);
+                $upload->addItem($uploadedItem);
+
+                $this->objectManager->persist($uploadedItem);
+            }
+
+            $action->setComplete();
+            $upload->setTotal(count($data));
+
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            $this->onPostRead($upload);
+        } catch (\Exception $e) {
+            $action->setNotComplete();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            throw $e;
         }
-
-        $action->setComplete();
-        $upload->setTotal(count($data));
-
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
-
-        $this->onPostRead($upload);
     }
 
     public function processValidation(Upload $upload)
@@ -267,49 +286,57 @@ class UploadConfig
 
         $action = $upload->getAction('validate');
 
-        $validationGroup = $action->isComplete() ? 'upload-revalidate' : 'upload-validate';
+        try {
+            $validationGroup = $action->isComplete() ? 'upload-revalidate' : 'upload-validate';
 
-        $action->setInProgress();
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
+            $action->setInProgress();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
 
-        $this->onPreValidate($upload);
+            $this->onPreValidate($upload);
 
-        $validations = $this->validationBuilder->getValidations();
+            $validations = $this->validationBuilder->getValidations();
 
-        $valids = $invalids = 0;
+            $valids = $invalids = 0;
 
-        foreach ($upload->getItems() as $item) {
-            $context = $this->validator->startContext();
-            $data = $item->getData();
-            foreach ($validations as $column => $constraints) {
-                $value = array_key_exists($column, $data) ? $data[$column] : null;
-                $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
+            foreach ($upload->getItems() as $item) {
+                $context = $this->validator->startContext();
+                $data = $item->getData();
+                foreach ($validations as $column => $constraints) {
+                    $value = array_key_exists($column, $data) ? $data[$column] : null;
+                    $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
+                }
+
+                $this->validateItem($item, $context, $upload);
+
+                $violations = $context->getViolations();
+
+                if (count($violations)) {
+                    $item->setErrors($context->getViolations());
+                    ++$invalids;
+                } else {
+                    $item->setErrors(null);
+                    ++$valids;
+                }
+
+                $this->objectManager->persist($item);
             }
 
-            $violations = $context->getViolations();
+            $action->setComplete();
+            $upload->setValids($valids);
+            $upload->setInvalids($invalids);
 
-            $this->validateItem($data, $violations, $upload);
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
 
-            if (count($violations)) {
-                $item->setErrors($context->getViolations());
-                ++$invalids;
-            } else {
-                $item->setErrors(null);
-                ++$valids;
-            }
+            $this->onPostValidate($upload);
+        } catch (\Exception $e) {
+            $action->setNotComplete();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
 
-            $this->objectManager->persist($item);
+            throw $e;
         }
-
-        $action->setComplete();
-        $upload->setValids($valids);
-        $upload->setInvalids($invalids);
-
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
-
-        $this->onPostRead($upload);
     }
 
     public function processTransfer(Upload $upload)
@@ -319,42 +346,49 @@ class UploadConfig
         }
 
         $action = $upload->getAction('transfer');
-        $action->setInProgress();
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
 
-        $this->transfer($upload, $upload->getItems());
+        try {
+            $action->setInProgress();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
 
-        $action->setComplete();
+            $this->transfer($upload, $upload->getItems());
 
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
+            $action->setComplete();
 
-        $this->onPostRead($upload);
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            $this->onPostRead($upload);
+
+        } catch (\Exception $e) {
+            $action->setNotComplete();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            throw $e;
+        }
     }
 
-    public function processAction(Upload $upload, $name)
-    {
-
-    }
+    public function processAction(Upload $upload, $name) { }
 
     public function onPreUpload(Upload $upload, File $file, array $formData = array()) { }
 
     public function onPostUpload(Upload $upload, File $file, array $formData = array()) { }
 
-    public function onPreRead() { }
+    public function onPreRead(Upload $upload) { }
 
-    public function onPostRead() { }
+    public function onPostRead(Upload $upload) { }
 
-    public function onPreValidate() { }
+    public function onPreValidate(Upload $upload) { }
 
-    public function validateItem(array $data, ConstraintViolationListInterface $violations, Upload $upload) { }
+    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload) { }
 
-    public function onPostValidate() { }
+    public function onPostValidate(Upload $upload) { }
 
-    public function transfer($data, Collection $items) { }
+    abstract public function transfer(Upload $upload, Collection $items);
 
-    public function onPreDelete() { }
+    public function onPreDelete(Upload $upload) { }
 
-    public function onPostDelete() { }
+    public function onPostDelete(Upload $upload) { }
 }

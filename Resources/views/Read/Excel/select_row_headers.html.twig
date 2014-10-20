@@ -1,26 +1,19 @@
+{% trans_default_domain 'upload_data' %}
 {% extends '@UploadData/base_ajax_modal.html.twig' %}
 {% set modal_id = 'csv_form' %}
 
-{#{% form_theme form#}
-{#'@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'#}
-{#%}#}
-
-{#{% form_theme form.attributes#}
 {% form_theme form
 '@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'
 _self %}
 
-{% block headline %}
-    Lectura del Archivo
-{% endblock %}
+{% block headline %}{{ 'title.file_read'|trans }}{% endblock %}
 
 {% block body %}
     {{ form_start(form, {attr: {'data-ajax': "##{modal_id} .modal-body-container" }}) }}
     <div class="modal-body">
         {% embed '@UploadData/panel.html.twig' %}
-            {% block body %}
-                Este formulario permite establecer opciones para la lecura de archivos <strong>CSV</strong>
-            {% endblock %}
+            {% trans_default_domain 'upload_data' %}
+            {% block body %}{{ 'info.read_excel_options'|trans|raw }}{% endblock %}
         {% endembed %}
         {{ form_widget(form.attributes) }}
         <div id="preview-excel-headers"></div>
@@ -31,7 +24,7 @@ _self %}
         'data-url': path('upload_data_upload_read_excel_preview_headers', {id: upload.id}),
         'data-before': 'prepareExcelParams', }}) }}
         {{ form_widget(form.send) }}
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'link.close'|trans }}</button>
     </div>
     {{ form_end(form) }}
 {% endblock %}

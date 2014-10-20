@@ -1,11 +1,10 @@
+{% trans_default_domain 'upload_data' %}
 {% set is_show = is_show is defined ? is_show: false %}
 <table class="table table-bordered">
     <thead>
-        {#{{ sonata_block_render({type: 'upload_data.block.header_column_list'}, {config: config, is_show: is_show}) }}#}
         {{ include('@UploadData/Block/header_columns.html.twig', {config: config, is_show: is_show}) }}
     </thead>
     <tbody>
         {{ include('@UploadData/Block/columns.html.twig', {config: config, items: items, is_show: is_show}) }}
-        {#{{ sonata_block_render({type: 'upload_data.block.column_list'}, {config: config, uploads: items, is_show: is_show}) }}#}
     </tbody>
 </table>

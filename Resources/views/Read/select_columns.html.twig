@@ -1,3 +1,4 @@
+{% trans_default_domain 'upload_data' %}
 <form class="form-horizontal" data-ajax data-before="validateColumnsForm"
       data-after="closeColumnsModal"
       action="{{ app.request.getRequestUri() }}" method="post">
@@ -5,8 +6,8 @@
         <table class="table table-bordered system-headers form-horizontal">
             <thead>
                 <tr>
-                    <th class="text-center">Columnas Esperadas</th>
-                    <th class="text-center">Columnas del Archivo</th>
+                    <th class="text-center">{{ 'table.expected_columns'|trans }}</th>
+                    <th class="text-center">{{ 'table.file_columns'|trans }}</th>
                 </tr>
             </thead>
             {% for name, options in columns %}
@@ -31,8 +32,8 @@
     </div>
 
     <div class="modal-footer">
-        <input type="submit" class="btn btn-primary" value="Procesar">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <input type="submit" class="btn btn-primary" value="{{ 'button.process'|trans }}">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'link.close'|trans }}</button>
     </div>
 
 </form>
