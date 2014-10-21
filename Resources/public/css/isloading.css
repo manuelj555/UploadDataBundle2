@@ -1,0 +1,40 @@
+.isloading-overlay .isloading-wrapper {
+    background: none repeat scroll 0 0 padding-box #ffffff;
+    border-radius: 7px;
+    display: inline-block;
+    margin: -20px 0 auto;
+    padding: 10px 20px;
+    top: 50%;
+    z-index: 9000;
+}
+
+.isloading-overlay {
+    position: relative;
+    text-align: center;
+}
+body > .isloading-overlay{
+    top: 0;left: 0;right: 0;bottom: 0;
+    position: fixed;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: auto !important;
+    height: auto !important;
+}
+
+.isloading-overlay .icon-spin {
+    animation: 1s linear 0s normal none infinite spin;
+    display: inline-block;
+}
+
+@-moz-keyframes spin {
+    from { -moz-transform: rotate(0deg); }
+    to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+    from { -webkit-transform: rotate(0deg); }
+    to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}

@@ -11,7 +11,8 @@
     {% block head_style %}
         {% stylesheets filter='cssrewrite'
         'bundles/uploaddata/css/bootstrap.min.css'
-        'bundles/uploaddata/css/jquery-ui.min.css' %}
+        'bundles/uploaddata/css/jquery-ui.min.css'
+        'bundles/uploaddata/css/isloading.css' %}
         {#'bundles/manuelajaxflash/vendor/pnotify/pnotify.custom.min.css'#}
         <link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen"/>
         {% endstylesheets %}
@@ -26,6 +27,7 @@
         'bundles/uploaddata/js/jquery.iframe-transport.js'
         'bundles/uploaddata/js/jquery.fileupload.js'
         'bundles/uploaddata/js/jquery-ui.min.js'
+        'bundles/uploaddata/js/jquery.isloading.min.js'
         %}
         {#'bundles/manuelajaxflash/vendor/pnotify/pnotify.custom.min.js'#}
         {#'bundles/manuelajaxflash/js/plugin.js'#}
@@ -91,6 +93,11 @@
         {#</script>#}
         <script>
             $('body').ajaxHelper();
+            $(document).ajaxStart(function () {
+                $.isLoading({class: 'glyphicon glyphicon-refresh'})
+            }).ajaxStop(function () {
+                $.isLoading('hide')
+            });
         </script>
     {% endblock foot_script %}
 
