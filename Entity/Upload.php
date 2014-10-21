@@ -553,6 +553,17 @@ class Upload
         }
     }
 
+    public function setAttributeValue($name, $value)
+    {
+        if($attr = $this->getAttribute($name)){
+            $attr->setValue($value);
+        }else{
+            $this->addAttribute($attr = new UploadAttribute($name, $value));
+        }
+
+        return $this;
+    }
+
     /**
      * Constructor
      */
