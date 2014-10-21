@@ -8,8 +8,6 @@ El funcionamiento del bundle se basa en una clase de configuración que existend
 namespace AppBundle\Upload;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
@@ -18,11 +16,8 @@ use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuelj555\Bundle\UploadDataBundle\Validator\ColumnError;
 use AppBundle\Card;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CardScheme;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 
 class UploadCardConfig extends UploadConfig
@@ -32,7 +27,11 @@ class UploadCardConfig extends UploadConfig
     {
         $mapper
             ->add('email')
-            ->add('card_number')
+            ->add('card_number', array(
+                'label' => 'Card Number',
+                'aliases' => array('CardNumber', 'Num Tarjeta', 'Tarjeta'),
+                'similar' => true, 
+            ))
             ->add('expiration_date', array(
                 'required' => false,
                 //podemos formatear los datos leidos del archivo subido.
@@ -86,7 +85,12 @@ class UploadCardConfig extends UploadConfig
         $this->objectManager->flush();
     }
 
-
 }
 ```
+
+la clase consta de 4 métodos, de los cuales solo son obligatorios los métodos **configureColumns, configureValidations y transfer**, ya que es por medio de estos, que se leerá la data del archivo, se validará y se procesará para llevar los datos a la lógica de la aplicación.
+
+## configureColumns
+
+Este método permite definir las columnas que necesitamos cargar del excel, y de una vez mapearlas a claves de datos usables en los posteriores procesos de lectura, validación y transferencia de los datos.
 
