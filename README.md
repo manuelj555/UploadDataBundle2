@@ -75,3 +75,7 @@ manuel_ajax_flash:
 
 Para mayor información sobre como usar el bundle, ver: [AjaxFlashBundle](https://github.com/manuelj555/AjaxFlashBundle)
 
+## Cargando Archivos
+
+(Uso)[https://github.com/manuelj555/UploadDataBundle2/blob/master/Resources/doc/usage.md]
+
