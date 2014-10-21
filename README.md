@@ -77,5 +77,5 @@ Para mayor información sobre como usar el bundle, ver: [AjaxFlashBundle](https:
 
 ## Cargando Archivos
 
-(Uso)[https://github.com/manuelj555/UploadDataBundle2/blob/master/Resources/doc/usage.md]
+[Uso](https://github.com/manuelj555/UploadDataBundle2/blob/master/Resources/doc/usage.md)
 
