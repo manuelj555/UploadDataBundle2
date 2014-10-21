@@ -8,6 +8,7 @@ namespace Manuelj555\Bundle\UploadDataBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -69,5 +70,6 @@ class RegisterUploadConfigPass implements CompilerPassInterface
         $definition->addMethodCall('setColumnListFactory', array(new Reference('upload_data.column_list_factory')));
         $definition->addMethodCall('setListMapper', array(new Reference('upload_data.list_mapper')));
         $definition->addMethodCall('setReaderLoader', array(new Reference('upload_data.reader_loader')));
+        $definition->addMethodCall('setTranslator', array(new Reference('translator', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
     }
 }

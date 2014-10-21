@@ -17,6 +17,7 @@ use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -27,17 +28,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 abstract class UploadConfig
 {
-    protected $columnsMapper;
-    protected $validationBuilder;
-    protected $listMapper;
+    private $columnsMapper;
+    private $validationBuilder;
+    private $listMapper;
     /**
      * @var ReaderLoader
      */
-    protected $readerLoader;
-    protected $columnListFactory;
+    private $readerLoader;
+    private $columnListFactory;
     private $processed = false;
-    protected $uploadDir = false;
-    protected $type = false;
+    private $uploadDir = false;
+    private $type = false;
 
     /**
      * @var EntityManagerInterface
@@ -46,7 +47,11 @@ abstract class UploadConfig
     /**
      * @var ValidatorInterface
      */
-    protected $validator;
+    private $validator;
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     public function __construct()
     {
@@ -100,6 +105,14 @@ abstract class UploadConfig
     public function setValidator($validator)
     {
         $this->validator = $validator;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -368,6 +381,23 @@ abstract class UploadConfig
 
             throw $e;
         }
+    }
+
+    /**
+     * Translates the given message.
+     *
+     * @param string      $id         The message id (may also be an object that can be cast to string)
+     * @param array       $parameters An array of parameters for the message
+     * @param string|null $domain     The domain for the message or null to use the default
+     * @param string|null $locale     The locale or null to use the default
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
+     *
+     * @return string The translated string
+     */
+    protected function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    {
+        return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
     public function processAction(Upload $upload, $name) { }
