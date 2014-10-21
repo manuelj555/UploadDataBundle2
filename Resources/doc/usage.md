@@ -90,7 +90,19 @@ class UploadCardConfig extends UploadConfig
 
 la clase consta de 4 métodos, de los cuales solo son obligatorios los métodos **configureColumns, configureValidations y transfer**, ya que es por medio de estos, que se leerá la data del archivo, se validará y se procesará para llevar los datos a la lógica de la aplicación.
 
-## configureColumns
+## configureColumns(name, array options)
 
 Este método permite definir las columnas que necesitamos cargar del excel, y de una vez mapearlas a claves de datos usables en los posteriores procesos de lectura, validación y transferencia de los datos.
+
+### options
+    
+Este arreglo permite definir una serie de opciones de configuración:
+
+Opcion      | Por Defecto       | Descripcion
+ ---        | ---               | --- 
+label       | null              | Label a mostrar al usuario para la columna leida del archivo.
+required    | true              | Indica si la columna es requerida.
+aliases     | array()           | Permite indicar una serie de strings con otros posibles nombres de la columna en el archivo, si la columna coincide con alguno, aparecera mapeada por defecto a este key.
+similar     | false             | si es true, permite mapear una columna del archivo que tenga un nombre muy parecido al esperado
+formatter   | callback(){}      | permite definir una función que será llamada al leer cada dato de la columna en el archivo, y en ella podemos modificar el contenido leido para ajustarlo a nuestras necesidades (formatear fechas, convertir textos, etc.).
 
