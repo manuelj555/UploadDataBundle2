@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Route("/read/csv/{id}")
+ * @Route("/read/csv/{id}", condition="request.isXmlHttpRequest()")
  */
 class CsvReadController extends BaseReadController
 {

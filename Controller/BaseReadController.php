@@ -15,6 +15,9 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\PhpProcess;
 use Symfony\Component\Process\Process;
 
+/**
+ * @Route(condition="request.isXmlHttpRequest()")
+ */
 class BaseReadController extends Controller
 {
     /**

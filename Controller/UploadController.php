@@ -126,7 +126,7 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/read/{id}", name="upload_data_upload_read")
+     * @Route("/read/{id}", name="upload_data_upload_read", condition="request.isXmlHttpRequest()")
      *
      * @param         $type
      * @param Upload  $upload
@@ -146,7 +146,7 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/validate/{id}", name="upload_data_upload_validate")
+     * @Route("/validate/{id}", name="upload_data_upload_validate", condition="request.isXmlHttpRequest()")
      *
      * @param        $type
      * @param Upload $upload
@@ -165,7 +165,7 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/transfer/{id}", name="upload_data_upload_transfer")
+     * @Route("/transfer/{id}", name="upload_data_upload_transfer", condition="request.isXmlHttpRequest()")
      *
      * @param        $type
      * @param Upload $upload

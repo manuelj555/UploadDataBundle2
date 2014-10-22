@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Route("/read/xls/{id}")
+ * @Route("/read/xls/{id}", condition="request.isXmlHttpRequest()")
  */
 class ExcelReadController extends BaseReadController
 {
