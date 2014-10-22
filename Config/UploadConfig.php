@@ -283,9 +283,7 @@ abstract class UploadConfig
 
             $this->onPostRead($upload);
         } catch (\Exception $e) {
-            $action->setNotComplete();
-            $this->objectManager->persist($upload);
-            $this->objectManager->flush();
+            $this->onActionException($action, $upload);
 
             throw $e;
         }
@@ -344,9 +342,7 @@ abstract class UploadConfig
 
             $this->onPostValidate($upload);
         } catch (\Exception $e) {
-            $action->setNotComplete();
-            $this->objectManager->persist($upload);
-            $this->objectManager->flush();
+            $this->onActionException($action, $upload);
 
             throw $e;
         }
@@ -375,9 +371,7 @@ abstract class UploadConfig
             $this->onPostRead($upload);
 
         } catch (\Exception $e) {
-            $action->setNotComplete();
-            $this->objectManager->persist($upload);
-            $this->objectManager->flush();
+            $this->onActionException($action, $upload);
 
             throw $e;
         }
@@ -421,4 +415,13 @@ abstract class UploadConfig
     public function onPreDelete(Upload $upload) { }
 
     public function onPostDelete(Upload $upload) { }
+
+    private function onActionException($action, $upload)
+    {
+        if ($this->objectManager->isOpen()) {
+            $action->setNotComplete();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+        }
+    }
 }
