@@ -37,7 +37,7 @@
                     {% for num, label in upload_config.columnsMapper.labels if num < 7 %}
                         <th>{{ label|title|trans }}</th>
                     {% endfor %}
-                    <th>{{ 'table.errors'|trans }}</th>
+                    <th style="width: 130px">{{ 'table.errors'|trans }}</th>
                 </tr>
             </thead>
             {% for item in upload.items %}
@@ -54,7 +54,7 @@
                             </a>
                         {%- endif %}
                         {% if item.errors|length > 0 -%}
-                            <span class=" pull-right btn btn-danger btn-xs"
+                            <span class="btn btn-danger btn-xs"
                                   data-toggle="popover"
                                   data-content="{{ errors(item.errors, upload_config.columnsMapper)|escape }}">
                             {{ 'link.errors'|trans }}
