@@ -276,7 +276,7 @@ abstract class UploadConfig
                 }
 
                 $uploadedItem = new UploadedItem();
-                $uploadedItem->setData($item);
+                $uploadedItem->setData($formattedItem);
                 $upload->addItem($uploadedItem);
 
                 $this->objectManager->persist($uploadedItem);
