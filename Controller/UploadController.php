@@ -83,9 +83,7 @@ class UploadController extends Controller
      */
     public function listAction(Request $request)
     {
-        $query = $this->getDoctrine()
-            ->getRepository('UploadDataBundle:Upload')
-            ->getQueryForType($this->type);
+        $query = $this->config->getQueryList($request, $this->get('upload_data.upload_repository'));
 //            ->getQuery();
 
         $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1));

@@ -12,11 +12,13 @@ use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
 use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
+use Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Manuelj555\Bundle\UploadDataBundle\Form\Type\UploadType;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
@@ -147,6 +149,11 @@ abstract class UploadConfig
     public function getViewPrefix()
     {
         return '@UploadData/Upload';
+    }
+
+    public function getQueryList(Request $request, UploadRepository $repository)
+    {
+        return $repository->getQueryForType($this->getType());
     }
 
     abstract public function configureColumns(ColumnsMapper $mapper);
