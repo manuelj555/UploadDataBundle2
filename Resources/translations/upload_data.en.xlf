@@ -118,6 +118,18 @@
                 <source>link.detail</source>
                 <target>Detail</target>
             </trans-unit>
+            <trans-unit id="30">
+                <source>title.show</source>
+                <target>Show</target>
+            </trans-unit>
+			<trans-unit id="31">
+				<source>table.column</source>
+				<target>Column</target>
+			</trans-unit>
+            <trans-unit id="32">
+				<source>table.value</source>
+				<target>Value</target>
+			</trans-unit>
         </body>
     </file>
 </xliff>

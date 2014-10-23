@@ -1,3 +1,4 @@
+{% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% set modal_id = 'show_item_modal' %}
 {% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
@@ -20,8 +21,8 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Columna</th>
-                <th>Valor</th>
+                <th>{{ 'table.column'|trans }}</th>
+                <th>{{ 'table.value'|trans }}</th>
             </tr>
         </thead>
         {% for name, value in item.data if name != extraName %}
