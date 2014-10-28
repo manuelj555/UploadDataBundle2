@@ -26,6 +26,7 @@ class RegisterUploadConfigPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('upload_data.config') as $id => $configs) {
             $definition = $container->getDefinition($id);
             $type = null;
+            $label = null;
 
             foreach ($configs as $config) {
 
@@ -42,12 +43,13 @@ class RegisterUploadConfigPass implements CompilerPassInterface
                 }
 
                 $type = $config['id'];
+                $label = $config['label'];
 
                 $uploadTypes[$config['id']] = $config['label'];
                 $uploadTypesServices[$config['id']] = $id;
             }
 
-            $this->configureDefinition($type, $definition, $container);
+            $this->configureDefinition($type, $definition, $container, $label);
         }
 
         $container->setParameter('upload_data.upload_types', $uploadTypes);
@@ -61,8 +63,9 @@ class RegisterUploadConfigPass implements CompilerPassInterface
         throw new \InvalidArgumentException(sprintf('El servicio "%s" debe tener definido el atributo "%s" para el tag "upload_data.config".', $service, $attribute));
     }
 
-    protected function configureDefinition($type, Definition $definition, ContainerBuilder $container)
+    protected function configureDefinition($type, Definition $definition, ContainerBuilder $container, $label)
     {
+        $definition->addMethodCall('setLabel', array($label));
         $definition->addMethodCall('setObjectManager', array(new Reference('doctrine.orm.entity_manager')));
         $definition->addMethodCall('setUploadDir', array('%upload_data.files_dir%'));
         $definition->addMethodCall('setType', array($type));

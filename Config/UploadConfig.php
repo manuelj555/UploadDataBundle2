@@ -41,6 +41,7 @@ abstract class UploadConfig
     private $processed = false;
     private $uploadDir = false;
     private $type = false;
+    private $label;
 
     /**
      * @var EntityManagerInterface
@@ -63,6 +64,22 @@ abstract class UploadConfig
     {
         $this->columnsMapper = new ColumnsMapper();
         $this->validationBuilder = new ValidationBuilder();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param mixed $label
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
     }
 
     /**
