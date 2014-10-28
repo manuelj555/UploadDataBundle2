@@ -11,7 +11,9 @@
                 <div class="modal-body-container">
                     {% block body %}
                         <div class="modal-body">
+                            {% block before_content %}{% endblock %}
                             {% block content %}{% endblock content %}
+                            {% block after_content %}{% endblock %}
                         </div>
                         <div class="modal-footer">
                             {% block modal_footer %}
