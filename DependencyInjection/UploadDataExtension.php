@@ -26,5 +26,6 @@ class UploadDataExtension extends Extension
         $loader->load('services.yml');
 
         $container->setParameter('upload_data.files_dir', $config['files_dir']);
+        $container->setParameter('upload_data.templates', $config['templates']);
     }
 }

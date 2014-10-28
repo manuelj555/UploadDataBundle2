@@ -54,6 +54,10 @@ abstract class UploadConfig
      * @var TranslatorInterface
      */
     private $translator;
+    /**
+     * @var array
+     */
+    private $templates = array();
 
     public function __construct()
     {
@@ -194,6 +198,34 @@ abstract class UploadConfig
     public function getColumnsMapper()
     {
         return $this->columnsMapper;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
+    }
+
+    /**
+     * @param array $templates
+     */
+    public function setTemplates($templates)
+    {
+        $this->templates = $templates;
+    }
+
+    public function getTemplate($name){
+        if(!isset($this->templates[$name])){
+            throw new \InvalidArgumentException('No existe el template ' . $name);
+        }
+
+        return $this->templates[$name];
+    }
+
+    public function setTemplate($name, $value){
+        $this->templates[$name] = $value;
     }
 
     /**

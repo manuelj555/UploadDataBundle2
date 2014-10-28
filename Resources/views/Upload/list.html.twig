@@ -1,13 +1,13 @@
 {% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
-{% extends is_ajax ? '@UploadData/base_ajax.html.twig' :'@UploadData/base.html.twig' %}
+{% extends is_ajax ? config.getTemplate('ajax') : config.getTemplate('layout') %}
 
 {% block headline %}{{ 'title.list'|trans }}{% endblock %}
 
 {% from '@UploadData/macros.html.twig' import bs_icon, bs_upload_status as status %}
 
 {% set type = app.request.get('type') %}
-{% set listMapper = upload_config.getListMapper() %}
+{% set listMapper = config.getListMapper() %}
 
 {% block content_row %}
     <div class="panel panel-default">
@@ -27,7 +27,7 @@
 {% block content %}
     {% if is_ajax %}{{ include('@UploadData/flash.html.twig') }}{% endif %}
     <div {% if not is_ajax %}id="upload-list-container"{% endif %}>
-        {{ include('@UploadData/Upload/uploads_table.html.twig', {config: upload_config}) }}
+        {{ include(config.getTemplate('upload_table'), {config: config}) }}
         {{ knp_pagination_render(items) }}
     </div>
 {% endblock %}

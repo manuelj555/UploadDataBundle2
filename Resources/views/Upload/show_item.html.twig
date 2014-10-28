@@ -1,7 +1,7 @@
 {% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% set modal_id = 'show_item_modal' %}
-{% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
+{% extends is_ajax ? config.getTemplate('ajax_modal') : config.getTemplate('layout') %}
 
 {% block headline %}Show
     <small>#{{ item.upload.id }}-{{ item.upload.filename }}</small> Item #{{ item.id }}{% endblock %}

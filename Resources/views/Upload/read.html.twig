@@ -1,6 +1,6 @@
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% set modal_id = 'show_read_modal' %}
-{% extends is_ajax ? '@UploadData/base_ajax_modal.html.twig' : '@UploadData/base.html.twig' %}
+{% extends is_ajax ? config.getTemplate('ajax_modal') : config.getTemplate('layout') %}
 
 {% block headline %}Read
     <small>#{{ upload.id }}-{{ upload.filename }}</small>{% endblock %}

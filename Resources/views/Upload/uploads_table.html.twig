@@ -2,9 +2,9 @@
 {% set is_show = is_show is defined ? is_show: false %}
 <table class="table table-bordered">
     <thead>
-        {{ include('@UploadData/Block/header_columns.html.twig', {config: config, is_show: is_show}) }}
+        {{ include(config.getTemplate('upload_table_header'), {config: config, is_show: is_show}) }}
     </thead>
     <tbody>
-        {{ include('@UploadData/Block/columns.html.twig', {config: config, items: items, is_show: is_show}) }}
+        {{ include(config.getTemplate('upload_table_rows'), {config: config,  items: items, is_show: is_show}) }}
     </tbody>
 </table>

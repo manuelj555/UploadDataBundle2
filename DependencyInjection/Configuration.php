@@ -26,6 +26,36 @@ class Configuration implements ConfigurationInterface
 
         $rootNode->children()
                 ->scalarNode('files_dir')->defaultValue('%kernel.root_dir%/cache/uploads/data/')->end()
+
+            ->arrayNode('templates')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('layout')->defaultValue('UploadDataBundle::base.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('ajax')->defaultValue('UploadDataBundle::base_ajax.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('ajax_modal')->defaultValue('UploadDataBundle::base_ajax_modal.html.twig')->cannotBeEmpty()->end()
+
+                    ->scalarNode('upload_list')->defaultValue('UploadDataBundle:Upload:list.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_new')->defaultValue('UploadDataBundle:Upload:new.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_read')->defaultValue('UploadDataBundle:Upload:rad.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_show')->defaultValue('UploadDataBundle:Upload:show.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_show_item')->defaultValue('UploadDataBundle:Upload:show_iem.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_table')->defaultValue('UploadDataBundle:Upload:uploads_table.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_table_header')->defaultValue('UploadDataBundle:Block:header_columns.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_table_rows')->defaultValue('UploadDataBundle:Block:columns.html.twig')->cannotBeEmpty()->end()
+
+                    ->scalarNode('read_select_columns')->defaultValue('UploadDataBundle:Read:select_columns.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('read_csv_separator')->defaultValue('UploadDataBundle:Read:Csv/separator.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('read_excel_preview_headers')->defaultValue('UploadDataBundle:Read:Excel/preview_headers.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('read_excel_select_row_headers')->defaultValue('UploadDataBundle:Read:Excel/select_row_headers.html.twig')->cannotBeEmpty()->end()
+
+                    ->scalarNode('column')->defaultValue('UploadDataBundle:Default:column.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('column_action')->defaultValue('UploadDataBundle:Default:column_action.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('column_datetime')->defaultValue('UploadDataBundle:Default:column_datetime.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('column_link')->defaultValue('UploadDataBundle:Default:column_link.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('column_number')->defaultValue('UploadDataBundle:Default:column_number.html.twig')->cannotBeEmpty()->end()
+                ->end()
+            ->end()
+
             ->end();
 
         return $treeBuilder;

@@ -1,7 +1,6 @@
 {% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
-{% extends is_ajax ? '@UploadData/base_ajax.html.twig' : '@UploadData/base.html.twig' %}
-{#{% extends '@UploadData/base.html.twig' %}#}
+{% extends is_ajax ? config.getTemplate('ajax') : config.getTemplate('layout') %}
 
 {% block headline %}{{ 'title.show'|trans }}
     <small>{{ upload.filename }}</small>{% endblock %}
@@ -16,14 +15,14 @@
     </style>
 {% endblock %}
 
-{% set show_detail = upload_config.columnsMapper.labels > 6 %}
+{% set show_detail = config.columnsMapper.labels > 6 %}
 
 {% block content %}
     <div id="show-container">
         <div class="row" id="show-container" data-url="{{ app.request.getRequestUri() }}">
             <div class="col-sm-6">
-                {{ include('@UploadData/Upload/uploads_table.html.twig', {
-                config: upload_config, items: [upload], is_show: true
+                {{ include(config.getTemplate('upload_table'), {
+                config: config, items: [upload], is_show: true
                 }) }}
             </div>
             <div class="col-sm-6 text-right">
@@ -34,7 +33,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    {% for num, label in upload_config.columnsMapper.labels if num < 7 %}
+                    {% for num, label in config.columnsMapper.labels if num < 7 %}
                         <th>{{ label|title|trans }}</th>
                     {% endfor %}
                     <th style="width: 130px">{{ 'table.errors'|trans }}</th>
@@ -42,7 +41,7 @@
             </thead>
             {% for item in upload.items %}
                 <tr>
-                    {% for name in upload_config.columnsMapper.names %}
+                    {% for name in config.columnsMapper.names %}
                         <td>{{ item.data[name]|default }}</td>
                     {% endfor %}
                     <td>
@@ -56,7 +55,7 @@
                         {% if item.errors|length > 0 -%}
                             <span class="btn btn-danger btn-xs"
                                   data-toggle="popover"
-                                  data-content="{{ errors(item.errors, upload_config.columnsMapper)|escape }}">
+                                  data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
                             {{ 'link.errors'|trans }}
                         </span>
                         {%- endif %}

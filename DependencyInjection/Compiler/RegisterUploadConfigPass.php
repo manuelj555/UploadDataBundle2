@@ -71,5 +71,33 @@ class RegisterUploadConfigPass implements CompilerPassInterface
         $definition->addMethodCall('setListMapper', array(new Reference('upload_data.list_mapper')));
         $definition->addMethodCall('setReaderLoader', array(new Reference('upload_data.reader_loader')));
         $definition->addMethodCall('setTranslator', array(new Reference('translator', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
+
+        $this->fixTemplates($container, $definition);
+
+    }
+
+    protected  function fixTemplates(ContainerBuilder $container, Definition $definition)
+    {
+        $definedTemplates = $container->getParameter('upload_data.templates');
+
+        $methods = array();
+        $pos = 0;
+        foreach ($definition->getMethodCalls() as $method) {
+            if ($method[0] == 'setTemplates') {
+                $definedTemplates = array_merge($definedTemplates, $method[1][0]);
+                continue;
+            }
+
+            if ($method[0] == 'setTemplate') {
+                $definedTemplates[$method[1][0]] = $method[1][1];
+                continue;
+            }
+
+            $methods[$pos] = $method;
+            $pos++;
+        }
+
+        $definition->setMethodCalls($methods);
+        $definition->addMethodCall('setTemplates', array($definedTemplates));
     }
 }
