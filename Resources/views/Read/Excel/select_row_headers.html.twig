@@ -1,5 +1,5 @@
 {% trans_default_domain 'upload_data' %}
-{% extends '@UploadData/base_ajax_modal.html.twig' %}
+{% extends config.getTemplate('ajax_modal') %}
 {% set modal_id = 'csv_form' %}
 
 {% form_theme form

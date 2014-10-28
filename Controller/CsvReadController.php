@@ -14,6 +14,17 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CsvReadController extends BaseReadController
 {
+    /**
+     * @param string $type
+     *
+     * @return UploadConfig
+     */
+    protected function getConfig(Upload $upload)
+    {
+        return $this->container
+            ->get('upload_data.config_provider')
+            ->get($upload->getType());
+    }
 
     /**
      * @Route("/separator", name="upload_data_upload_read_csv")
