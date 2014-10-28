@@ -26,6 +26,8 @@ class ExcelReadController extends BaseReadController
      */
     public function selectRowHeadersAction(Request $request, Upload $upload)
     {
+        $config = $this->getConfig($upload);
+
         if (!$attr = $upload->getAttribute('row_headers')) {
             $attr = new UploadAttribute('row_headers', 1);
             $upload->addAttribute($attr);
@@ -63,9 +65,10 @@ class ExcelReadController extends BaseReadController
             )));
         }
 
-        return $this->render('@UploadData/Read/Excel/select_row_headers.html.twig', array(
+        return $this->render($config->getTemplate('read_excel_select_row_headers'), array(
             'form' => $form->createView(),
             'upload' => $upload,
+            'config' => $config,
         ));
     }
 
@@ -79,6 +82,8 @@ class ExcelReadController extends BaseReadController
      */
     public function previewHeadersAction(Request $request, Upload $upload)
     {
+        $config = $this->getConfig($upload);
+
         $row = $request->get('row', 1);
 
         //previsualizamos las cabeceras
@@ -87,8 +92,9 @@ class ExcelReadController extends BaseReadController
                 'row_headers' => $row,
             ));
 
-        return $this->render('@UploadData/Read/Excel/preview_headers.html.twig', array(
+        return $this->render($config->getTemplate('read_excel_preview_headers'), array(
             'headers' => $headers,
+            'config' => $config,
         ));
     }
 
@@ -102,6 +108,7 @@ class ExcelReadController extends BaseReadController
      */
     public function selectColumnsAction(Request $request, Upload $upload)
     {
+        $config = $this->getConfig($upload);
         //la idea acá es leer las columnas del archivo y mostrarlas
         //para que el usuario haga un mapeo de ellas con las esperadas
         //por el sistema.
@@ -114,8 +121,7 @@ class ExcelReadController extends BaseReadController
             ->get($upload->getFullFilename())
             ->getRowHeaders($upload->getFullFilename(), $options);
 
-        $a = $this->getConfig($upload);
-        $columnsMapper = $a->getColumnsMapper();
+        $columnsMapper = $config->getColumnsMapper();
 
         $columns = $columnsMapper->getColumns();
         $matches = $columnsMapper->match($headers);
@@ -147,10 +153,11 @@ class ExcelReadController extends BaseReadController
             ));
         }
 
-        return $this->render('@UploadData/Read/select_columns.html.twig', array(
+        return $this->render($config->getTemplate('read_select_columns'), array(
             'file_headers' => $headers,
             'columns' => $columns,
             'matches' => $matches,
+            'config' => $config,
         ));
     }
 }

@@ -4,14 +4,15 @@
 
 {% form_theme form
 '@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'
-_self %}
+'@UploadData/Read/Excel/form_theme.html.twig'
+%}
 
 {% block headline %}{{ 'title.file_read'|trans }}{% endblock %}
 
 {% block body %}
     {{ form_start(form, {attr: {'data-ajax': "##{modal_id} .modal-body-container" }}) }}
     <div class="modal-body">
-        {% embed '@UploadData/panel.html.twig' %}
+        {% embed '@UploadData/panel.html.twig' with {config: config} %}
             {% trans_default_domain 'upload_data' %}
             {% block body %}{{ 'info.read_excel_options'|trans|raw }}{% endblock %}
         {% endembed %}
@@ -28,18 +29,6 @@ _self %}
     </div>
     {{ form_end(form) }}
 {% endblock %}
-
-{% block upload_attribute_row %}
-    {{ form_widget(form) }}
-{% endblock %}
-
-{% block form_label_class -%}
-    col-sm-6
-{%- endblock form_label_class %}
-
-{% block form_group_class -%}
-    col-sm-6
-{%- endblock form_group_class %}
 
 {% block ajax_script -%}
     {{ parent() }}

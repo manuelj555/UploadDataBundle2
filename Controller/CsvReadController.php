@@ -14,17 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class CsvReadController extends BaseReadController
 {
-    /**
-     * @param string $type
-     *
-     * @return UploadConfig
-     */
-    protected function getConfig(Upload $upload)
-    {
-        return $this->container
-            ->get('upload_data.config_provider')
-            ->get($upload->getType());
-    }
 
     /**
      * @Route("/separator", name="upload_data_upload_read_csv")
@@ -33,6 +22,8 @@ class CsvReadController extends BaseReadController
      */
     public function separatorAction(Request $request, Upload $upload)
     {
+        $config = $this->getConfig($upload);
+
         if (!$separatorAttribute = $upload->getAttribute('separator')) {
             $separatorAttribute = new UploadAttribute('separator', '|');
             $upload->addAttribute($separatorAttribute);
@@ -64,8 +55,9 @@ class CsvReadController extends BaseReadController
             )));
         }
 
-        return $this->render('@UploadData/Read/Csv/separator.html.twig', array(
+        return $this->render($config->getTemplate('read_csv_separator'), array(
             'form' => $form->createView(),
+            'config' => $config,
         ));
     }
 
@@ -79,6 +71,7 @@ class CsvReadController extends BaseReadController
      */
     public function selectColumnsAction(Request $request, Upload $upload)
     {
+        $config = $this->getConfig($upload);
         //la idea acá es leer las columnas del archivo y mostrarlas
         //para que el usuario haga un mapeo de ellas con las esperadas
         //por el sistema.
@@ -91,8 +84,7 @@ class CsvReadController extends BaseReadController
         $headers = $this->get('upload_data.csv_reader')
             ->getRowHeaders($upload->getFullFilename(), $options);
 
-        $a = $this->getConfig($upload);
-        $columnsMapper = $a->getColumnsMapper();
+        $columnsMapper = $config->getColumnsMapper();
 
         $columns = $columnsMapper->getColumns();
         $matches = $columnsMapper->match($headers);
@@ -124,10 +116,11 @@ class CsvReadController extends BaseReadController
             ));
         }
 
-        return $this->render('@UploadData/Read/select_columns.html.twig', array(
+        return $this->render($config->getTemplate('read_select_columns'), array(
             'file_headers' => $headers,
             'columns' => $columns,
             'matches' => $matches,
+            'config' => $config,
         ));
     }
 }
