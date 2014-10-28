@@ -1,0 +1,19 @@
+upload_data_upload_read_csv:
+    path:     /csv/separator/{id}
+    defaults: { _controller: UploadDataBundle:CsvRead:separator }
+
+upload_data_upload_select_columns_csv:
+    path:     /csv/select-columns/{id}
+    defaults: { _controller: UploadDataBundle:CsvRead:selectColumns }
+
+upload_data_upload_read_excel:
+    path:     /xls/select-row/{id}
+    defaults: { _controller: UploadDataBundle:ExcelRead:selectRowHeaders }
+
+upload_data_upload_read_excel_preview_headers:
+    path:     /xls/headers-preview/{id}
+    defaults: { _controller: UploadDataBundle:ExcelRead:previewHeaders }
+
+upload_data_upload_select_columns_excel:
+    path:     /xls/select-columns/{id}
+    defaults: { _controller: UploadDataBundle:ExcelRead:selectColumns }

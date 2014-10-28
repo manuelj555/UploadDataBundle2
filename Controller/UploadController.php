@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Route("/{type}")
  */
 class UploadController extends Controller
 {
@@ -70,8 +69,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/list", name="upload_data_upload_list")
-     *
      * @param         $type
      * @param Request $request
      *
@@ -90,8 +87,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/new", name="upload_data_upload_new")
-     *
      * @param         $type
      * @param Request $request
      *
@@ -120,8 +115,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/read/{id}", name="upload_data_upload_read", condition="request.isXmlHttpRequest()")
-     *
      * @param         $type
      * @param Upload  $upload
      * @param Request $request
@@ -140,8 +133,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/validate/{id}", name="upload_data_upload_validate", condition="request.isXmlHttpRequest()")
-     *
      * @param        $type
      * @param Upload $upload
      *
@@ -159,8 +150,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/transfer/{id}", name="upload_data_upload_transfer", condition="request.isXmlHttpRequest()")
-     *
      * @param        $type
      * @param Upload $upload
      *
@@ -178,8 +167,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/show/{id}", name="upload_data_upload_show")
-     *
      * @param        $type
      * @param Upload $upload
      *
@@ -193,8 +180,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/show-item/{id}", name="upload_data_upload_show_item")
-     *
      * @param              $type
      * @param UploadedItem $item
      *
@@ -208,8 +193,6 @@ class UploadController extends Controller
     }
 
     /**
-     * @Route("/delete/{id}", name="upload_data_upload_delete")
-     *
      * @param        $type
      * @param Upload $upload
      *

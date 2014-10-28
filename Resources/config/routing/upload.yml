@@ -1,0 +1,34 @@
+upload_data_upload_list:
+    path:     /list
+    defaults: { _controller: UploadDataBundle:Upload:list }
+
+upload_data_upload_new:
+    path:     /new
+    defaults: { _controller: UploadDataBundle:Upload:new }
+
+upload_data_upload_read:
+    path:     /read/{id}
+    defaults: { _controller: UploadDataBundle:Upload:read }
+    condition: request.isXmlHttpRequest()
+
+upload_data_upload_validate:
+    path:     /validate/{id}
+    defaults: { _controller: UploadDataBundle:Upload:validate }
+    condition: request.isXmlHttpRequest()
+
+upload_data_upload_transfer:
+    path:     /transfer/{id}
+    defaults: { _controller: UploadDataBundle:Upload:transfer }
+    condition: request.isXmlHttpRequest()
+
+upload_data_upload_show:
+    path:     /show/{id}
+    defaults: { _controller: UploadDataBundle:Upload:show }
+
+upload_data_upload_show_item:
+    path:     /show-item/{id}
+    defaults: { _controller: UploadDataBundle:Upload:showItem }
+
+upload_data_upload_delete:
+    path:     /delete/{id}
+    defaults: { _controller: UploadDataBundle:Upload:delete }

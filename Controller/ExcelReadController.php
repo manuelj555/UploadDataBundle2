@@ -11,14 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Route("/read/xls/{id}", condition="request.isXmlHttpRequest()")
  */
 class ExcelReadController extends BaseReadController
 {
 
     /**
-     * @Route("/select-row", name="upload_data_upload_read_excel")
-     *
      * @param Request $request
      * @param Upload  $upload
      *
@@ -73,8 +70,6 @@ class ExcelReadController extends BaseReadController
     }
 
     /**
-     * @Route("/preview-headers", name="upload_data_upload_read_excel_preview_headers")
-     *
      * @param Request $request
      * @param Upload  $upload
      *
@@ -99,8 +94,6 @@ class ExcelReadController extends BaseReadController
     }
 
     /**
-     * @Route("/select-columns", name="upload_data_upload_select_columns_excel")
-     *
      * @param Request $request
      * @param Upload  $upload
      *

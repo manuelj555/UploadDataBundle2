@@ -2,14 +2,11 @@ upload_data_homepage:
     path:     /
     defaults: { _controller: UploadDataBundle:Dashboard:index }
 
-_upload_controller:
-    resource: @UploadDataBundle/Controller/UploadController.php
-    type: annotation
+_upload_data_upload:
+    resource: routing/upload.yml
+    prefix: /{type}
 
-_upload_csv_read_controller:
-    resource: @UploadDataBundle/Controller/CsvReadController.php
-    type: annotation
-
-_upload_excel_read_controller:
-    resource: @UploadDataBundle/Controller/ExcelReadController.php
-    type: annotation
+_upload_data_upload_read:
+    resource: routing/read.yml
+    prefix: /read
+    condition: request.isXmlHttpRequest()

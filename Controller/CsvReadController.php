@@ -10,14 +10,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @Route("/read/csv/{id}", condition="request.isXmlHttpRequest()")
  */
 class CsvReadController extends BaseReadController
 {
 
     /**
-     * @Route("/separator", name="upload_data_upload_read_csv")
-     *
      * @param Upload $upload
      */
     public function separatorAction(Request $request, Upload $upload)
@@ -62,8 +59,6 @@ class CsvReadController extends BaseReadController
     }
 
     /**
-     * @Route("/select-columns", name="upload_data_upload_select_columns_csv")
-     *
      * @param Request $request
      * @param Upload  $upload
      *
