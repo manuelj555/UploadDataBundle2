@@ -18,6 +18,9 @@
 {% set extraName = constant('Manuelj555\\Bundle\\UploadDataBundle\\Data\\Reader\\ReaderInterface::EXTRA_FIELDS_NAME') %}
 
 {% block content %}
+
+    {% block before_table %}{% endblock %}
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -53,6 +56,9 @@
             </table>
         </div>
     {% endif %}
+
+    {% block after_table %}{% endblock %}
+
 {% endblock %}
 
 {% block ajax_script %}

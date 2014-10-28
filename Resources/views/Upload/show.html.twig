@@ -26,43 +26,49 @@
                 }) }}
             </div>
             <div class="col-sm-6 text-right">
-                <a href="{{ path('upload_data_upload_list', {type: type}) }}" class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
+                <a href="{{ path('upload_data_upload_list', {type: type}) }}"
+                   class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
             </div>
         </div>
-
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    {% for num, label in config.columnsMapper.labels if num < 7 %}
-                        <th>{{ label|title|trans }}</th>
-                    {% endfor %}
-                    <th style="width: 130px">{{ 'table.errors'|trans }}</th>
-                </tr>
-            </thead>
-            {% for item in upload.items %}
-                <tr>
-                    {% for name in config.columnsMapper.names %}
-                        <td>{{ item.data[name]|default }}</td>
-                    {% endfor %}
-                    <td>
-                        {% if show_detail %}
-                            <a class="btn btn-info btn-xs"
-                               href="{{ path('upload_data_upload_show_item', {type: type, id: item.id}) }}"
-                               data-ajax data-after="showModal">
-                                {{ 'link.detail'|trans }}
-                            </a>
-                        {%- endif %}
-                        {% if item.errors|length > 0 -%}
-                            <span class="btn btn-danger btn-xs"
-                                  data-toggle="popover"
-                                  data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
+        {% block show_table %}
+            <table class="table table-bordered">
+                {% block show_table_head %}
+                    <thead>
+                        <tr>
+                            {% for num, label in config.columnsMapper.labels if num < 7 %}
+                                <th>{{ label|title|trans }}</th>
+                            {% endfor %}
+                            <th style="width: 130px">{{ 'table.errors'|trans }}</th>
+                        </tr>
+                    </thead>
+                {% endblock %}
+                {% block show_table_body %}
+                    {% for item in upload.items %}
+                        <tr>
+                            {% for name in config.columnsMapper.names %}
+                                <td>{{ item.data[name]|default }}</td>
+                            {% endfor %}
+                            <td>
+                                {% if show_detail %}
+                                    <a class="btn btn-info btn-xs"
+                                       href="{{ path('upload_data_upload_show_item', {type: type, id: item.id}) }}"
+                                       data-ajax data-after="showModal">
+                                        {{ 'link.detail'|trans }}
+                                    </a>
+                                {%- endif %}
+                                {% if item.errors|length > 0 -%}
+                                    <span class="btn btn-danger btn-xs"
+                                          data-toggle="popover"
+                                          data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
                             {{ 'link.errors'|trans }}
                         </span>
-                        {%- endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                                {%- endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endblock %}
+            </table>
+        {% endblock %}
     </div>
 {% endblock %}
 

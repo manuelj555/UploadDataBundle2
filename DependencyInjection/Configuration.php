@@ -36,7 +36,6 @@ class Configuration implements ConfigurationInterface
 
                     ->scalarNode('upload_list')->defaultValue('UploadDataBundle:Upload:list.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_new')->defaultValue('UploadDataBundle:Upload:new.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_read')->defaultValue('UploadDataBundle:Upload:rad.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_show')->defaultValue('UploadDataBundle:Upload:show.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_show_item')->defaultValue('UploadDataBundle:Upload:show_item.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_table')->defaultValue('UploadDataBundle:Upload:uploads_table.html.twig')->cannotBeEmpty()->end()

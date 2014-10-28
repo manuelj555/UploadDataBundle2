@@ -26,9 +26,19 @@
 
 {% block content %}
     {% if is_ajax %}{{ include('@UploadData/flash.html.twig') }}{% endif %}
+
     <div {% if not is_ajax %}id="upload-list-container"{% endif %}>
+
+        {% block before_table %}{% endblock %}
+
         {{ include(config.getTemplate('upload_table'), {config: config}) }}
-        {{ knp_pagination_render(items) }}
+
+        {% block pagination %}
+            {{ knp_pagination_render(items) }}
+        {% endblock %}
+
+        {% block after_table %}{% endblock %}
+
     </div>
 {% endblock %}
 
