@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Mapper;
+namespace Manuel\Bundle\UploadDataBundle\Mapper;
 
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;

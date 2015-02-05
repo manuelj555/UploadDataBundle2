@@ -4,7 +4,7 @@
  * tracking_upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Form\Type;
+namespace Manuel\Bundle\UploadDataBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

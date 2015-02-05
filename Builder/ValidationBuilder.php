@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Builder;
+namespace Manuel\Bundle\UploadDataBundle\Builder;
 
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Date;

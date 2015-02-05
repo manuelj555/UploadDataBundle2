@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Step;
+namespace Manuel\Bundle\UploadDataBundle\Step;
 
 
 /**

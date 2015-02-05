@@ -4,9 +4,9 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Form\Type;
+namespace Manuel\Bundle\UploadDataBundle\Form\Type;
 
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -44,7 +44,7 @@ class CsvConfigurationType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Manuelj555\Bundle\UploadDataBundle\Entity\Upload',
+            'data_class' => 'Manuel\Bundle\UploadDataBundle\Entity\Upload',
         ));
     }
 

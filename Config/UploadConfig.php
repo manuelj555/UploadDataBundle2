@@ -4,18 +4,18 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Config;
+namespace Manuel\Bundle\UploadDataBundle\Config;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
-use Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
-use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository;
-use Manuelj555\Bundle\UploadDataBundle\Form\Type\UploadType;
-use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
-use Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper;
+use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
+use Manuel\Bundle\UploadDataBundle\Form\Type\UploadType;
+use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
+use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -91,7 +91,7 @@ abstract class UploadConfig
     }
 
     /**
-     * @param \Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper $listMapper
+     * @param \Manuel\Bundle\UploadDataBundle\Mapper\ListMapper $listMapper
      */
     public function setListMapper($listMapper)
     {
@@ -246,7 +246,7 @@ abstract class UploadConfig
     }
 
     /**
-     * @return \Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper
+     * @return \Manuel\Bundle\UploadDataBundle\Mapper\ListMapper
      */
     public function getListMapper()
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Upload
  *
  * @ORM\Table(name="upload_data_upload")
- * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository")
+ * @ORM\Entity(repositoryClass="Manuel\Bundle\UploadDataBundle\Entity\UploadRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Upload
@@ -43,7 +43,7 @@ class Upload
     /**
      * @var string
      *
-     * @ORM\OneToMany(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem", mappedBy="upload", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadedItem", mappedBy="upload", orphanRemoval=true)
      */
     private $items;
 
@@ -127,7 +127,7 @@ class Upload
 
     /**
      * @ORM\OneToMany(
-     *      targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute",
+     *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute",
      *      cascade={"all"},
      *      mappedBy="upload",
      *      orphanRemoval=true
@@ -137,7 +137,7 @@ class Upload
 
     /**
      * @ORM\OneToMany(
-     *      targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction",
+     *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAction",
      *      cascade={"all"},
      *      mappedBy="upload",
      *      orphanRemoval=true,
@@ -302,11 +302,11 @@ class Upload
     /**
      * Add items
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items
      *
      * @return Upload
      */
-    public function addItem(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items)
+    public function addItem(\Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items)
     {
         $this->items[] = $items;
 
@@ -318,9 +318,9 @@ class Upload
     /**
      * Remove items
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items
      */
-    public function removeItem(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem $items)
+    public function removeItem(\Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items)
     {
         $this->items->removeElement($items);
 
@@ -436,11 +436,11 @@ class Upload
     /**
      * Add attributes
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
      *
      * @return Upload
      */
-    public function addAttribute(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
+    public function addAttribute(\Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
     {
         $this->attributes[] = $attributes;
 
@@ -452,9 +452,9 @@ class Upload
     /**
      * Remove attributes
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
      */
-    public function removeAttribute(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
+    public function removeAttribute(\Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
     {
         $this->attributes->removeElement($attributes);
 
@@ -474,11 +474,11 @@ class Upload
     /**
      * Add actions
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions
      *
      * @return Upload
      */
-    public function addAction(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions)
+    public function addAction(\Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions)
     {
         $this->actions[] = $actions;
 
@@ -490,9 +490,9 @@ class Upload
     /**
      * Remove actions
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions
      */
-    public function removeAction(\Manuelj555\Bundle\UploadDataBundle\Entity\UploadAction $actions)
+    public function removeAction(\Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions)
     {
         $this->actions->removeElement($actions);
 

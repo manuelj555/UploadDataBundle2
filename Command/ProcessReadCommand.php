@@ -4,10 +4,10 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Command;
+namespace Manuel\Bundle\UploadDataBundle\Command;
 
-use Manuelj555\Bundle\UploadDataBundle\ConfigProvider;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository;
+use Manuel\Bundle\UploadDataBundle\ConfigProvider;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

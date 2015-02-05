@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -25,7 +25,7 @@ class UploadAttribute
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\Upload", inversedBy="attributes")
+     * @ORM\ManyToOne(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\Upload", inversedBy="attributes")
      */
     private $upload;
 
@@ -126,11 +126,11 @@ class UploadAttribute
     /**
      * Set upload
      *
-     * @param \Manuelj555\Bundle\UploadDataBundle\Entity\Upload $upload
+     * @param \Manuel\Bundle\UploadDataBundle\Entity\Upload $upload
      *
      * @return UploadAttribute
      */
-    public function setUpload(\Manuelj555\Bundle\UploadDataBundle\Entity\Upload $upload = null)
+    public function setUpload(\Manuel\Bundle\UploadDataBundle\Entity\Upload $upload = null)
     {
         $this->upload = $upload;
 
@@ -140,7 +140,7 @@ class UploadAttribute
     /**
      * Get upload
      *
-     * @return \Manuelj555\Bundle\UploadDataBundle\Entity\Upload
+     * @return \Manuel\Bundle\UploadDataBundle\Entity\Upload
      */
     public function getUpload()
     {

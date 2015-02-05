@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,7 +26,7 @@ class UploadAction
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\Upload", inversedBy="actions")
+     * @ORM\ManyToOne(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\Upload", inversedBy="actions")
      */
     private $upload;
 

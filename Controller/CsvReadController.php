@@ -1,11 +1,11 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Controller;
+namespace Manuel\Bundle\UploadDataBundle\Controller;
 
-use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
-use Manuelj555\Bundle\UploadDataBundle\Form\Type\AttributeType;
-use Manuelj555\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
+use Manuel\Bundle\UploadDataBundle\Form\Type\AttributeType;
+use Manuel\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 

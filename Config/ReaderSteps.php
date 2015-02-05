@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Config;
+namespace Manuel\Bundle\UploadDataBundle\Config;
 
 
 /**

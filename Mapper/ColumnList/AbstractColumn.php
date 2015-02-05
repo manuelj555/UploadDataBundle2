@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList;
+namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Controller;
+namespace Manuel\Bundle\UploadDataBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 

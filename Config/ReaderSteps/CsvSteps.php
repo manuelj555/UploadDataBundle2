@@ -4,9 +4,9 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Config\ReaderSteps;
+namespace Manuel\Bundle\UploadDataBundle\Config\ReaderSteps;
 
-use Manuelj555\Bundle\UploadDataBundle\Step\UploadStep;
+use Manuel\Bundle\UploadDataBundle\Step\UploadStep;
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>

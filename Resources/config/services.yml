@@ -1,83 +1,83 @@
 services:
 #    upload_data.example:
-#        class: Manuelj555\Bundle\UploadDataBundle\Example
+#        class: Manuel\Bundle\UploadDataBundle\Example
 #        arguments: [@service_id, "plain_value", %parameter%]
 
     upload_data.config_provider:
-        class: Manuelj555\Bundle\UploadDataBundle\ConfigProvider
+        class: Manuel\Bundle\UploadDataBundle\ConfigProvider
         arguments: [@service_container, []]
 
     upload_data.column_list_factory:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory
         arguments: [@service_container, []]
 
     upload_data.list_mapper:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ListMapper
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ListMapper
         arguments: [@upload_data.column_list_factory]
         public: false
 
     upload_data.column_list.text:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\TextColumn
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\TextColumn
         tags:
             - { name: upload_data.column_list, alias: text }
 
     upload_data.column_list.link:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\LinkColumn
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\LinkColumn
         tags:
             - { name: upload_data.column_list, alias: link }
 
     upload_data.column_list.datetime:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\DatetimeColumn
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\DatetimeColumn
         tags:
             - { name: upload_data.column_list, alias: datetime }
 
     upload_data.column_list.number:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\NumberColumn
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\NumberColumn
         tags:
             - { name: upload_data.column_list, alias: number }
 
     upload_data.column_list.action:
-        class: Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList\ActionColumn
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\ActionColumn
         tags:
             - { name: upload_data.column_list, alias: action }
 
     upload_data.csv_reader:
-        class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\CsvReader
+        class: Manuel\Bundle\UploadDataBundle\Data\Reader\CsvReader
         tags:
             - { name: upload_data.reader, route_config: upload_data_upload_read_csv }
 
     upload_data.excel_reader:
-        class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\ExcelReader
+        class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelReader
         tags:
             - { name: upload_data.reader, route_config: upload_data_upload_read_excel }
 
     upload_data.reader_loader:
-        class: Manuelj555\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
+        class: Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
 #
 #    upload_data.twig.callable_extension:
-#        class: Manuelj555\Bundle\UploadDataBundle\Twig\Extention\CallbackExtension
+#        class: Manuel\Bundle\UploadDataBundle\Twig\Extention\CallbackExtension
 #        tags:
 #            - { name: twig.extension }
 #
 #    upload_config_test:
-#        class: Manuelj555\Bundle\UploadDataBundle\VentasConfig
+#        class: Manuel\Bundle\UploadDataBundle\VentasConfig
 #        tags:
 #            - { name: upload_data.config, id: ventas, label: Ventas }
 
 #    upload_data.block.column_list:
-#        class: Manuelj555\Bundle\UploadDataBundle\Block\ColumnListBlockService
+#        class: Manuel\Bundle\UploadDataBundle\Block\ColumnListBlockService
 #        arguments: [upload_data.block.column_list, @templating]
 #        tags:
 #            - { name: sonata.block }
 #
 #    upload_data.block.header_column_list:
-#        class: Manuelj555\Bundle\UploadDataBundle\Block\HeaderColumnListBlockService
+#        class: Manuel\Bundle\UploadDataBundle\Block\HeaderColumnListBlockService
 #        arguments: [upload_data.block.header_column_list, @templating]
 #        tags:
 #            - { name: sonata.block }
 
     upload_data.block.upload_list:
-        class: Manuelj555\Bundle\UploadDataBundle\Block\UploadListBlockService
+        class: Manuel\Bundle\UploadDataBundle\Block\UploadListBlockService
         arguments: [upload_data.block.upload_list, @templating]
         calls:
             - [setUploadTypes, [%upload_data.upload_types%]]
@@ -85,7 +85,7 @@ services:
             - { name: sonata.block }
 
     upload_data.upload_repository:
-        class: Manuelj555\Bundle\UploadDataBundle\Entity\UploadRepository
+        class: Manuel\Bundle\UploadDataBundle\Entity\UploadRepository
         factory_service: doctrine.orm.entity_manager
         factory_method: getRepository
         arguments: [UploadDataBundle:Upload]

@@ -4,9 +4,9 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Step;
+namespace Manuel\Bundle\UploadDataBundle\Step;
 
-use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\DependencyInjection;
+namespace Manuel\Bundle\UploadDataBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

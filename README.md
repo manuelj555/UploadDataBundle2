@@ -10,7 +10,7 @@ Agregar al composer.json:
 
 ```json
 "require" : {
-    "manuelj555/upload-data-bundle": "dev-master"
+    "manuel/upload-data-bundle": "dev-master"
 }
 ```
 
@@ -26,8 +26,8 @@ public function registerBundles()
     $bundles = array(
         ...
         new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(), //solo si no esta antes agregado
-        new Manuelj555\Bundle\AjaxFlashBundle\ManuelAjaxFlashBundle(),
-        new Manuelj555\Bundle\UploadDataBundle\UploadDataBundle(),
+        new Manuel\Bundle\AjaxFlashBundle\ManuelAjaxFlashBundle(),
+        new Manuel\Bundle\UploadDataBundle\UploadDataBundle(),
     );
     
     ...
@@ -73,9 +73,9 @@ manuel_ajax_flash:
 #            title: Información
 ```
 
-Para mayor información sobre como usar el bundle, ver: [AjaxFlashBundle](https://github.com/manuelj555/AjaxFlashBundle)
+Para mayor información sobre como usar el bundle, ver: [AjaxFlashBundle](https://github.com/manuel/AjaxFlashBundle)
 
 ## Cargando Archivos
 
-[Uso](https://github.com/manuelj555/UploadDataBundle2/blob/master/Resources/doc/usage.md)
+[Uso](https://github.com/manuel/UploadDataBundle2/blob/master/Resources/doc/usage.md)
 

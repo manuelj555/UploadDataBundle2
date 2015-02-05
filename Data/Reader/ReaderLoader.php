@@ -4,9 +4,9 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Data\Reader;
+namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
-use Manuelj555\Bundle\UploadDataBundle\Metadata;
+use Manuel\Bundle\UploadDataBundle\Metadata;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 

@@ -1,6 +1,6 @@
 # Usando el Bundle
 
-El funcionamiento del bundle se basa en una clase de configuración que existende [UploadConfig](https://github.com/manuelj555/UploadDataBundle2/blob/master/Config/UploadConfig.php), por ejemplo:
+El funcionamiento del bundle se basa en una clase de configuración que existende [UploadConfig](https://github.com/manuel/UploadDataBundle2/blob/master/Config/UploadConfig.php), por ejemplo:
 
 ```php
 <?php
@@ -8,13 +8,13 @@ El funcionamiento del bundle se basa en una clase de configuración que existend
 namespace AppBundle\Upload;
 
 use Doctrine\Common\Collections\Collection;
-use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
-use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
-use Manuelj555\Bundle\UploadDataBundle\Entity\Upload;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadAttribute;
-use Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItem;
-use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
-use Manuelj555\Bundle\UploadDataBundle\Validator\ColumnError;
+use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
+use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
+use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
+use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
 use AppBundle\Card;
 use Symfony\Component\Validator\Constraints\CardScheme;
 use Symfony\Component\Validator\Constraints\Regex;

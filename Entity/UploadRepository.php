@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityRepository;

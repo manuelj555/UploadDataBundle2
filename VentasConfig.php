@@ -4,11 +4,13 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle;
+namespace Manuel\Bundle\UploadDataBundle;
 
-use Manuelj555\Bundle\UploadDataBundle\Builder\ValidationBuilder;
-use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
-use Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
+use Doctrine\Common\Collections\Collection;
+use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
+use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Symfony\Component\Validator\Constraints\CardScheme;
 
 
@@ -57,10 +59,8 @@ class VentasConfig extends UploadConfig
             ;
     }
 
-    public function onPreValidate()
+    public function transfer(Upload $upload, Collection $items)
     {
-        //sleep(15);
+
     }
-
-
-} 
+}

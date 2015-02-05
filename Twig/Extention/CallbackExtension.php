@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Twig\Extention;
+namespace Manuel\Bundle\UploadDataBundle\Twig\Extention;
 
 
 /**

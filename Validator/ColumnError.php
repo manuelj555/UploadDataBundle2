@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Validator;
+namespace Manuel\Bundle\UploadDataBundle\Validator;
 
 use Symfony\Component\Validator\ConstraintViolation;
 

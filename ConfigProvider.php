@@ -4,9 +4,9 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle;
+namespace Manuel\Bundle\UploadDataBundle;
 
-use Manuelj555\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 

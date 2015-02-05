@@ -1,10 +1,10 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle;
+namespace Manuel\Bundle\UploadDataBundle;
 
-use Manuelj555\Bundle\UploadDataBundle\DependencyInjection\Compiler\RegisterColumnListPass;
-use Manuelj555\Bundle\UploadDataBundle\DependencyInjection\Compiler\RegisterUploadConfigPass;
-use Manuelj555\Bundle\UploadDataBundle\DependencyInjection\Compiler\RegisterUploadReaderPass;
+use Manuel\Bundle\UploadDataBundle\DependencyInjection\Compiler\RegisterColumnListPass;
+use Manuel\Bundle\UploadDataBundle\DependencyInjection\Compiler\RegisterUploadConfigPass;
+use Manuel\Bundle\UploadDataBundle\DependencyInjection\Compiler\RegisterUploadReaderPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

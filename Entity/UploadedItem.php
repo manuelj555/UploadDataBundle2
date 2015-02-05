@@ -1,6 +1,6 @@
 <?php
 
-namespace Manuelj555\Bundle\UploadDataBundle\Entity;
+namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -9,7 +9,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * UploadedItem
  *
  * @ORM\Table(name="upload_data_uploaded_item")
- * @ORM\Entity(repositoryClass="Manuelj555\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
+ * @ORM\Entity(repositoryClass="Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class UploadedItem implements \ArrayAccess
@@ -26,7 +26,7 @@ class UploadedItem implements \ArrayAccess
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Manuelj555\Bundle\UploadDataBundle\Entity\Upload", inversedBy="items")
+     * @ORM\ManyToOne(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\Upload", inversedBy="items")
      */
     private $upload;
 

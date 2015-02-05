@@ -1,5 +1,5 @@
 {
-    "name": "manuelj555/upload-data-bundle",
+    "name": "manuel/upload-data-bundle",
     "type": "symfony-bundle",
     "description": "Symfony UploadDataBundle",
     "keywords": ["excel", "upload", "bundle"],
@@ -8,16 +8,16 @@
         {
             "name": "Manuel Aguirre",
             "email": "programador.manuel@gmail.com",
-            "homepage": "http://manuelj555.github.io/"
+            "homepage": "http://manuel.github.io/"
         }
     ],
     "require": {
         "symfony/symfony": "~2.5",
         "knplabs/knp-paginator-bundle": "~2.4",
         "phpoffice/phpexcel": "~1.8.0",
-        "manuelj555/ajax-flash-bundle": "1.0.*@dev"
+        "manuel/ajax-flash-bundle": "1.0.*@dev"
     },
     "autoload": {
-        "psr-4": { "Manuelj555\\Bundle\\UploadDataBundle\\": "" }
+        "psr-4": { "Manuel\\Bundle\\UploadDataBundle\\": "" }
     }
 }

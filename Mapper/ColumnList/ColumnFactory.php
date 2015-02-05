@@ -4,7 +4,7 @@
  * upload
  */
 
-namespace Manuelj555\Bundle\UploadDataBundle\Mapper\ColumnList;
+namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
 use Psr\Log\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
