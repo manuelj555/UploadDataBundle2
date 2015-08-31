@@ -11,7 +11,6 @@
     {% block head_style %}
         <link href="{{ asset('bundles/uploaddata/css/bootstrap.min.css') }}" type="text/css" rel="stylesheet" media="screen"/>
         <link href="{{ asset('bundles/uploaddata/css/jquery-ui.min.css') }}" type="text/css" rel="stylesheet" media="screen"/>
-        <link href="{{ asset('bundles/uploaddata/css/isloading.css') }}" type="text/css" rel="stylesheet" media="screen"/>
     {% endblock head_style %}
 
     {% block head_script %}
@@ -22,7 +21,6 @@
         <script src="{{ asset('bundles/uploaddata/js/jquery.iframe-transport.js') }}" type="text/javascript"></script>
         <script src="{{ asset('bundles/uploaddata/js/jquery.fileupload.js') }}" type="text/javascript"></script>
         <script src="{{ asset('bundles/uploaddata/js/jquery-ui.min.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('bundles/uploaddata/js/jquery.isloading.min.js') }}" type="text/javascript"></script>
     {% endblock head_script %}
 
     {% block head_bottom %}
@@ -81,11 +79,6 @@
     {% block foot_script %}
         <script>
             $('body').ajaxHelper();
-            $(document).ajaxStart(function () {
-                $.isLoading({class: 'glyphicon glyphicon-refresh'})
-            }).ajaxStop(function () {
-                $.isLoading('hide')
-            });
         </script>
     {% endblock foot_script %}
 
