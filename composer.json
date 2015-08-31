@@ -19,5 +19,10 @@
     },
     "autoload": {
         "psr-4": { "Manuel\\Bundle\\UploadDataBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
     }
 }
