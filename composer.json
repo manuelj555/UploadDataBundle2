@@ -12,10 +12,9 @@
         }
     ],
     "require": {
-        "symfony/symfony": "~2.5",
+        "symfony/symfony": "~2.6",
         "knplabs/knp-paginator-bundle": "~2.4",
-        "phpoffice/phpexcel": "~1.8.0",
-        "manuel/ajax-flash-bundle": "1.0.*@dev"
+        "phpoffice/phpexcel": "~1.8.0"
     },
     "autoload": {
         "psr-4": { "Manuel\\Bundle\\UploadDataBundle\\": "" }
