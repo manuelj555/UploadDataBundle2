@@ -10,12 +10,13 @@
 {% block content %}
 
     {{ form_start(form) }}
-        {{ form_widget(form) }}
-    {{ form_end(form) }}
+    {{ form_widget(form) }}
 
     {% if not is_ajax %}
         <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">{{ 'link.back_to_list'|trans }}</a>
+        <input type="submit" class="btn btn-primary" value="{{ 'button.process'|trans }}">
     {% endif %}
+    {{ form_end(form) }}
 
 {% endblock %}
 
@@ -28,6 +29,7 @@
 
         var noty = null;
 
+        {% if is_ajax %}
         $('#{{ form.file.vars.id }}').fileupload({
             url: '{{ path('upload_data_upload_new', {type: app.request.get('type')}) }}',
             dataType: 'json',
@@ -44,16 +46,7 @@
                 }
             },
             always: function () {
-                if (noty) {
-                    noty.update({type: 'success', text: '{{ 'label.upload_complete'|trans }}!'});
-                }
-                {% if is_ajax %}$("#{{ modal_id }}").modal('hide')
-                {% endif %}
-            },
-            done: function (e, data) {
-                if (noty) {
-                    noty.update({type: 'success', text: '{{ 'label.upload_complete'|trans }}!'});
-                }
+                $("#{{ modal_id }}").modal('hide')
             },
             progress: function (e, data) {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -62,6 +55,7 @@
                 }
             }
         });
+        {% endif %}
     </script>
 {% endblock %}
 

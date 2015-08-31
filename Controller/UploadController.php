@@ -104,8 +104,14 @@ class UploadController extends Controller
 
             $this->config->processUpload($file, $form->getData());
 
-            $response = new Response(null, 200, array(
-                'X-Reload' => true,
+            $this->addFlash(
+                'success',
+                $this->get('translator')->trans('label.upload_complete', array(), 'upload_data')
+            );
+
+            $this->get('ku_ajax.handler')->success();
+            return $this->redirectToRoute('upload_data_upload_list', array(
+                'type' => $this->getRequestType(),
             ));
         }
 
@@ -123,13 +129,12 @@ class UploadController extends Controller
      */
     public function readAction(Upload $upload, Request $request)
     {
-
         $reader = $this->get('upload_data.reader_loader')
             ->get($upload->getFullFilename());
 
-        return $this->redirect($this->generateUrl($reader->getRouteConfig(), array(
+        return $this->redirectToRoute($reader->getRouteConfig(),  array(
             'id' => $upload->getId(),
-        )));
+        ));
     }
 
     /**
