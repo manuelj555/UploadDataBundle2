@@ -57,7 +57,7 @@ Con esto ya se ha instalado correctamente el bundle.
 Configurando el bundle AjaxBundle:
 ___________
 
- ver: [AjaxFlashBundle](https://github.com/manuel/AjaxFlashBundle)
+ ver: [AjaxBundle](https://github.com/manuel/AjaxFlashBundle)
 
 ## Cargando Archivos
 
