@@ -54,26 +54,10 @@ Además ejecutar el comando
 Con esto ya se ha instalado correctamente el bundle.
 
 
-Configurando el bundle AjaxFlashBundle:
+Configurando el bundle AjaxBundle:
 ___________
 
-Este bundle nos permite ver mensajes flash en nuestras peticiones con ajax, y por defecto ofrece 2 plugins de javascript a usar, lo configuracion es la siguiente:
-
-```yaml
-manuel_ajax_flash:
-    auto_assets:
-       pnotify:   # por defecto activamos pnotify
-           animation: none
-       # sticky:
-#    mapping:
-#        success:
-#            title: Información
-#            icon: my-icon
-#        info:
-#            title: Información
-```
-
-Para mayor información sobre como usar el bundle, ver: [AjaxFlashBundle](https://github.com/manuel/AjaxFlashBundle)
+ ver: [AjaxFlashBundle](https://github.com/manuel/AjaxFlashBundle)
 
 ## Cargando Archivos
 
