@@ -1,6 +1,5 @@
 {% trans_default_domain 'upload_data' %}
-<form class="form-horizontal" data-ajax data-before="validateColumnsForm"
-      data-after="closeColumnsModal"
+<form id="upload_match_columns" class="form-horizontal"
       action="{{ app.request.getRequestUri() }}" method="post">
     <div class="modal-body">
         <table class="table table-bordered system-headers form-horizontal">
@@ -60,9 +59,23 @@
         }
     }
 
-    function closeColumnsModal(content, $form, $container, jqXhr) {
-        if (jqXhr.getResponseHeader('X-Close-Modal')) {
-            $(".modal").modal('hide');
+    $("#upload_match_columns").on('submit', function (e) {
+        var $this = $(this);
+
+        if (!validateColumnsForm($this)) {
+            e.preventDefault();
         }
+
+        $this.find(':submit').button('loading');
+
+        $.post(this.action, $this.serializeArray())
+                .done(closeColumnsModal)
+                .always(function () {
+                    $this.find(':submit').button('reset');
+                });
+    });
+
+    function closeColumnsModal(content, $form, $container, jqXhr) {
+        $(".modal").modal('hide');
     }
 </script>

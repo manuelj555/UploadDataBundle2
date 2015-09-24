@@ -12,7 +12,7 @@
 {% block content_row %}
     <div class="panel panel-default">
         <div class="panel-body">
-            <a class="btn btn-primary" data-ajax data-after="showModal"
+            <a class="btn btn-primary" data-ajax data-after="showModal" data-before="disableNewButton"
                href="{{ path('upload_data_upload_new', {type: type}) }}">{{ 'link.new_upload'|trans }}</a>
         </div>
     </div>
@@ -53,7 +53,12 @@
             auto_reload: 30000
         });
 
-        function showModal(html) {
+        function disableNewButton($btn) {
+            $btn.button('loading');
+        }
+
+        function showModal(html, $btn) {
+            $btn.button('reset');
             $("#new_upload").remove();
             $('body').append(html);
             $("#new_upload").modal();
@@ -64,8 +69,10 @@
                 url: '{{ path('upload_data_upload_new', {type: type}) }}',
                 dataType: 'json',
                 start: function () {
-                    $('#upload-progress').show();
                     {% block ajax_upload_start %}
+                    $("#new_upload :button:last").button('loading');
+                    $('#upload-progress').show();
+                    {% block ajax_upload_start_pnotity %}
                     if (window['PNotify'] != undefined) {
                         noty = new PNotify({
                             title: '{{ 'label.loading_file'|trans }}',
@@ -76,10 +83,12 @@
                         });
                     }
                     {% endblock %}
+                    {% endblock %}
                 },
                 always: function () {
                     {% block ajax_upload_always %}
-                    $("#new_upload").modal('hide')
+                    $("#new_upload").modal('hide');
+                    $("#new_upload :button:last").button('reset');
                     {% endblock %}
                     upload.reload();
                 },
