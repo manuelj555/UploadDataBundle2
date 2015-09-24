@@ -13,7 +13,10 @@ var UploadData = function (opts) {
         error: function () {
             alert('Ups!!, Ocurrió un Error!!!');
         },
-        auto_reload: false
+        auto_reload: false,
+        confirm: function(text){
+            return confirm(text);
+        }
     };
 
     options = $.extend(options, opts);
@@ -34,7 +37,7 @@ var UploadData = function (opts) {
             var $row = $a.closest('.upload-row');
 
             if ($a.is('[data-confirm]')) {
-                if (!confirm($a.data('confirm'))) {
+                if (!options.confirm($a.data('confirm'))) {
                     return;
                 }
             }
