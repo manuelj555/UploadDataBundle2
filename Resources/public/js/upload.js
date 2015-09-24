@@ -14,8 +14,10 @@ var UploadData = function (opts) {
             alert('Ups!!, Ocurrió un Error!!!');
         },
         auto_reload: false,
-        confirm: function(text){
-            return confirm(text);
+        confirm: function (text, callback) {
+            if(confirm(text)){
+                callback();
+            }
         }
     };
 
@@ -31,34 +33,37 @@ var UploadData = function (opts) {
 
     var upload = this;
 
+
     options.container.on('click', '.upload-process', function (e) {
             e.preventDefault();
             var $a = $(this);
             var $row = $a.closest('.upload-row');
 
-            if ($a.is('[data-confirm]')) {
-                if (!options.confirm($a.data('confirm'))) {
-                    return;
+            function processClick(){
+                if (!$a.is('[data-modal]')) {
+                    $a.parent().html($processing.clone());
+                    $row.find('a.upload-process').addClass('disabled');
                 }
+                $.ajax({
+                    url: $a.attr('href'),
+                    success: function (content) {
+                        if ($a.is('[data-modal]')) {
+                            $('#upload-ajax-extra-content').html(content);
+                        } else {
+                            upload.reload();
+                        }
+                    },
+                    error: function () {
+                        options.error();
+                    }
+                });
             }
 
-            if (!$a.is('[data-modal]')) {
-                $a.parent().html($processing.clone());
-                $row.find('a.upload-process').addClass('disabled');
+            if ($a.is('[data-confirm]')) {
+                options.confirm($a.data('confirm'), processClick);
+            }else{
+                processClick();
             }
-            $.ajax({
-                url: $a.attr('href'),
-                success: function (content) {
-                    if ($a.is('[data-modal]')) {
-                        $('#upload-ajax-extra-content').html(content);
-                    } else {
-                        upload.reload();
-                    }
-                },
-                error: function () {
-                    options.error();
-                }
-            });
         }
     );
 
