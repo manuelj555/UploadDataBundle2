@@ -61,5 +61,5 @@ ___________
 
 ## Cargando Archivos
 
-[Uso](https://github.com/manuel/UploadDataBundle2/blob/master/Resources/doc/usage.md)
+[Uso](./Resources/doc/usage.md)
 
