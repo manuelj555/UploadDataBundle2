@@ -52,10 +52,46 @@
             url_refresh: '{{ app.request.getRequestUri() }}',
             auto_reload: 30000
         });
+
         function showModal(html) {
             $("#new_upload").remove();
             $('body').append(html);
             $("#new_upload").modal();
+
+            var noty = null;
+
+            $('form :file', '#new_upload').fileupload({
+                url: '{{ path('upload_data_upload_new', {type: type}) }}',
+                dataType: 'json',
+                start: function () {
+                    $('#upload-progress').show();
+                    {% block ajax_upload_start %}
+                    if (window['PNotify'] != undefined) {
+                        noty = new PNotify({
+                            title: '{{ 'label.loading_file'|trans }}',
+                            text: '0 %',
+                            animation: 'none',
+                            styling: "bootstrap3",
+                            type: 'info'
+                        });
+                    }
+                    {% endblock %}
+                },
+                always: function () {
+                    {% block ajax_upload_always %}
+                    $("#new_upload").modal('hide')
+                    {% endblock %}
+                    upload.reload();
+                },
+                progress: function (e, data) {
+                    {% block ajax_upload_progress %}
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    if (noty) {
+                        noty.update(progress + ' %');
+                    }
+                    {% endblock %}
+                }
+            });
         }
     </script>
 {% endblock %}
