@@ -26,7 +26,7 @@ public function registerBundles()
     $bundles = array(
         ...
         new Knp\Bundle\PaginatorBundle\KnpPaginatorBundle(), //solo si no esta antes agregado
-        new Manuel\Bundle\AjaxFlashBundle\ManuelAjaxFlashBundle(),
+        new Ku\AjaxBundle\KuAjaxBundle(), //solo si no esta antes agregado
         new Manuel\Bundle\UploadDataBundle\UploadDataBundle(),
     );
     
