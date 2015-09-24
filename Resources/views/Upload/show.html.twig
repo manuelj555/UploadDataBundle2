@@ -19,14 +19,14 @@
 {% block content %}
     <div id="show-container">
         <div class="row" id="show-container" data-url="{{ app.request.getRequestUri() }}">
-            {{ include('@UploadData/Upload/show_small_info.html.twig') }}
+            {{ include(config.getTemplate('show_small_info')) }}
             <div class="col-sm-6 text-right">
                 <a href="{{ path('upload_data_upload_list', {type: type}) }}"
                    class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
             </div>
         </div>
         {% block show_table %}
-            {{ include('@UploadData/Upload/show_table_content.html.twig') }}
+            {{ include(config.getTemplate('show_table')) }}
         {% endblock %}
     </div>
 {% endblock %}

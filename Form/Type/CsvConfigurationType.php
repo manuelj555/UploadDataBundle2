@@ -37,7 +37,8 @@ class CsvConfigurationType extends AbstractType
             'attr' => array(
                 'class' => 'btn-primary',
             ),
-            'label' => 'Siguiente Paso',
+            'label' => 'label.next_step',
+            'translation_domain' => 'upload_data',
         ));
     }
 

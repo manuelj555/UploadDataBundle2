@@ -1,0 +1,59 @@
+<script src="{{ asset('bundles/uploaddata/js/upload.js') }}"></script>
+<script>
+
+    var upload = new UploadData({
+        container: $('#upload-list-container'),
+        url_refresh: '{{ app.request.getRequestUri() }}',
+        auto_reload: 30000
+    });
+
+    function disableNewButton($btn) {
+        $btn.button('loading');
+    }
+
+    function showModal(html, $btn) {
+        $btn.button('reset');
+        $("#new_upload").remove();
+        $('body').append(html);
+        $("#new_upload").modal();
+
+        var noty = null;
+
+        $('form :file', '#new_upload').fileupload({
+            url: '{{ path('upload_data_upload_new', {type: type}) }}',
+            dataType: 'json',
+            start: function () {
+                {% block ajax_upload_start %}
+                $("#new_upload :button:last").button('loading');
+                $('#upload-progress').show();
+                {% block ajax_upload_start_pnotity %}
+                if (window['PNotify'] != undefined) {
+                    noty = new PNotify({
+                        title: '{{ 'label.loading_file'|trans }}',
+                        text: '0 %',
+                        animation: 'none',
+                        styling: "bootstrap3",
+                        type: 'info'
+                    });
+                }
+                {% endblock %}
+                {% endblock %}
+            },
+            always: function () {
+                {% block ajax_upload_always %}
+                $("#new_upload").modal('hide');
+                $("#new_upload :button:last").button('reset');
+                {% endblock %}
+                upload.reload();
+            },
+            progress: function (e, data) {
+                {% block ajax_upload_progress %}
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                if (noty) {
+                    noty.update(progress + ' %');
+                }
+                {% endblock %}
+            }
+        });
+    }
+</script>
