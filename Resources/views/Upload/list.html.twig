@@ -31,7 +31,7 @@
 
         {% block before_table %}{% endblock %}
 
-        {{ include(config.getTemplate('list_table'), {config: config}) }}
+        {{ include(config.getTemplate('upload_table'), {config: config}) }}
 
         {% block pagination %}
             {{ knp_pagination_render(items) }}
@@ -44,5 +44,5 @@
 
 {% block foot_script %}
     {{ parent() }}
-    {{ include('@UploadData/Upload/list_js.html.twig') }}
+    {{ include('list_js') }}
 {% endblock %}
