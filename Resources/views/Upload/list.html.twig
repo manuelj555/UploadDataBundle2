@@ -31,7 +31,7 @@
 
         {% block before_table %}{% endblock %}
 
-        {{ include(config.getTemplate('upload_table'), {config: config}) }}
+        {{ include(config.getTemplate('list_table'), {config: config}) }}
 
         {% block pagination %}
             {{ knp_pagination_render(items) }}
