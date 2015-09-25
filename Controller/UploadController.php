@@ -81,7 +81,7 @@ class UploadController extends Controller
 
         $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1));
 
-        return $this->render($this->config->getTemplate('upload_list'), array(
+        return $this->render($this->config->getTemplate('list'), array(
             'items' => $items,
         ));
     }
@@ -186,7 +186,7 @@ class UploadController extends Controller
         $pagination = $this->get('knp_paginator')
             ->paginate($query, $request->get('page'), $request->get('per_page', 10));
 
-        return $this->render($this->config->getTemplate('upload_show'), array(
+        return $this->render($this->config->getTemplate('show'), array(
             'upload' => $upload,
             'pagination' => $pagination,
         ));
@@ -200,7 +200,7 @@ class UploadController extends Controller
      */
     public function showItemAction(UploadedItem $item)
     {
-        return $this->render($this->config->getTemplate('upload_show_item'), array(
+        return $this->render($this->config->getTemplate('show_item'), array(
             'item' => $item,
         ));
     }
