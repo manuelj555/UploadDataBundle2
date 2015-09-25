@@ -184,7 +184,7 @@ class UploadController extends Controller
             ->getQueryByUpload($upload);
 
         $pagination = $this->get('knp_paginator')
-            ->paginate($query, $request->get('page'), $request->get('per_page', 10));
+            ->paginate($query, $request->get('page', 1), $request->get('per_page', 10));
 
         return $this->render($this->config->getTemplate('show'), array(
             'upload' => $upload,
