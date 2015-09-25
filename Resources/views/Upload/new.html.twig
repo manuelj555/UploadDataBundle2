@@ -12,6 +12,12 @@
     {{ form_start(form) }}
     {{ form_widget(form) }}
 
+    {% if is_ajax %}
+        <div class="progress" id="upload-progress">
+            <div class="progress-bar" style="width: 0"></div>
+        </div>
+    {% endif %}
+
     {% if not is_ajax %}
         <a href="{{ path('upload_data_upload_list', {type: app.request.get('type')}) }}" class="btn btn-default">{{ 'link.back_to_list'|trans }}</a>
         <input type="submit" class="btn btn-primary" value="{{ 'button.process'|trans }}">

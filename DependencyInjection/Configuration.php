@@ -35,6 +35,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('ajax_modal')->defaultValue('UploadDataBundle::base_ajax_modal.html.twig')->cannotBeEmpty()->end()
 
                     ->scalarNode('upload_list')->defaultValue('UploadDataBundle:Upload:list.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('upload_list_javascript')->defaultValue('UploadDataBundle:Upload:list_javascript.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_new')->defaultValue('UploadDataBundle:Upload:new.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_show')->defaultValue('UploadDataBundle:Upload:show.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('upload_show_item')->defaultValue('UploadDataBundle:Upload:show_item.html.twig')->cannotBeEmpty()->end()

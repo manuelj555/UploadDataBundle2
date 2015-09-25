@@ -1,6 +1,6 @@
 {% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
-{% extends is_ajax ? config.getTemplate('ajax') : config.getTemplate('layout') %}
+{% extends config.getTemplate('layout') %}
 
 {% block headline %}{{ 'title.show'|trans }}
     <small>{{ upload.filename }}</small>{% endblock %}
@@ -16,25 +16,25 @@
 
 {% set show_detail = config.columnsMapper.labels > 6 %}
 
+{% block page_content_attributes %}id="show-container"{% endblock %}
+
 {% block content %}
-    <div id="show-container">
-        <div class="row" id="show-container" data-url="{{ app.request.getRequestUri() }}">
-            {{ include(config.getTemplate('show_small_info')) }}
-            <div class="col-sm-6 text-right">
-                <a href="{{ path('upload_data_upload_list', {type: type}) }}"
-                   class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
-            </div>
-        </div>
-        {% block show_table %}
-            {{ include(config.getTemplate('show_table')) }}
-        {% endblock %}
+    <div class="table-responsive">
+        {{ include(config.getTemplate('show_table')) }}
     </div>
 {% endblock %}
 
-{#{% block modal_footer %}#}
-{#{{ parent() }}#}
-{#&#123;&#35;<input type="submit" class="btn btn-primary">&#35;&#125;#}
-{#{% endblock %}#}
+{% block actions %}
+    <div class="row">
+        <div class="col-sm-4 col-sm-push-8 text-right">
+            <a href="{{ path('upload_data_upload_list', {type: type}) }}"
+               class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
+        </div>
+        <div class="col-sm-8 col-sm-pull-4">
+            {{ include(config.getTemplate('show_small_info')) }}
+        </div>
+    </div>
+{% endblock %}
 
 {% block ajax_script %}
     <script>
@@ -60,6 +60,7 @@
     <script>
         new UploadData({
             container: $('#show-container'),
+            reload_container_selector: '#show-container',
             url_refresh: '{{ app.request.getRequestUri() }}'
         });
     </script>

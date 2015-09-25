@@ -7,6 +7,7 @@ var UploadData = function (opts) {
 
     var options = {
         container: $('body'),
+        reload_container_selector: 'body',
         url_refresh: null,
         refresh_complete: function () {
         },
@@ -24,7 +25,9 @@ var UploadData = function (opts) {
     options = $.extend(options, opts);
 
     this.reload = function () {
-        options.container.load(options.url_refresh, options.refresh_complete);
+        $.get(options.url_refresh).done(function(html){
+            $(options.reload_container_selector).html($(html).find(options.reload_container_selector).html());
+        }).done(options.refresh_complete);
     };
 
     if (options.auto_reload) {
@@ -32,7 +35,6 @@ var UploadData = function (opts) {
     }
 
     var upload = this;
-
 
     options.container.on('click', '.upload-process', function (e) {
             e.preventDefault();

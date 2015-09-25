@@ -3,19 +3,20 @@
 
     var upload = new UploadData({
         container: $('#upload-list-container'),
+        reload_container_selector: '#upload-list-table',
         url_refresh: '{{ app.request.getRequestUri() }}',
         auto_reload: 30000
     });
 
-    function disableNewButton($btn) {
-        $btn.button('loading');
-    }
 
     function showModal(html, $btn) {
+
         $btn.button('reset');
         $("#new_upload").remove();
         $('body').append(html);
         $("#new_upload").modal();
+
+        var $progressBar = $("#upload-progress .progress-bar").width(0);
 
         var noty = null;
 
@@ -25,7 +26,6 @@
             start: function () {
                 {% block ajax_upload_start %}
                 $("#new_upload :button:last").button('loading');
-                $('#upload-progress').show();
                 {% block ajax_upload_start_pnotity %}
                 if (window['PNotify'] != undefined) {
                     noty = new PNotify({
@@ -49,6 +49,7 @@
             progress: function (e, data) {
                 {% block ajax_upload_progress %}
                 var progress = parseInt(data.loaded / data.total * 100, 10);
+                $progressBar.width(progress * parseInt($progressBar.parent().width()) / 100);
                 if (noty) {
                     noty.update(progress + ' %');
                 }
@@ -56,4 +57,12 @@
             }
         });
     }
+
+    $("#btn-upload-file").on('click', function(e){
+        e.preventDefault();
+        var $this = $(this).button('loading');
+        $.get(this.href).done(function(html){
+            showModal(html, $this);
+        });
+    });
 </script>
