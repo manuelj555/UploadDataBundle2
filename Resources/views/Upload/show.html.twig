@@ -62,11 +62,13 @@
     {{ parent() }}
     <script src="{{ asset('bundles/uploaddata/js/upload.js') }}"></script>
     {{ block('ajax_script') }}
-    <script>
-        new UploadData({
-            container: $('#show-container'),
-            reload_container_selector: '#show-container',
-            url_refresh: '{{ app.request.getRequestUri() }}'
-        });
-    </script>
+    {% block script_upload_data_create %}
+        <script>
+            new UploadData({
+                container: $('#show-container'),
+                reload_container_selector: '#show-container',
+                url_refresh: '{{ app.request.getRequestUri() }}'
+            });
+        </script>
+    {% endblock script_upload_data_create %}
 {% endblock %}
