@@ -115,7 +115,7 @@ class UploadController extends Controller
             ));
         }
 
-        return $this->render($this->config->getTemplate('upload_new'), array(
+        return $this->render($this->config->getTemplate('new'), array(
             'form' => $form->createView(),
         ), $response);
     }
