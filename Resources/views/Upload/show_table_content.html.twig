@@ -20,6 +20,8 @@
                         <button class="btn btn-danger btn-xs"
                                 data-html="true"
                                 data-toggle="popover"
+                                data-trigger="focus"
+                                data-placement="focus"
                                 data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
                             {{ 'link.errors'|trans }}
                         </button>

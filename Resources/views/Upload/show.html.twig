@@ -43,11 +43,7 @@
 
 {% block ajax_script %}
     <script>
-        $('[data-toggle="popover"]').popover({
-            html: true,
-            placement: 'right',
-            trigger: 'focus'
-        });
+        $('[data-toggle="popover"]').popover();
 
         function showModal(html) {
             $("#show_item_modal").remove();
