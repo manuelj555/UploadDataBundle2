@@ -132,7 +132,7 @@ class UploadController extends Controller
         $reader = $this->get('upload_data.reader_loader')
             ->get($upload->getFullFilename());
 
-        return $this->redirectToRoute($reader->getRouteConfig(),  array(
+        return $this->redirectToRoute($reader->getRouteConfig(), array(
             'id' => $upload->getId(),
         ));
     }
@@ -177,10 +177,18 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function showAction(Upload $upload)
+    public function showAction(Request $request, Upload $upload)
     {
+        $query = $this->getDoctrine()
+            ->getRepository('UploadDataBundle:UploadedItem')
+            ->getQueryByUpload($upload);
+
+        $pagination = $this->get('knp_paginator')
+            ->paginate($query, $request->get('page'), $request->get('per_page', 10));
+
         return $this->render($this->config->getTemplate('upload_show'), array(
             'upload' => $upload,
+            'pagination' => $pagination,
         ));
     }
 
@@ -190,7 +198,7 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function showItemAction($type, UploadedItem $item)
+    public function showItemAction(UploadedItem $item)
     {
         return $this->render($this->config->getTemplate('upload_show_item'), array(
             'item' => $item,

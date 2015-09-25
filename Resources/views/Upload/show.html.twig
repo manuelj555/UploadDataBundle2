@@ -22,6 +22,11 @@
     <div class="table-responsive">
         {{ include(config.getTemplate('show_table')) }}
     </div>
+
+    {% block pagination %}
+        {{ knp_pagination_render(pagination) }}
+    {% endblock %}
+
 {% endblock %}
 
 {% block actions %}
@@ -40,8 +45,8 @@
     <script>
         $('[data-toggle="popover"]').popover({
             html: true,
-            placement: 'left',
-            trigger: 'click hover'
+            placement: 'right',
+            trigger: 'focus'
         });
 
         function showModal(html) {

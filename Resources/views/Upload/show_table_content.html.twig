@@ -4,16 +4,28 @@
     {% block show_table_head %}
         <thead>
             <tr>
+                <th style="width: 130px">{{ 'table.errors'|trans }}</th>
                 {% for num, label in config.columnsMapper.labels if num < 7 %}
                     <th>{{ label|title|trans }}</th>
                 {% endfor %}
-                <th style="width: 130px">{{ 'table.errors'|trans }}</th>
+                <th style="width: 130px">{{ 'table.details'|trans }}</th>
             </tr>
         </thead>
     {% endblock %}
     {% block show_table_body %}
-        {% for item in upload.items %}
+        {% for item in pagination %}
             <tr>
+                <td>
+                    {% if item.errors|length > 0 -%}
+                        <button class="btn btn-danger btn-xs"
+                              data-toggle="popover"
+                              data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
+                            {{ 'link.errors'|trans }}
+                        </button>
+                    {%- else -%}
+                        --
+                    {%- endif %}
+                </td>
                 {% for name in config.columnsMapper.names %}
                     <td>{{ item.data[name]|default }}</td>
                 {% endfor %}
@@ -24,13 +36,6 @@
                            data-ajax data-after="showModal">
                             {{ 'link.detail'|trans }}
                         </a>
-                    {%- endif %}
-                    {% if item.errors|length > 0 -%}
-                        <span class="btn btn-danger btn-xs"
-                              data-toggle="popover"
-                              data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
-                            {{ 'link.errors'|trans }}
-                        </span>
                     {%- endif %}
                 </td>
             </tr>

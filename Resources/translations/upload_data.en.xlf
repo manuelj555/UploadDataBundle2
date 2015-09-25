@@ -130,6 +130,10 @@
 				<source>table.value</source>
 				<target>Value</target>
 			</trans-unit>
+            <trans-unit id="33">
+				<source>table.details</source>
+				<target>Details</target>
+			</trans-unit>
         </body>
     </file>
 </xliff>

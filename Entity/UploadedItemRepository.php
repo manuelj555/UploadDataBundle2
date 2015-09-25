@@ -12,4 +12,10 @@ use Doctrine\ORM\EntityRepository;
  */
 class UploadedItemRepository extends EntityRepository
 {
+    public function getQueryByUpload($upload)
+    {
+        return $this->createQueryBuilder('uploaded_item')
+            ->where('uploaded_item.upload = :upload')
+            ->setParameter('upload', $upload);
+    }
 }
