@@ -66,8 +66,9 @@ class ValidationBuilder
         return $this->addConstraint(new NotBlank($config));
     }
 
-    public function assertCallback($config = null)
+    public function assertCallback($callback, $config = null)
     {
+        $config['callback'] = $callback;
         return $this->addConstraint(new Callback($config));
     }
 
