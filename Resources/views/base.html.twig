@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -55,16 +54,13 @@
             {% endif %}
         {% endblock flashes %}
 
-        {% block before_content %}{% endblock %}
+        <div {% block page_content_attributes %}{% endblock %}>
 
-        {% block content_row %}
-            <div class="">
-                {% block content %}
-                {% endblock content %}
-            </div>
-        {% endblock content_row %}
+        <div style="margin-bottom: 10px">{% block actions %}{% endblock %}</div>
 
-        {% block after_content %}{% endblock %}
+        {% block content %}
+        {% endblock content %}
+        </div>
 
         <footer>
 

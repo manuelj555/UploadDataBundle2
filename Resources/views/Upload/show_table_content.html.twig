@@ -1,0 +1,62 @@
+{% trans_default_domain 'upload_data' %}
+{% from _self import errors %}
+<table class="table table-bordered">
+    {% block show_table_head %}
+        <thead>
+            <tr>
+                <th style="width: 130px">{{ 'table.errors'|trans }}</th>
+                {% for num, label in config.columnsMapper.labels if num < 7 %}
+                    <th>{{ label|title|trans }}</th>
+                {% endfor %}
+                <th style="width: 130px">{{ 'table.details'|trans }}</th>
+            </tr>
+        </thead>
+    {% endblock %}
+    {% block show_table_body %}
+        {% for item in pagination %}
+            <tr>
+                <td>
+                    {% if item.errors|length > 0 -%}
+                        <button class="btn btn-danger btn-xs"
+                                data-html="true"
+                                data-toggle="popover"
+                                data-trigger="focus"
+                                data-placement="focus"
+                                data-content="{{ errors(item.errors, config.columnsMapper)|escape }}">
+                            {{ 'link.errors'|trans }}
+                        </button>
+                    {%- else -%}
+                        --
+                    {%- endif %}
+                </td>
+                {% for name in config.columnsMapper.names %}
+                    <td>{{ item.data[name]|default }}</td>
+                {% endfor %}
+                <td>
+                    {% if show_detail %}
+                        <a class="btn btn-info btn-xs"
+                           href="{{ path('upload_data_upload_show_item', {type: type, id: item.id}) }}"
+                           data-ajax data-after="showModal">
+                            {{ 'link.detail'|trans }}
+                        </a>
+                    {%- endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    {% endblock %}
+</table>
+
+{%- macro errors(errors, mapper) -%}
+    <table class="table table-bordered table-condensed">
+        {%- for column, errors in errors -%}
+            <tr>
+                <td><strong>{{ mapper.getLabel(column)|title }}</strong></td>
+                <td>
+                    <ul>
+                        <li>{{ errors|join('</li><li>')|raw }}</li>
+                    </ul>
+                </td>
+            </tr>
+        {%- endfor -%}
+    </table>
+{%- endmacro -%}

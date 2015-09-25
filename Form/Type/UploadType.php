@@ -30,6 +30,7 @@ class UploadType extends AbstractType
     {
         $builder->add('file', 'file', array(
             'label' => 'label.file',
+            'translation_domain' => 'upload_data',
         ));
     }
 

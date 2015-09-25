@@ -34,13 +34,18 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('ajax')->defaultValue('UploadDataBundle::base_ajax.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('ajax_modal')->defaultValue('UploadDataBundle::base_ajax_modal.html.twig')->cannotBeEmpty()->end()
 
-                    ->scalarNode('upload_list')->defaultValue('UploadDataBundle:Upload:list.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_new')->defaultValue('UploadDataBundle:Upload:new.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_show')->defaultValue('UploadDataBundle:Upload:show.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_show_item')->defaultValue('UploadDataBundle:Upload:show_item.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_table')->defaultValue('UploadDataBundle:Upload:uploads_table.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_table_header')->defaultValue('UploadDataBundle:Block:header_columns.html.twig')->cannotBeEmpty()->end()
-                    ->scalarNode('upload_table_rows')->defaultValue('UploadDataBundle:Block:columns.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('new')->defaultValue('UploadDataBundle:Upload:new.html.twig')->cannotBeEmpty()->end()
+
+                    ->scalarNode('list')->defaultValue('UploadDataBundle:Upload:list.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('list_table')->defaultValue('UploadDataBundle:Upload:list_table.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('list_table_headers')->defaultValue('UploadDataBundle:Upload:list_table_headers.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('list_table_rows')->defaultValue('UploadDataBundle:Upload:list_table_rows.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('list_javascript')->defaultValue('UploadDataBundle:Upload:list_javascript.html.twig')->cannotBeEmpty()->end()
+
+                    ->scalarNode('show')->defaultValue('UploadDataBundle:Upload:show.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('show_item')->defaultValue('UploadDataBundle:Upload:show_item.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('show_table')->defaultValue('UploadDataBundle:Upload:show_table_content.html.twig')->cannotBeEmpty()->end()
+                    ->scalarNode('show_small_info')->defaultValue('UploadDataBundle:Upload:show_small_info.html.twig')->cannotBeEmpty()->end()
 
                     ->scalarNode('read_select_columns')->defaultValue('UploadDataBundle:Read:select_columns.html.twig')->cannotBeEmpty()->end()
                     ->scalarNode('read_csv_separator')->defaultValue('UploadDataBundle:Read:Csv/separator.html.twig')->cannotBeEmpty()->end()

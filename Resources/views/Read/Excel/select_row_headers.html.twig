@@ -1,16 +1,15 @@
 {% trans_default_domain 'upload_data' %}
 {% extends config.getTemplate('ajax_modal') %}
-{% set modal_id = 'csv_form' %}
+{% set modal_id = 'upload_excel_read_modal' %}
 
 {% form_theme form
 '@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'
-'@UploadData/Read/Excel/form_theme.html.twig'
-%}
+'@UploadData/Read/Excel/form_theme.html.twig' %}
 
 {% block headline %}{{ 'title.file_read'|trans }}{% endblock %}
 
 {% block body %}
-    {{ form_start(form, {attr: {'data-ajax': "##{modal_id} .modal-body-container" }}) }}
+    {{ form_start(form) }}
     <div class="modal-body">
         {% embed '@UploadData/panel.html.twig' with {config: config} %}
             {% trans_default_domain 'upload_data' %}
@@ -20,10 +19,7 @@
         <div id="preview-excel-headers"></div>
     </div>
     <div class="modal-footer">
-        {{ form_widget(form.preview, { attr: {
-        'data-ajax': '#preview-excel-headers',
-        'data-url': path('upload_data_upload_read_excel_preview_headers', {id: upload.id}),
-        'data-before': 'prepareExcelParams', }}) }}
+        {{ form_widget(form.preview) }}
         {{ form_widget(form.send) }}
         <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'link.close'|trans }}</button>
     </div>
@@ -33,8 +29,21 @@
 {% block ajax_script -%}
     {{ parent() }}
     <script>
-        function prepareExcelParams($el, event, container, params) {
-            params.row = $("#{{ form.attributes[0].value.vars.id }}").val();
-        }
+        $('#{{ form.preview.vars.id }}').on('click', function (e) {
+            e.preventDefault();
+            var path = '{{ path('upload_data_upload_read_excel_preview_headers', {id: upload.id}) }}';
+            var $this = $(this).button('loading');
+            $('#preview-excel-headers').load(path, {row: $("#{{ form.attributes[0].value.vars.id }}").val()}, function (html) {
+                $this.button('reset');
+            });
+        });
+        $('#{{ modal_id }} form').on('submit', function (e) {
+            e.preventDefault();
+            var $btn = $(':submit', this).button('loading');
+            $.post(this.action, $(this).serializeArray()).done(function(html){
+                $btn.button('reset');
+                $("#{{ modal_id~' .modal-body-container' }}").html(html);
+            });
+        })
     </script>
 {%- endblock ajax_script %}

@@ -1,6 +1,6 @@
 {% trans_default_domain 'upload_data' %}
 {% extends config.getTemplate('ajax_modal') %}
-{% set modal_id = 'csv_form' %}
+{% set modal_id = 'upload_csv_read_modal' %}
 
 {% form_theme form
 '@UploadData/Form/form_bootstrap_3.2.x_horizontal_layout.html.twig'
@@ -9,7 +9,7 @@ _self %}
 {% block headline %}{{ 'title.file_read'|trans }}{% endblock %}
 
 {% block body %}
-    {{ form_start(form, {attr: {'data-ajax': "##{modal_id} .modal-body-container" }}) }}
+    {{ form_start(form) }}
     <div class="modal-body">
         {% embed '@UploadData/panel.html.twig' %}
             {% block body %}
@@ -36,3 +36,17 @@ _self %}
 {% block form_group_class -%}
     col-sm-6
 {%- endblock form_group_class %}
+
+{% block ajax_script -%}
+    {{ parent() }}
+    <script>
+        $('#{{ modal_id }} form').on('submit', function (e) {
+            e.preventDefault();
+            var $btn = $(':submit', this).button('loading');
+            $.post(this.action, $(this).serializeArray()).done(function(html){
+                $btn.button('reset');
+                $("#{{ modal_id~' .modal-body-container' }}").html(html);
+            });
+        })
+    </script>
+{%- endblock ajax_script %}
