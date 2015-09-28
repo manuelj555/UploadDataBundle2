@@ -4,11 +4,14 @@ namespace Manuel\Bundle\UploadDataBundle\Controller;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  */
@@ -147,7 +150,7 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function validateAction(Upload $upload)
+    public function validateAction(Request $request, Upload $upload, $type)
     {
         $this->config->processValidation($upload);
 
@@ -155,7 +158,9 @@ class UploadController extends Controller
             ->getFlashBag()
             ->add('success', 'Validated!');
 
-        return new Response('Ok');
+        return $this->redirectToRoute('upload_data_upload_list', array_merge(
+            $request->query->all(), array('type' => $type)
+        ));
     }
 
     /**
@@ -164,7 +169,7 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function transferAction(Upload $upload)
+    public function transferAction(Request $request, Upload $upload, $type)
     {
         $this->config->processTransfer($upload);
 
@@ -172,7 +177,9 @@ class UploadController extends Controller
             ->getFlashBag()
             ->add('success', 'Transfered!');
 
-        return new Response('Ok');
+        return $this->redirectToRoute('upload_data_upload_list', array_merge(
+            $request->query->all(), array('type' => $type)
+        ));
     }
 
     /**
@@ -215,7 +222,7 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function deleteAction($type, Upload $upload)
+    public function deleteAction(Request $request, Upload $upload, $type)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -226,7 +233,34 @@ class UploadController extends Controller
             ->getFlashBag()
             ->add('success', 'Deleted!');
 
-        return new Response('Ok');
+        return $this->redirectToRoute('upload_data_upload_list', array_merge(
+            $request->query->all(), array('type' => $type)
+        ));
+    }
+
+    /**
+     * @param        $type
+     * @param Upload $upload
+     *
+     * @return Response
+     */
+    public function restoreInProgressAction($type, Upload $upload)
+    {
+        /** @var UploadAction $action */
+        foreach ($upload->getActions() as $action) {
+            if ($action->isInProgress()) {
+                $action->setNotComplete();
+            }
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->flush();
+
+        $this->get('session')
+            ->getFlashBag()
+            ->add('success', 'Restored!');
+
+        return $this->redirectToRoute('upload_data_upload_show', array('type' => $type, 'id' => $upload->getId()));
     }
 
     protected function createFilterListForm()
@@ -238,5 +272,22 @@ class UploadController extends Controller
         ))
             ->add('search', 'text', array('required' => false))
             ->getForm();
+    }
+
+    protected function attachException(Upload $upload, $actionName)
+    {
+        $action = $upload->getAction($actionName);
+        /* @var $em \Doctrine\ORM\EntityManager */
+        $em = $this->getDoctrine()->getManager();
+
+        $closure = function (GetResponseForExceptionEvent $event) use ($upload, $action, $em) {
+            if ($em->isOpen() and $action and $action->isInProgress()) {
+                $action->setNotComplete();
+                $em->persist($action);
+                $em->flush($action);
+            }
+        };
+
+        $this->get('event_dispatcher')->addListener(KernelEvents::EXCEPTION, $closure);
     }
 }

@@ -583,4 +583,16 @@ class Upload
                 return $item->getIsValid();
             });
     }
+
+    public function hasInProgressActions()
+    {
+        /** @var UploadAction $action */
+        foreach ($this->getActions() as $action) {
+            if ($action->isInProgress()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
