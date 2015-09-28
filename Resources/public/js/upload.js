@@ -16,7 +16,7 @@ var UploadData = function (opts) {
         },
         auto_reload: false,
         confirm: function (text, callback) {
-            if(confirm(text)){
+            if (confirm(text)) {
                 callback();
             }
         },
@@ -26,7 +26,7 @@ var UploadData = function (opts) {
     options = $.extend(options, opts);
 
     this.reload = function () {
-        $.get(options.url_refresh).done(function(html){
+        $.get(options.url_refresh).done(function (html) {
             $(options.reload_container_selector).html($(html).find(options.reload_container_selector).html());
         }).done(options.refresh_complete);
     };
@@ -37,39 +37,29 @@ var UploadData = function (opts) {
 
     var upload = this;
 
-    options.container.on('click', '.upload-process', function (e) {
-            e.preventDefault();
-            var $a = $(this);
-            var $row = $a.closest('.upload-row');
+    options.container.on('click', '.upload-process[data-modal]', function (e) {
+        e.preventDefault();
+        var $a = $(this);
+        var $row = $a.closest('.upload-row');
 
-            function processClick(){
-                if (!$a.is('[data-modal]')) {
-                    $a.parent().html($processing.clone());
-                    $row.find('a.upload-process').addClass('disabled');
-                }
-                $.ajax({
-                    url: $a.attr('href'),
-                    data: options.filter_form.serializeArray(),
-                    success: function (content) {
-                        if ($a.is('[data-modal]')) {
-                            $('#upload-ajax-extra-content').html(content);
-                        } else {
-                            upload.reload();
-                        }
-                    },
-                    error: function () {
-                        options.error();
-                    }
-                });
+        $.ajax({
+            url: $a.attr('href'),
+            data: options.filter_form.serializeArray(),
+            success: function (content) {
+                $('#upload-ajax-extra-content').html(content);
+            },
+            error: function () {
+                options.error();
             }
+        });
+    }).on('click', '.upload-process[data-confirm]', function (e) {
+        e.preventDefault();
+        var $a = $(this);
 
-            if ($a.is('[data-confirm]')) {
-                options.confirm($a.data('confirm'), processClick);
-            }else{
-                processClick();
-            }
-        }
-    );
+        options.confirm($a.data('confirm'), function () {
+            document.location = $a.attr('href')
+        });
+    });
 
     $.ajaxSetup({
         complete: function (xhr) {
