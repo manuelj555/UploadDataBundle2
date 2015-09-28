@@ -134,6 +134,14 @@
                 <source>table.details</source>
                 <target>Detalles</target>
             </trans-unit>
+            <trans-unit id="34">
+                <source>label.search</source>
+                <target>Buscar</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>label.clear</source>
+                <target>Limpiar</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

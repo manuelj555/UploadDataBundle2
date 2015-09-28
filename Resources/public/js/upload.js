@@ -19,7 +19,8 @@ var UploadData = function (opts) {
             if(confirm(text)){
                 callback();
             }
-        }
+        },
+        filter_form: $('.upload_filter_form')
     };
 
     options = $.extend(options, opts);
@@ -48,6 +49,7 @@ var UploadData = function (opts) {
                 }
                 $.ajax({
                     url: $a.attr('href'),
+                    data: options.filter_form.serializeArray(),
                     success: function (content) {
                         if ($a.is('[data-modal]')) {
                             $('#upload-ajax-extra-content').html(content);
