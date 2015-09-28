@@ -158,9 +158,7 @@ class UploadController extends Controller
             ->getFlashBag()
             ->add('success', 'Validated!');
 
-        return $this->redirectToRoute('upload_data_upload_list', array_merge(
-            $request->query->all(), array('type' => $type)
-        ));
+        return $this->redirectToTargetOrList($request, $type);
     }
 
     /**
@@ -177,9 +175,7 @@ class UploadController extends Controller
             ->getFlashBag()
             ->add('success', 'Transfered!');
 
-        return $this->redirectToRoute('upload_data_upload_list', array_merge(
-            $request->query->all(), array('type' => $type)
-        ));
+        return $this->redirectToTargetOrList($request, $type);
     }
 
     /**
@@ -234,7 +230,7 @@ class UploadController extends Controller
             ->add('success', 'Deleted!');
 
         return $this->redirectToRoute('upload_data_upload_list', array_merge(
-            $request->query->all(), array('type' => $type)
+            array('type' => $type)
         ));
     }
 
@@ -289,5 +285,16 @@ class UploadController extends Controller
         };
 
         $this->get('event_dispatcher')->addListener(KernelEvents::EXCEPTION, $closure);
+    }
+
+    protected function redirectToTargetOrList(Request $request, $type)
+    {
+        if ($request->query->has('_target_path')) {
+            return $this->redirect($request->query->get('_target_path'));
+        } else {
+            return $this->redirectToRoute('upload_data_upload_list', array_merge(
+                array('type' => $type)
+            ));
+        }
     }
 }
