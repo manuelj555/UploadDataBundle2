@@ -34,6 +34,10 @@
         <div class="col-sm-4 col-sm-push-8 text-right">
             <a href="{{ path('upload_data_upload_list', {type: type}) }}"
                class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
+            {% if upload.hasInProgressActions() %}
+                <a href="{{ path('upload_data_upload_restore_actions', {type: type, id: upload.id}) }}"
+                   class="btn btn-danger btn-sm ">{{ 'link.restore_actions'|trans }}</a>
+            {% endif %}
         </div>
         <div class="col-sm-8 col-sm-pull-4">
             {{ include(config.getTemplate('show_small_info')) }}

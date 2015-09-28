@@ -14,12 +14,12 @@ upload_data_upload_read:
 upload_data_upload_validate:
     path:     /validate/{id}
     defaults: { _controller: UploadDataBundle:Upload:validate }
-    condition: request.isXmlHttpRequest()
+#    condition: request.isXmlHttpRequest()
 
 upload_data_upload_transfer:
     path:     /transfer/{id}
     defaults: { _controller: UploadDataBundle:Upload:transfer }
-    condition: request.isXmlHttpRequest()
+#    condition: request.isXmlHttpRequest()
 
 upload_data_upload_show:
     path:     /show/{id}
@@ -32,3 +32,7 @@ upload_data_upload_show_item:
 upload_data_upload_delete:
     path:     /delete/{id}
     defaults: { _controller: UploadDataBundle:Upload:delete }
+
+upload_data_upload_restore_actions:
+    path:     /restore-inprogress/{id}
+    defaults: { _controller: UploadDataBundle:Upload:restoreInProgress }
