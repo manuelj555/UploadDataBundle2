@@ -5,7 +5,6 @@ namespace Manuel\Bundle\UploadDataBundle\Controller;
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,13 +75,18 @@ class UploadController extends Controller
      */
     public function listAction(Request $request)
     {
-        $query = $this->config->getQueryList($request, $this->get('upload_data.upload_repository'));
-//            ->getQuery();
+        $filterForm = $this->createFilterListForm();
+        $filterForm->handleRequest($request);
+
+        $query = $this->config->getQueryList(
+            $this->get('upload_data.upload_repository'), $filterForm->getData()
+        );
 
         $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1));
 
         return $this->render($this->config->getTemplate('list'), array(
             'items' => $items,
+            'filter_form' => $filterForm->createView(),
         ));
     }
 
@@ -223,5 +227,16 @@ class UploadController extends Controller
             ->add('success', 'Deleted!');
 
         return new Response('Ok');
+    }
+
+    protected function createFilterListForm()
+    {
+        return $this->get('form.factory')->createNamedBuilder('filter', 'form', null, array(
+            'method' => 'GET',
+            'csrf_protection' => false,
+            'attr' => array('class' => 'upload_filter_form'),
+        ))
+            ->add('search', 'text', array('required' => false))
+            ->getForm();
     }
 }

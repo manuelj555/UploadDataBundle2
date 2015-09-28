@@ -172,9 +172,15 @@ abstract class UploadConfig
         return '@UploadData/Upload';
     }
 
-    public function getQueryList(Request $request, UploadRepository $repository)
+    public function getQueryList(UploadRepository $repository, $filters = null, $order = 'DESC')
     {
-        return $repository->getQueryForType($this->getType());
+        if(is_array($filters) and array_key_exists('search', $filters)){
+            $search = $filters['search'];
+        }else{
+            $search = null;
+        }
+
+        return $repository->getQueryForType($this->getType(), $search, $order);
     }
 
     abstract public function configureColumns(ColumnsMapper $mapper);

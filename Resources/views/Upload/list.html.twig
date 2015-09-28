@@ -20,6 +20,10 @@
 
         {% block before_table %}{% endblock %}
 
+        {% block filter_form %}
+            {{ include('@UploadData/Upload/list_filter_form.html.twig') }}
+        {% endblock %}
+
         <div id="upload-list-table">
             {% if is_ajax %}
                 {{ include('@UploadData/flash.html.twig') }}

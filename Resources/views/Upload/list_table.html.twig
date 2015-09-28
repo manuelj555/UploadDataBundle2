@@ -1,10 +1,12 @@
 {% trans_default_domain 'upload_data' %}
 {% set is_show = is_show is defined ? is_show: false %}
-<table class="table table-bordered">
-    <thead>
-        {{ include(config.getTemplate('list_table_headers'), {config: config, is_show: is_show}) }}
-    </thead>
-    <tbody>
-        {{ include(config.getTemplate('list_table_rows'), {config: config,  items: items, is_show: is_show}) }}
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            {{ include(config.getTemplate('list_table_headers'), {config: config, is_show: is_show}) }}
+        </thead>
+        <tbody>
+            {{ include(config.getTemplate('list_table_rows'), {config: config,  items: items, is_show: is_show}) }}
+        </tbody>
+    </table>
+</div>

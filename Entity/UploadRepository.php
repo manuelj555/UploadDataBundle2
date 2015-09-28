@@ -14,15 +14,28 @@ use Doctrine\ORM\Query;
  */
 class UploadRepository extends EntityRepository
 {
-    public function getQueryForType($type, $order = 'DESC')
+    public function getQueryForType($type, $search = null, $order = 'DESC')
     {
-        return $this->createQueryBuilder('upload')
+        $q = $this->createQueryBuilder('upload')
             ->select('upload, actions, attributes')
             ->leftJoin('upload.actions', 'actions')
             ->leftJoin('upload.attributes', 'attributes')
             ->where('upload.type = :type')
             ->setParameter('type', $type)
             ->orderBy('upload.id ', $order);
+
+        if (null !== $search && '' !== $search) {
+            $q
+                ->andWhere($q->expr()->orX(
+                    'upload.id = :search',
+                    'upload.filename LIKE :search_contains',
+                    'upload.file LIKE :search_contains'
+                ))
+                ->setParameter('search', $search)
+                ->setParameter('search_contains', '%' . $search . '%');
+        }
+
+        return $q;
     }
 
     /**

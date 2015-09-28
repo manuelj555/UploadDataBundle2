@@ -130,6 +130,7 @@ class Upload
      *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute",
      *      cascade={"all"},
      *      mappedBy="upload",
+     *      fetch="EAGER",
      *      orphanRemoval=true
      * )
      */
@@ -140,6 +141,7 @@ class Upload
      *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAction",
      *      cascade={"all"},
      *      mappedBy="upload",
+     *      fetch="EAGER",
      *      orphanRemoval=true,
      * )
      * @ORM\OrderBy(value={"position": "ASC"})
@@ -555,9 +557,9 @@ class Upload
 
     public function setAttributeValue($name, $value)
     {
-        if($attr = $this->getAttribute($name)){
+        if ($attr = $this->getAttribute($name)) {
             $attr->setValue($value);
-        }else{
+        } else {
             $this->addAttribute($attr = new UploadAttribute($name, $value));
         }
 
