@@ -2,6 +2,8 @@
 {% set is_ajax = app.request.isXmlHttpRequest() %}
 {% extends config.getTemplate('layout') %}
 
+{% set _target = 'show' %}{# usado para determinar la ruta a la cuar redirigir al ejecutar un proceso (validar, transferiri, eliminar) #}
+
 {% block headline %}{{ 'title.show'|trans }}
     <small>{{ upload.filename }}</small>{% endblock %}
 

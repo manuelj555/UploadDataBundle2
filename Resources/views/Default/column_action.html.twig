@@ -3,15 +3,16 @@
 {% set action = item.getAction(name) %}
 {% set status = action.getStatus() %}
 {% set is_actionable = column.callOption('condition', [item]) %}
+{% set routeParams = {id: item.id, type: upload_type}|merge(_target is defined ? {_target: _target}: {}) %}
 <td class="text-center">
     {%- if action.isInProgress() -%}
         <span class="label label-warning">{{ bs_icon('refresh') }}...</span>
     {%- elseif is_actionable -%}
         <a class="upload-process upload-process-{{ name }} btn btn-{{ action.isComplete() ? 'success' : 'info' }} btn-xs"
-           href="{{ path(column.options.route, {id: item.id, type: upload_type, _target_path: app.request.requestUri}) }}"
-                {% if column.options.confirm -%}data-confirm="{{ column.options.confirm_text|trans }}"{%- endif -%}
+           href="{{ path(column.options.route, app.request.query.all()|merge(routeParams)) }}"
+           {% if column.options.confirm -%}data-confirm="{{ column.options.confirm_text|trans }}"{%- endif -%}
                 {% if column.options.modal -%}data-modal{%- endif -%}>
-        {{ bs_icon(action.isComplete() ? 'refresh' : 'eject') }}
+            {{ bs_icon(action.isComplete() ? 'refresh' : 'eject') }}
         </a>
     {%- elseif action.isComplete() -%}
         <span class="label label-success">{{ bs_icon('ok') }}</span>

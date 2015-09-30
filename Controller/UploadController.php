@@ -85,7 +85,7 @@ class UploadController extends Controller
             $this->get('upload_data.upload_repository'), $filterForm->getData()
         );
 
-        $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1));
+        $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1), 1);
 
         return $this->render($this->config->getTemplate('list'), array(
             'items' => $items,
@@ -289,12 +289,21 @@ class UploadController extends Controller
 
     protected function redirectToTargetOrList(Request $request, $type)
     {
-        if ($request->query->has('_target_path')) {
-            return $this->redirect($request->query->get('_target_path'));
-        } else {
-            return $this->redirectToRoute('upload_data_upload_list', array_merge(
-                array('type' => $type)
-            ));
+        $parameters = array(
+            'type' => $type,
+            'filter' => $request->get('filter'),
+            'page' => $request->get('page'),
+        );
+
+        switch ($request->get('_target')) {
+            case 'show':
+                $route = 'upload_data_upload_show';
+                $parameters['id'] = $request->get('id');
+                break;
+            default:
+                $route = 'upload_data_upload_list';
         }
+
+        return $this->redirectToRoute($route, array_filter($parameters));
     }
 }
