@@ -85,7 +85,7 @@ class UploadController extends Controller
             $this->get('upload_data.upload_repository'), $filterForm->getData()
         );
 
-        $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1), 1);
+        $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1));
 
         return $this->render($this->config->getTemplate('list'), array(
             'items' => $items,

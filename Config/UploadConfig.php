@@ -288,7 +288,7 @@ abstract class UploadConfig
         $file = $file->move($this->uploadDir, $upload->getId() . '.' . $file->getClientOriginalExtension());
 
         $upload->setFile($file->getFilename());
-        $upload->setFullFilename($file->getLinkTarget());
+        $upload->setFullFilename($file->getRealPath());
 
         $this->onPostUpload($upload, $file, $formData);
 
