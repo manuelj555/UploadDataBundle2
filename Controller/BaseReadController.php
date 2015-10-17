@@ -32,10 +32,23 @@ class BaseReadController extends Controller
     protected function processRead(Upload $upload)
     {
         $config = $this->getConfig($upload);
+        try {
+            $config->processRead($upload);
 
-        $this->get('event_dispatcher')->addListener('kernel.terminate'
-            , function () use ($config, $upload) {
-                $config->processRead($upload);
-            });
+            return true;
+        } catch (\Exception $e) {
+
+            if ($this->container->has('logger')) {
+                $this->get('logger')->critical('No se pudo procesar la lectura del excel', array(
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ));
+            }
+
+            $this->addFlash('error', 'there has been an error, we could not complete the operation!');
+        }
+
+        return false;
     }
 }

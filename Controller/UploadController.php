@@ -152,11 +152,22 @@ class UploadController extends Controller
      */
     public function validateAction(Request $request, Upload $upload, $type)
     {
-        $this->config->processValidation($upload);
+        try {
+            $this->config->processValidation($upload);
 
-        $this->get('session')
-            ->getFlashBag()
-            ->add('success', 'Validated!');
+            $this->addFlash('success', 'Validated!');
+        } catch (\Exception $e) {
+
+            if ($this->container->has('logger')) {
+                $this->get('logger')->critical('No se pudo procesar la lectura del excel', array(
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ));
+            }
+
+            $this->addFlash('error', 'there has been an error, we could not complete the operation!');
+        }
 
         return $this->redirectToTargetOrList($request, $type);
     }
@@ -169,11 +180,22 @@ class UploadController extends Controller
      */
     public function transferAction(Request $request, Upload $upload, $type)
     {
-        $this->config->processTransfer($upload);
+        try {
+            $this->config->processTransfer($upload);
 
-        $this->get('session')
-            ->getFlashBag()
-            ->add('success', 'Transfered!');
+            $this->addFlash('success', 'Transfered!');
+        } catch (\Exception $e) {
+
+            if ($this->container->has('logger')) {
+                $this->get('logger')->critical('No se pudo procesar la transferencia del excel', array(
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ));
+            }
+
+            $this->addFlash('error', 'there has been an error, we could not complete the operation!');
+        }
 
         return $this->redirectToTargetOrList($request, $type);
     }
