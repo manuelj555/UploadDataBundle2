@@ -94,3 +94,12 @@ services:
         factory_service: doctrine.orm.entity_manager
         factory_method: getRepository
         arguments: [UploadDataBundle:Upload]
+
+    upload_data.command.process_action:
+        class: Manuel\Bundle\UploadDataBundle\Command\ProcessActionCommand
+        arguments:
+            - @upload_data.config_provider
+            - @upload_data.upload_repository
+            - @?logger
+        tags:
+            - { name: console.command }

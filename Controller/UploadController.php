@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  */
@@ -129,7 +131,7 @@ class UploadController extends Controller
 
     /**
      * @param         $type
-     * @param Upload  $upload
+     * @param Upload $upload
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -152,21 +154,25 @@ class UploadController extends Controller
      */
     public function validateAction(Request $request, Upload $upload, $type)
     {
-        try {
-            $this->config->processValidation($upload);
+        if ($this->useCommand()) {
+            $this->runCommand('validate', $upload->getId());
+        } else {
+            try {
+                $this->config->processValidation($upload);
 
-            $this->addFlash('success', 'Validated!');
-        } catch (\Exception $e) {
+                $this->addFlash('success', 'Validated!');
+            } catch (\Exception $e) {
 
-            if ($this->container->has('logger')) {
-                $this->get('logger')->critical('No se pudo procesar la lectura del excel', array(
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ));
+                if ($this->container->has('logger')) {
+                    $this->get('logger')->critical('No se pudo procesar la lectura del excel', array(
+                        'error' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ));
+                }
+
+                $this->addFlash('error', 'there has been an error, we could not complete the operation!');
             }
-
-            $this->addFlash('error', 'there has been an error, we could not complete the operation!');
         }
 
         return $this->redirectToTargetOrList($request, $type);
@@ -180,21 +186,25 @@ class UploadController extends Controller
      */
     public function transferAction(Request $request, Upload $upload, $type)
     {
-        try {
-            $this->config->processTransfer($upload);
+        if ($this->useCommand()) {
+            $this->runCommand('transfer', $upload->getId());
+        } else {
+            try {
+                $this->config->processTransfer($upload);
 
-            $this->addFlash('success', 'Transfered!');
-        } catch (\Exception $e) {
+                $this->addFlash('success', 'Transfered!');
+            } catch (\Exception $e) {
 
-            if ($this->container->has('logger')) {
-                $this->get('logger')->critical('No se pudo procesar la transferencia del excel', array(
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ));
+                if ($this->container->has('logger')) {
+                    $this->get('logger')->critical('No se pudo procesar la transferencia del excel', array(
+                        'error' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ));
+                }
+
+                $this->addFlash('error', 'there has been an error, we could not complete the operation!');
             }
-
-            $this->addFlash('error', 'there has been an error, we could not complete the operation!');
         }
 
         return $this->redirectToTargetOrList($request, $type);
@@ -327,5 +337,23 @@ class UploadController extends Controller
         }
 
         return $this->redirectToRoute($route, array_filter($parameters));
+    }
+
+    private function useCommand()
+    {
+        return $this->container->getParameter('upload_data.use_command');
+    }
+
+    private function runCommand($action, $id)
+    {
+        $dir = $this->container->getParameter('kernel.root_dir');
+        $php = $this->container->getParameter('upload_data.php_bin');
+
+        $command = sprintf('%s %s/console uploaddata:process %s %d', $php, $dir, $action, $id);
+
+        $process = new Process($command);
+        $process->start();
+
+        return $process;
     }
 }
