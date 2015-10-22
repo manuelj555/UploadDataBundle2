@@ -174,9 +174,9 @@ abstract class UploadConfig
 
     public function getQueryList(UploadRepository $repository, $filters = null, $order = 'DESC')
     {
-        if(is_array($filters) and array_key_exists('search', $filters)){
+        if (is_array($filters) and array_key_exists('search', $filters)) {
             $search = $filters['search'];
-        }else{
+        } else {
             $search = null;
         }
 
@@ -190,27 +190,57 @@ abstract class UploadConfig
         $mapper->add('id', null, array('use_show' => true,));
         $mapper->add('filename', 'link', array(
             'route' => 'upload_data_upload_show',
-            'condition' => function (Upload $upload) { return $upload->getTotal() > 0; },
+            'condition' => function (Upload $upload) {
+                return $upload->getTotal() > 0;
+            },
         ));
         $mapper->add('uploadedAt', 'datetime');
-        $mapper->add('total', 'number', array('use_show' => true,));
-        $mapper->add('valids', 'number', array('use_show' => true,));
-        $mapper->add('invalids', 'number', array('use_show' => true,));
+        $mapper->add('total', 'number_link', array(
+            'use_show' => true,
+            'route' => 'upload_data_upload_show',
+            'condition' => function (Upload $upload) {
+                return $upload->getTotal() > 0;
+            },
+        ));
+        $mapper->add('valids', 'number_link', array(
+            'use_show' => true,
+            'route' => 'upload_data_upload_show',
+            'condition' => function (Upload $upload) {
+                return $upload->getValids() > 0;
+            },
+            'parameters' => array('valid' => 1),
+        ));
+        $mapper->add('invalids', 'number_link', array(
+            'use_show' => true,
+            'route' => 'upload_data_upload_show',
+            'condition' => function (Upload $upload) {
+                return $upload->getInvalids() > 0;
+            },
+            'parameters' => array('valid' => 0),
+        ));
         $mapper->addAction('read', array(
-            'condition' => function (Upload $upload) { return $upload->isReadable(); },
+            'condition' => function (Upload $upload) {
+                return $upload->isReadable();
+            },
             'route' => 'upload_data_upload_read',
             'modal' => true,
         ));
         $mapper->addAction('validate', array(
-            'condition' => function (Upload $upload) { return $upload->isValidatable(); },
+            'condition' => function (Upload $upload) {
+                return $upload->isValidatable();
+            },
             'route' => 'upload_data_upload_validate',
         ));
         $mapper->addAction('transfer', array(
-            'condition' => function (Upload $upload) { return $upload->isTransferable(); },
+            'condition' => function (Upload $upload) {
+                return $upload->isTransferable();
+            },
             'route' => 'upload_data_upload_transfer',
         ));
         $mapper->addAction('delete', array(
-            'condition' => function (Upload $upload) { return $upload->isDeletable(); },
+            'condition' => function (Upload $upload) {
+                return $upload->isDeletable();
+            },
             'route' => 'upload_data_upload_delete',
             'confirm_text' => 'upload_data.confirm_delete'
         ));
@@ -239,15 +269,17 @@ abstract class UploadConfig
         $this->templates = $templates;
     }
 
-    public function getTemplate($name){
-        if(!isset($this->templates[$name])){
+    public function getTemplate($name)
+    {
+        if (!isset($this->templates[$name])) {
             throw new \InvalidArgumentException('No existe el template ' . $name);
         }
 
         return $this->templates[$name];
     }
 
-    public function setTemplate($name, $value){
+    public function setTemplate($name, $value)
+    {
         $this->templates[$name] = $value;
     }
 
@@ -442,10 +474,10 @@ abstract class UploadConfig
     /**
      * Translates the given message.
      *
-     * @param string      $id         The message id (may also be an object that can be cast to string)
-     * @param array       $parameters An array of parameters for the message
-     * @param string|null $domain     The domain for the message or null to use the default
-     * @param string|null $locale     The locale or null to use the default
+     * @param string $id The message id (may also be an object that can be cast to string)
+     * @param array $parameters An array of parameters for the message
+     * @param string|null $domain The domain for the message or null to use the default
+     * @param string|null $locale The locale or null to use the default
      *
      * @throws \InvalidArgumentException If the locale contains invalid characters
      *
@@ -456,27 +488,47 @@ abstract class UploadConfig
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
-    public function processAction(Upload $upload, $name) { }
+    public function processAction(Upload $upload, $name)
+    {
+    }
 
-    public function onPreUpload(Upload $upload, File $file, array $formData = array()) { }
+    public function onPreUpload(Upload $upload, File $file, array $formData = array())
+    {
+    }
 
-    public function onPostUpload(Upload $upload, File $file, array $formData = array()) { }
+    public function onPostUpload(Upload $upload, File $file, array $formData = array())
+    {
+    }
 
-    public function onPreRead(Upload $upload) { }
+    public function onPreRead(Upload $upload)
+    {
+    }
 
-    public function onPostRead(Upload $upload) { }
+    public function onPostRead(Upload $upload)
+    {
+    }
 
-    public function onPreValidate(Upload $upload) { }
+    public function onPreValidate(Upload $upload)
+    {
+    }
 
-    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload) { }
+    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
+    {
+    }
 
-    public function onPostValidate(Upload $upload) { }
+    public function onPostValidate(Upload $upload)
+    {
+    }
 
     abstract public function transfer(Upload $upload, Collection $items);
 
-    public function onPreDelete(Upload $upload) { }
+    public function onPreDelete(Upload $upload)
+    {
+    }
 
-    public function onPostDelete(Upload $upload) { }
+    public function onPostDelete(Upload $upload)
+    {
+    }
 
     private function onActionException($action, $upload)
     {

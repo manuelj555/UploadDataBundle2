@@ -2,9 +2,9 @@
 {% set url_parameters = column.options.parameters %}
 <td>
     {% if use_link %}
-        <a href="{{ path(column.options.route, {id: item.id, type: upload_type}|merge(url_parameters)) }}" class="btn btn-link btn-xs">
+        <a href="{{ path(column.options.route, {id: item.id, type: upload_type}|merge(url_parameters)) }}">
     {% endif %}
-    {% block text %}{{ attribute(item, name) }}{% endblock %}
+    {% block text %}{{ attribute(item, name)|number_format(0) }}{% endblock %}
     {% if use_link %}
         </a>
     {% endif %}

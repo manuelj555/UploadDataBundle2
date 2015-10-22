@@ -210,7 +210,7 @@ class UploadController extends Controller
     {
         $query = $this->getDoctrine()
             ->getRepository('UploadDataBundle:UploadedItem')
-            ->getQueryByUpload($upload);
+            ->getQueryByUpload($upload, $request->query->all());
 
         $pagination = $this->get('knp_paginator')
             ->paginate($query, $request->get('page', 1), $request->get('per_page', 10));

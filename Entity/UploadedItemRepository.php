@@ -12,10 +12,17 @@ use Doctrine\ORM\EntityRepository;
  */
 class UploadedItemRepository extends EntityRepository
 {
-    public function getQueryByUpload($upload)
+    public function getQueryByUpload($upload, $filters = array())
     {
-        return $this->createQueryBuilder('uploaded_item')
+        $query = $this->createQueryBuilder('uploaded_item')
             ->where('uploaded_item.upload = :upload')
             ->setParameter('upload', $upload);
+
+        if (array_key_exists('valid', $filters)) {
+            $query->andWhere('uploaded_item.isValid = :is_valid')
+                ->setParameter('is_valid', (bool)$filters['valid']);
+        }
+
+        return $query;
     }
 }
