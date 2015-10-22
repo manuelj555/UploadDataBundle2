@@ -55,15 +55,17 @@
                     return false;
                 }
             }
-
         }
+
+        return true;
     }
 
     $("#upload_match_columns").on('submit', function (e) {
         var $this = $(this);
+        e.preventDefault();
 
         if (!validateColumnsForm($this)) {
-            e.preventDefault();
+            return false;
         }
 
         $this.find(':submit').button('loading');
