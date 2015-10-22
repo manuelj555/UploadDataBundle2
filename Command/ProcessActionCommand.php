@@ -65,14 +65,6 @@ class ProcessActionCommand extends Command
         $actionName = strtolower($input->getArgument('action'));
         $id = $input->getArgument('id');
 
-        $validActions = array('validate', 'transfer');
-
-        if (!in_array($actionName, $validActions)) {
-            $output->writeln(sprintf("<error>No existe la acción \"%s\", intente con: [%s]</error>", $id,
-                join(',', $validActions)));
-            return -1;
-        }
-
         if (!$upload = $this->uploadRepository->find($id)) {
             $output->writeln(sprintf("<error>No existe el Item con id \"%s\"</error>", $id));
             return -1;
@@ -84,15 +76,14 @@ class ProcessActionCommand extends Command
             $result = false;
 
             switch ($actionName) {
-//                case 'read':
-//                    $result = $config->processRead($upload, array());
-//                    break;
                 case 'validate':
                     $result = $config->processValidation($upload);
                     break;
                 case 'transfer':
                     $result = $config->processTransfer($upload);
                     break;
+                default:
+                    $result = $config->processActionByName($upload, $actionName);
             }
 
             if (false !== $result) {

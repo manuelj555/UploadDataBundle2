@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Manuel\Bundle\UploadDataBundle\Form\Type\UploadType;
@@ -30,8 +31,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 abstract class UploadConfig
 {
+    /**
+     * @var ColumnsMapper
+     */
     private $columnsMapper;
+    /**
+     * @var ValidationBuilder
+     */
     private $validationBuilder;
+    /**
+     * @var ListMapper
+     */
     private $listMapper;
     /**
      * @var ReaderLoader
@@ -185,6 +195,9 @@ abstract class UploadConfig
 
     abstract public function configureColumns(ColumnsMapper $mapper);
 
+    /**
+     * @param ListMapper $mapper
+     */
     public function configureList(ListMapper $mapper)
     {
         $mapper->add('id', null, array('use_show' => true,));
@@ -196,6 +209,7 @@ abstract class UploadConfig
         ));
         $mapper->add('uploadedAt', 'datetime');
         $mapper->add('total', 'number_link', array(
+            'position' => 10,
             'use_show' => true,
             'route' => 'upload_data_upload_show',
             'condition' => function (Upload $upload) {
@@ -203,6 +217,7 @@ abstract class UploadConfig
             },
         ));
         $mapper->add('valids', 'number_link', array(
+            'position' => 20,
             'use_show' => true,
             'route' => 'upload_data_upload_show',
             'condition' => function (Upload $upload) {
@@ -211,6 +226,7 @@ abstract class UploadConfig
             'parameters' => array('valid' => 1),
         ));
         $mapper->add('invalids', 'number_link', array(
+            'position' => 30,
             'use_show' => true,
             'route' => 'upload_data_upload_show',
             'condition' => function (Upload $upload) {
@@ -219,6 +235,7 @@ abstract class UploadConfig
             'parameters' => array('valid' => 0),
         ));
         $mapper->addAction('read', array(
+            'position' => 100,
             'condition' => function (Upload $upload) {
                 return $upload->isReadable();
             },
@@ -226,18 +243,21 @@ abstract class UploadConfig
             'modal' => true,
         ));
         $mapper->addAction('validate', array(
+            'position' => 200,
             'condition' => function (Upload $upload) {
                 return $upload->isValidatable();
             },
             'route' => 'upload_data_upload_validate',
         ));
         $mapper->addAction('transfer', array(
+            'position' => 300,
             'condition' => function (Upload $upload) {
                 return $upload->isTransferable();
             },
             'route' => 'upload_data_upload_transfer',
         ));
         $mapper->addAction('delete', array(
+            'position' => 500,
             'condition' => function (Upload $upload) {
                 return $upload->isDeletable();
             },
@@ -488,7 +508,34 @@ abstract class UploadConfig
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
-    public function processAction(Upload $upload, $name)
+    public function processActionByName(Upload $upload, $name)
+    {
+        $action = $upload->getAction($name);
+
+        if(null == $action){
+            return false;
+        }
+
+        try {
+            $action->setInProgress();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            $this->processAction($upload, $action);
+
+            $action->setComplete();
+
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+        } catch (\Exception $e) {
+            $this->onActionException($action, $upload);
+
+            throw $e;
+        }
+    }
+
+    protected function processAction(Upload $upload, UploadAction $action)
     {
     }
 

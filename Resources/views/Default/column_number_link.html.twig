@@ -1,6 +1,6 @@
 {% set use_link = column.callOption('condition', [item]) %}
 {% set url_parameters = column.options.parameters %}
-<td>
+<td class="text-right">
     {% if use_link %}
         <a href="{{ path(column.options.route, {id: item.id, type: upload_type}|merge(url_parameters)) }}">
     {% endif %}

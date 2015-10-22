@@ -216,6 +216,39 @@ class UploadController extends Controller
      *
      * @return Response
      */
+    public function customAction(Request $request, Upload $upload, $type, $action)
+    {
+        if ($this->useCommand()) {
+            $this->runCommand($action, $upload->getId());
+        } else {
+            try {
+                $this->config->processActionByName($upload, $action);
+
+                $this->addFlash('success', 'Action Completed!');
+            } catch (\Exception $e) {
+
+                if ($this->container->has('logger')) {
+                    $this->get('logger')->critical('No se pudo procesar la acción {action} del excel', array(
+                        'action' => $action,
+                        'error' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ));
+                }
+
+                $this->addFlash('error', 'there has been an error, we could not complete the operation!');
+            }
+        }
+
+        return $this->redirectToTargetOrList($request, $type);
+    }
+
+    /**
+     * @param        $type
+     * @param Upload $upload
+     *
+     * @return Response
+     */
     public function showAction(Request $request, Upload $upload)
     {
         $query = $this->getDoctrine()

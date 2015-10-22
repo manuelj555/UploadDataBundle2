@@ -51,17 +51,9 @@ class UploadAction
      */
     private $completedAt;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="position", type="integer")
-     */
-    private $position;
-
-    function __construct($name = null, $position = 0)
+    function __construct($name = null)
     {
         $this->setName($name);
-        $this->position = $position;
         $this->setStatus(self::STATUS_NOT_COMPLETE);
     }
 
@@ -169,30 +161,6 @@ class UploadAction
     public function getCompletedAt()
     {
         return $this->completedAt;
-    }
-
-    /**
-     * Set position
-     *
-     * @param integer $position
-     *
-     * @return UploadAction
-     */
-    public function setPosition($position)
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
-    /**
-     * Get position
-     *
-     * @return integer
-     */
-    public function getPosition()
-    {
-        return $this->position;
     }
 
     public function isNotComplete()

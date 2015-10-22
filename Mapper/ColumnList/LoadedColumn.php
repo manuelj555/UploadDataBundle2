@@ -51,11 +51,41 @@ class LoadedColumn
     }
 
     /**
+     * @param $name
+     * @param $value
+     */
+    public function setOption($name, $value)
+    {
+        $this->options[$name] = $value;
+    }
+
+    /**
+     * @param $position
+     */
+    public function setPosition($position)
+    {
+        $this->options['position'] = $position;
+    }
+
+    /**
      * @return mixed
      */
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function getOption($name)
+    {
+        if (!array_key_exists($name, $this->options)) {
+            throw new \InvalidArgumentException(sprintf('The Option "%s" does not exists', $name));
+        }
+
+        return $this->options[$name];
     }
 
     /**

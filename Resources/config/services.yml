@@ -26,6 +26,11 @@ services:
         tags:
             - { name: upload_data.column_list, alias: link }
 
+    upload_data.column_list.attribute:
+        class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\AttributeColumn
+        tags:
+            - { name: upload_data.column_list, alias: attribute }
+
     upload_data.column_list.number_link:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\NumberLinkColumn
         tags:

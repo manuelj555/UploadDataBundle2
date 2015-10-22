@@ -22,6 +22,12 @@ abstract class AbstractColumn
             'label' => null,
             'template' => '@UploadData/Default/column.html.twig',
             'use_show' => false,
+            'position' => 0,
+        ));
+
+        $resolver->setAllowedTypes(array(
+            'position' => array('float', 'integer'),
+            'use_show' => 'bool',
         ));
     }
 } 

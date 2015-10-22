@@ -144,7 +144,6 @@ class Upload
      *      fetch="EAGER",
      *      orphanRemoval=true,
      * )
-     * @ORM\OrderBy(value={"position": "ASC"})
      */
     private $actions;
 
@@ -295,10 +294,10 @@ class Upload
 //        $this->setValidated(self::STATUS_NOT_COMPLETE);
 //        $this->setTransfered(self::STATUS_NOT_COMPLETE);
 
-        $this->addAction(new UploadAction('read', 0));
-        $this->addAction(new UploadAction('validate', 100));
-        $this->addAction(new UploadAction('transfer', 200));
-        $this->addAction(new UploadAction('delete', 1000));
+        $this->addAction(new UploadAction('read'));
+        $this->addAction(new UploadAction('validate'));
+        $this->addAction(new UploadAction('transfer'));
+        $this->addAction(new UploadAction('delete'));
     }
 
     /**

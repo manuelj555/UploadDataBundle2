@@ -21,6 +21,10 @@ upload_data_upload_transfer:
     defaults: { _controller: UploadDataBundle:Upload:transfer }
 #    condition: request.isXmlHttpRequest()
 
+upload_data_upload_custom_action:
+    path:     /process/{action}/{id}
+    defaults: { _controller: UploadDataBundle:Upload:custom }
+
 upload_data_upload_show:
     path:     /show/{id}
     defaults: { _controller: UploadDataBundle:Upload:show }

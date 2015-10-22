@@ -6,11 +6,14 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Twig\Extention;
 
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\LoadedColumn;
+
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
-class CallbackExtension extends \Twig_Extension
+class UploadDataExtension extends \Twig_Extension
 {
 
     /**
@@ -26,11 +29,12 @@ class CallbackExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('upload_upload_callback', function (\Closure $callable, $argumnets = array()) {
-                return call_user_func_array($callable, $argumnets);
-            })
+            new \Twig_SimpleFunction('upload_item_value', array($this, 'getUploadAttributeValue'))
         );
     }
 
+    public function getUploadAttributeValue(Upload $upload, LoadedColumn $column, $attribute)
+    {
 
+    }
 }

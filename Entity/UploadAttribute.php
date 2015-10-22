@@ -242,4 +242,13 @@ class UploadAttribute
             $this->setValue(unserialize($this->getValue()));
         }
     }
+
+    public function __toString()
+    {
+        $value = $this->getValue();
+
+        return is_array($value) ? json_encode($value, JSON_PRETTY_PRINT) : $value;
+    }
+
+
 }
