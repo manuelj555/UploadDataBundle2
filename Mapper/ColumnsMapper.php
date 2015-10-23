@@ -27,7 +27,9 @@ class ColumnsMapper
             'label' => $name,
             'name' => $name,
             'required' => true,
-            'similar' => false,
+            'similar' => function (Options $options){
+                return count($options['aliases']) > 0;
+            },
             'formatter' => function ($value) { return $value; },
         ));
         $resolver->setNormalizers(array(
