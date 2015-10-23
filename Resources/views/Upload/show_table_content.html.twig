@@ -1,12 +1,13 @@
 {% trans_default_domain 'upload_data' %}
 {% from _self import errors %}
+{% set columns = config.getColumnsForShow() %}
 <table class="table table-bordered">
     {% block show_table_head %}
         <thead>
             <tr>
                 <th style="width: 130px">{{ 'table.errors'|trans }}</th>
-                {% for num, label in config.columnsMapper.labels if num < 7 %}
-                    <th>{{ label|title|trans }}</th>
+                {% for name in columns %}
+                    <th>{{ config.columnsMapper.label(name)|title|trans }}</th>
                 {% endfor %}
                 <th style="width: 130px">{{ 'table.details'|trans }}</th>
             </tr>
@@ -29,7 +30,7 @@
                         --
                     {%- endif %}
                 </td>
-                {% for name in config.columnsMapper.names %}
+                {% for name in columns %}
                     <td>{{ item.data[name]|default }}</td>
                 {% endfor %}
                 <td>

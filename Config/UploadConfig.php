@@ -195,6 +195,13 @@ abstract class UploadConfig
 
     abstract public function configureColumns(ColumnsMapper $mapper);
 
+    public function getColumnsForShow()
+    {
+        $columns = array_chunk($this->getColumnsMapper()->getNames(), 6);
+
+        return current($columns);
+    }
+
     /**
      * @param ListMapper $mapper
      */
@@ -512,7 +519,7 @@ abstract class UploadConfig
     {
         $action = $upload->getAction($name);
 
-        if(null == $action){
+        if (null == $action) {
             return false;
         }
 
