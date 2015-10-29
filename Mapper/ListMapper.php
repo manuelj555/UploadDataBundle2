@@ -69,13 +69,18 @@ class ListMapper
     {
         if (false === $this->orderedColumns) {
             $this->orderedColumns = true;
+            $keys = array_keys($this->columns);
 
-            uasort($this->columns, function (LoadedColumn $a, LoadedColumn $b) {
+            uasort($this->columns, function (LoadedColumn $a, LoadedColumn $b) use ($keys) {
                 $aPosition = $a->getOption('position');
                 $bPosition = $b->getOption('position');
 
                 if ($aPosition === $bPosition) {
-                    return 0;
+                    // Si son iguales debemos mantener el orden en que fueron agregados.
+                    $initialAPosition = array_search($a->getName(), $keys);
+                    $initialBPosition = array_search($b->getName(), $keys);
+                    return $initialAPosition < $initialBPosition ? -1 :
+                        ($initialAPosition > $initialBPosition ? 1 : 0);
                 }
 
                 return $aPosition < $bPosition ? -1 : 1;
