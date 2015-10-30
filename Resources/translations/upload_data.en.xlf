@@ -142,6 +142,10 @@
 				<source>label.clear</source>
 				<target>Clear</target>
 			</trans-unit>
+			<trans-unit id="36">
+                <source>link.restore_incomplete_process</source>
+                <target>Restore incomplete process</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

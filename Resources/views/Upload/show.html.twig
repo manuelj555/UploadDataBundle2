@@ -33,15 +33,15 @@
 
 {% block actions %}
     <div class="row">
-        <div class="col-sm-4 col-sm-push-8 text-right">
+        <div class="col-md-5 col-md-push-7 text-right" style="margin-bottom: 10px">
             <a href="{{ path('upload_data_upload_list', {type: type}) }}"
                class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
             {% if upload.hasInProgressActions() %}
                 <a href="{{ path('upload_data_upload_restore_actions', {type: type, id: upload.id}) }}"
-                   class="btn btn-danger btn-sm ">{{ 'link.restore_actions'|trans }}</a>
+                   class="btn btn-danger btn-sm ">{{ 'link.restore_incomplete_process'|trans }}</a>
             {% endif %}
         </div>
-        <div class="col-sm-8 col-sm-pull-4">
+        <div class="col-md-7 col-md-pull-5">
             {{ include(config.getTemplate('show_small_info')) }}
         </div>
     </div>
