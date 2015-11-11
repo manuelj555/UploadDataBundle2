@@ -40,6 +40,13 @@ class UploadedItem implements \ArrayAccess
     /**
      * @var array
      *
+     * @ORM\Column(name="extras", type="json_array", nullable=true)
+     */
+    private $extras = array();
+
+    /**
+     * @var array
+     *
      * @ORM\Column(name="errors", type="array", nullable=true)
      */
     private $errors;
@@ -220,5 +227,31 @@ class UploadedItem implements \ArrayAccess
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExtras()
+    {
+        return $this->extras;
+    }
+
+    /**
+     * @param array $extras
+     */
+    public function setExtras($extras)
+    {
+        $this->extras = $extras;
+    }
+
+    public function setExtra($key, $value)
+    {
+        $this->extras[$key] = $value;
+    }
+
+    public function getExtra($key)
+    {
+        return array_key_exists($key, $this->extras) ? $this->extras[$key] : null;
     }
 }
