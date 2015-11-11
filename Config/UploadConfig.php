@@ -70,7 +70,7 @@ abstract class UploadConfig
      */
     private $templates = array();
 
-    public function __construct()
+    public function initialize()
     {
         $this->columnsMapper = new ColumnsMapper();
         $this->validationBuilder = new ValidationBuilder();
