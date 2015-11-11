@@ -51,6 +51,12 @@ class UploadedItem implements \ArrayAccess
      */
     private $isValid;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="status", type="integer", nullable=true)
+     */
+    private $status;
 
     /**
      * Get id
@@ -198,5 +204,21 @@ class UploadedItem implements \ArrayAccess
         if ($this->offsetExists($offset)) {
             unset($this->data[$offset]);
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param boolean $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 }
