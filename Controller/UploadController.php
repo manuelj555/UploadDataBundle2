@@ -285,14 +285,26 @@ class UploadController extends Controller
      */
     public function deleteAction(Request $request, Upload $upload, $type)
     {
-        $em = $this->getDoctrine()->getManager();
+        if ($this->useCommand()) {
+            $this->runCommand('delete', $upload->getId());
+        } else {
+            try {
+                $this->config->processDelete($upload);
 
-        $em->remove($upload);
-        $em->flush();
+                $this->addFlash('success', 'Deleted!');
+            } catch (\Exception $e) {
 
-        $this->get('session')
-            ->getFlashBag()
-            ->add('success', 'Deleted!');
+                if ($this->container->has('logger')) {
+                    $this->get('logger')->critical('No se pudo procesar la eliminación del excel', array(
+                        'error' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ));
+                }
+
+                $this->addFlash('error', 'there has been an error, we could not complete the operation!');
+            }
+        }
 
         return $this->redirectToRoute('upload_data_upload_list', array_merge(
             array('type' => $type)

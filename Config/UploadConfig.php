@@ -207,6 +207,8 @@ abstract class UploadConfig
      */
     public function configureList(ListMapper $mapper)
     {
+        $uploadConfig = $this;
+
         $mapper->add('id', null, array('use_show' => true,));
         $mapper->add('filename', 'link', array(
             'route' => 'upload_data_upload_show',
@@ -243,30 +245,30 @@ abstract class UploadConfig
         ));
         $mapper->addAction('read', array(
             'position' => 100,
-            'condition' => function (Upload $upload) {
-                return $upload->isReadable();
+            'condition' => function (Upload $upload) use ($uploadConfig) {
+                return $uploadConfig->isReadable($upload);
             },
             'route' => 'upload_data_upload_read',
             'modal' => true,
         ));
         $mapper->addAction('validate', array(
             'position' => 200,
-            'condition' => function (Upload $upload) {
-                return $upload->isValidatable();
+            'condition' => function (Upload $upload) use ($uploadConfig) {
+                return $uploadConfig->isValidatable($upload);
             },
             'route' => 'upload_data_upload_validate',
         ));
         $mapper->addAction('transfer', array(
             'position' => 300,
-            'condition' => function (Upload $upload) {
-                return $upload->isTransferable();
+            'condition' => function (Upload $upload) use ($uploadConfig) {
+                return $uploadConfig->isTransferable($upload);
             },
             'route' => 'upload_data_upload_transfer',
         ));
         $mapper->addAction('delete', array(
             'position' => 500,
-            'condition' => function (Upload $upload) {
-                return $upload->isDeletable();
+            'condition' => function (Upload $upload) use ($uploadConfig) {
+                return $uploadConfig->isDeletable($upload);
             },
             'route' => 'upload_data_upload_delete',
             'confirm_text' => 'upload_data.confirm_delete'
@@ -358,7 +360,7 @@ abstract class UploadConfig
 
     public function processRead(Upload $upload)
     {
-        if (!$upload->isReadable() or !$upload->getAttribute('config_read')) {
+        if (!$this->isReadable($upload) or !$upload->getAttribute('config_read')) {
             return false;
         }
 
@@ -412,7 +414,7 @@ abstract class UploadConfig
 
     public function processValidation(Upload $upload)
     {
-        if (!$upload->isValidatable()) {
+        if (!$this->isValidatable($upload)) {
             return false;
         }
 
@@ -471,7 +473,7 @@ abstract class UploadConfig
 
     public function processTransfer(Upload $upload)
     {
-        if (!$upload->isTransferable()) {
+        if (!$this->isTransferable($upload)) {
             return false;
         }
 
@@ -490,6 +492,35 @@ abstract class UploadConfig
             $this->objectManager->flush();
 
             $this->onPostRead($upload);
+
+        } catch (\Exception $e) {
+            $this->onActionException($action, $upload);
+
+            throw $e;
+        }
+    }
+
+    public function processDelete(Upload $upload)
+    {
+        if (!$this->isDeletable($upload)) {
+            return false;
+        }
+
+        $action = $upload->getAction('delete');
+
+        try {
+            $action->setInProgress();
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            $this->onPreDelete($upload);
+
+            $this->objectManager->remove($upload);
+            $this->objectManager->flush();
+
+            $action->setComplete();
+
+            $this->onPostDelete($upload);
 
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
@@ -582,6 +613,42 @@ abstract class UploadConfig
 
     public function onPostDelete(Upload $upload)
     {
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isDeletable(Upload $upload)
+    {
+        return $upload->isDeletable();
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isTransferable(Upload $upload)
+    {
+        return $upload->isTransferable();
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isValidatable(Upload $upload)
+    {
+        return $upload->isValidatable();
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isReadable(Upload $upload)
+    {
+        return $upload->isReadable();
     }
 
     private function onActionException($action, $upload)
