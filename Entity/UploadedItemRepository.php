@@ -23,6 +23,16 @@ class UploadedItemRepository extends EntityRepository
                 ->setParameter('is_valid', (bool)$filters['valid']);
         }
 
+        if (array_key_exists('extra', $filters)) {
+            $query->andWhere('uploaded_item.extras LIKE :extra')
+                ->setParameter('extra', '%' . $filters['extra'] . '%');
+        }
+
+        if (array_key_exists('status', $filters)) {
+            $query->andWhere('uploaded_item.status = :status')
+                ->setParameter('status', $filters['status']);
+        }
+
         return $query;
     }
 }
