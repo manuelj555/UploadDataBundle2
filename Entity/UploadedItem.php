@@ -214,15 +214,15 @@ class UploadedItem implements \ArrayAccess
     }
 
     /**
-     * @return boolean
+     * @return int
      */
-    public function isStatus()
+    public function getStatus()
     {
         return $this->status;
     }
 
     /**
-     * @param boolean $status
+     * @param int $status
      */
     public function setStatus($status)
     {
