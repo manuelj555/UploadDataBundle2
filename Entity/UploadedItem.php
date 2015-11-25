@@ -252,6 +252,11 @@ class UploadedItem implements \ArrayAccess
 
     public function getExtra($key)
     {
-        return array_key_exists($key, $this->extras) ? $this->extras[$key] : null;
+        return $this->hasExtra($key) ? $this->extras[$key] : null;
+    }
+
+    public function hasExtra($key)
+    {
+        return array_key_exists($key, $this->extras);
     }
 }
