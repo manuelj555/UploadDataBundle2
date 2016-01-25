@@ -10,7 +10,7 @@ Agregar al composer.json:
 
 ```json
 "require" : {
-    "manuel/upload-data-bundle": "dev-master"
+    "manuelj555/upload-data-bundle": "1.0.*@dev",
 }
 ```
 
