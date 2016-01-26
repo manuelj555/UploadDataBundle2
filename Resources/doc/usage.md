@@ -113,3 +113,26 @@ Este método permite especificar validaciones para cada una de las columnas que 
 ## transfer()
 
 Con este método realizaremos el proceso de transferencia de los datos leidos a la aplicación.
+
+## Registrar la clase como un Servicio:
+
+Para poder hacer uso de la carga de Tarjetas, debemos registrar la clase `AppBundle\Upload\UploadCardConfig` como un servicio y agregarle las etiquetas necesarias:
+
+```yaml
+services:
+    app.upload.card_config:
+        class: AppBundle\Upload\UploadCardConfig
+        tags:
+            - { name: upload_data.config, id: 'cards', label: 'label.upload_cards_list' }
+```
+
+La etiqueta `upload_data.config` le indica a symfony que el servicio `app.upload.card_config` es una clase para administrar carga de archivos, donde `id` es el nombre unico que define el tipo de carga, y es usado como parte de la url para la administración y lectura de los ficheros que se suben. Y `label` es el título de la página de carga de tarjetas.
+
+### Visualizar la página de carga de tarjetas
+
+Luego de registrar el servicio podemos acceder a la url `/proyecto/app_dev.php/uploads/cards` y visualizar un listado de los archivos de cards cargados hasta el momento.
+
+En este punto es importante entender como se estructura la url a la que hemos accedido:
+
+ * /uploads es el patron de ruta que hemos colocado en nuestro `app/config/routing.yml` al importar las rutas del bundle.
+ * /cards es el id que le hemos colocado al servicio al etiquetarlo con `upload_data.config`.
