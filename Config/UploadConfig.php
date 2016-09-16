@@ -356,6 +356,8 @@ abstract class UploadConfig
         $this->objectManager->flush();
         $this->objectManager->commit();
 
+        return $upload;
+
     }
 
     public function processRead(Upload $upload)
