@@ -25,7 +25,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
@@ -271,7 +270,7 @@ abstract class UploadConfig
                 return $uploadConfig->isDeletable($upload);
             },
             'route' => 'upload_data_upload_delete',
-            'confirm_text' => 'upload_data.confirm_delete'
+            'confirm_text' => 'upload_data.confirm_delete',
         ));
     }
 
@@ -301,7 +300,7 @@ abstract class UploadConfig
     public function getTemplate($name)
     {
         if (!isset($this->templates[$name])) {
-            throw new \InvalidArgumentException('No existe el template ' . $name);
+            throw new \InvalidArgumentException('No existe el template '.$name);
         }
 
         return $this->templates[$name];
@@ -332,12 +331,16 @@ abstract class UploadConfig
         return new UploadType();
     }
 
-    public function processUpload(UploadedFile $file, array $formData = array())
+    public function processUpload(UploadedFile $file, array $formData = array(), array $attributes = [])
     {
         $upload = $this->getInstance();
 
         $upload->setFilename($file->getClientOriginalName());
         $upload->setType($this->getType());
+
+        foreach ($attributes as $name => $attrValue) {
+            $upload->setAttributeValue($name, $attrValue);
+        }
 
         $this->objectManager->beginTransaction();
 
@@ -346,7 +349,7 @@ abstract class UploadConfig
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
-        $file = $file->move($this->uploadDir, $upload->getId() . '.' . $file->getClientOriginalExtension());
+        $file = $file->move($this->uploadDir, $upload->getId().'.'.$file->getClientOriginalExtension());
 
         $upload->setFile($file->getFilename());
         $upload->setFullFilename($file->getRealPath());
