@@ -489,20 +489,19 @@ abstract class UploadConfig
             $this->objectManager->persist($upload);
             $this->objectManager->flush();
 
-            $this->transfer($upload, $upload->getItems());
+            $data = $this->transfer($upload, $upload->getItems());
 
             $action->setComplete();
 
             $this->objectManager->persist($upload);
             $this->objectManager->flush();
-
-            $this->onPostRead($upload);
-
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
 
             throw $e;
         }
+
+        return $data;
     }
 
     public function processDelete(Upload $upload)
