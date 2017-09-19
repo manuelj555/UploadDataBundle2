@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
+use Manuel\Bundle\UploadDataBundle\Data\UploadedFileHelperInterface;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
@@ -64,6 +65,11 @@ abstract class UploadConfig
      * @var TranslatorInterface
      */
     private $translator;
+
+    /**
+     * @var UploadedFileHelperInterface
+     */
+    private $uploadedFileHelper;
     /**
      * @var array
      */
@@ -129,6 +135,14 @@ abstract class UploadConfig
     public function setUploadDir($uploadDir)
     {
         $this->uploadDir = $uploadDir;
+    }
+
+    /**
+     * @param UploadedFileHelperInterface $uploadedFileHelper
+     */
+    public function setUploadedFileHelper($uploadedFileHelper)
+    {
+        $this->uploadedFileHelper = $uploadedFileHelper;
     }
 
     /**
@@ -349,7 +363,8 @@ abstract class UploadConfig
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
-        $file = $file->move($this->uploadDir, $upload->getId().'.'.$file->getClientOriginalExtension());
+        $newFilename = $upload->getId().'.'.$file->getClientOriginalExtension();
+        $file = $this->uploadedFileHelper->saveFile($file, $this->uploadDir, $newFilename);
 
         $upload->setFile($file->getFilename());
         $upload->setFullFilename($file->getRealPath());
@@ -377,6 +392,8 @@ abstract class UploadConfig
             $this->objectManager->flush();
 
             $this->onPreRead($upload);
+
+            $this->uploadedFileHelper->prepareFileForRead($upload);
 
             $reader = $this->readerLoader->get($upload->getFullFilename());
 

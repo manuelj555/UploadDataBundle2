@@ -108,3 +108,7 @@ services:
             - @?logger
         tags:
             - { name: console.command }
+
+    upload_data.file_helper.local:
+        class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper
+        public: false

@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('files_dir')->defaultValue('%kernel.root_dir%/cache/uploads/data/')->end()
                 ->booleanNode('use_command')->defaultValue(true)->end()
                 ->scalarNode('php_bin')->defaultValue('php')->cannotBeEmpty()->end()
+                ->scalarNode('uploaded_file_helper')->defaultValue('upload_data.file_helper.local')->cannotBeEmpty()->end()
                 ->arrayNode('templates')
                     ->addDefaultsIfNotSet()
                     ->children()
