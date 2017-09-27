@@ -20,9 +20,11 @@ interface UploadedFileHelperInterface
      * Esta función se encarga de preparar el archivo para su lectura.
      * Puede ser moverlo al sitio de lectura, crearlo, darle permisos de lectura, etc.
      *
-     * @param Upload $upload
+     * @param string $filename
+     *
+     * @return string la ruta al archivo que será leido.
      */
-    public function prepareFileForRead(Upload $upload);
+    public function prepareFileForRead($filename);
 
     /**
      * Se encarga de guardar el archivo en donde corresponda.

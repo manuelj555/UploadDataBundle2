@@ -18,7 +18,7 @@ class CsvReader extends BaseReader
 
     public function getData($filename, $options)
     {
-        $this->verifyFile($filename);
+        $filename = $this->resolveFile($filename);
 
         $options = $this->resolveOptions($options);
 
@@ -51,14 +51,12 @@ class CsvReader extends BaseReader
         return $formattedData;
     }
 
-    public
-    function supports($filename)
+    public function supports($filename)
     {
         return strtolower(pathinfo($filename, PATHINFO_EXTENSION)) === 'csv';
     }
 
-    public
-    function setDefaultOptions(OptionsResolverInterface $resolver, $headers = false)
+    public function setDefaultOptions(OptionsResolverInterface $resolver, $headers = false)
     {
         parent::setDefaultOptions($resolver, $headers);
 
@@ -69,10 +67,9 @@ class CsvReader extends BaseReader
         $resolver->setRequired(array('row_headers'));
     }
 
-    public
-    function getRowHeaders($filename, $options)
+    public function getRowHeaders($filename, $options)
     {
-        $this->verifyFile($filename);
+        $filename = $this->resolveFile($filename);
 
         $options = $this->resolveOptions($options, true);
 

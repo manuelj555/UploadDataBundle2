@@ -28,7 +28,7 @@ class ExcelReader extends BaseReader
 
     public function getData($filename, $options)
     {
-        $this->verifyFile($filename);
+        $filename = $this->resolveFile($filename);
 
         $options = $this->resolveOptions($options);
 
@@ -69,7 +69,7 @@ class ExcelReader extends BaseReader
 
     public function getRowHeaders($filename, $options)
     {
-        $this->verifyFile($filename);
+        $filename = $this->resolveFile($filename);
 
         $options = $this->resolveOptions($options, true);
 

@@ -48,5 +48,9 @@ class RegisterUploadReaderPass implements CompilerPassInterface
     protected function configureDefinition($route, Definition $definition, ContainerBuilder $container)
     {
         $definition->addMethodCall('setRouteConfig', array($route));
+        $definition->addMethodCall(
+            'setUploadedFileHelper',
+            array(new Reference('upload_data.file_helper.default'))
+        );
     }
 }
