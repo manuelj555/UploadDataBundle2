@@ -259,4 +259,26 @@ class UploadedItem implements \ArrayAccess
     {
         return array_key_exists($key, $this->extras);
     }
+
+    public function getErrorsAsString($separator = ', ')
+    {
+        $errors = [];
+
+        foreach ($this->getErrors() as $data) {
+            $errors = array_merge($errors, $data);
+        }
+
+        return join($separator, array_unique($errors));
+    }
+
+    public function getFlattenErrors()
+    {
+        $errors = [];
+
+        foreach ($this->getErrors() as $data) {
+            $errors = array_merge($errors, $data);
+        }
+
+        return  array_unique($errors);
+    }
 }

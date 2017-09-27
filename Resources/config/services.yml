@@ -112,3 +112,9 @@ services:
     upload_data.file_helper.local:
         class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper
         public: false
+
+    upload_data.twig.extension.upload:
+        class: Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension
+        public: false
+        tags:
+            - { name: twig.extension }
