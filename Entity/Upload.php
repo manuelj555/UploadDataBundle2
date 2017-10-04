@@ -27,14 +27,14 @@ class Upload
     private $id;
 
     /**
-     * @var string
+     * @var string Nombre del archivo original que se cargó
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $filename;
 
     /**
-     * @var string
+     * @var string Nombre y Ruta del archivo procesado y renombrado por el sistema
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -48,7 +48,7 @@ class Upload
     private $items;
 
     /**
-     * @var string
+     * @var string Nombre corto del archivo procesado y renombrado por el sistema
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */

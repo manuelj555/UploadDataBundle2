@@ -361,7 +361,7 @@ abstract class UploadConfig
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
-        $newFilename = $upload->getId().'.'.$file->getClientOriginalExtension();
+        $newFilename = $this->createUniqueFilename($file, $upload);
         $filename = $this->uploadedFileHelper->saveFile($file, $this->uploadDir, $newFilename);
 
         $upload->setFile(basename($filename));
@@ -675,5 +675,21 @@ abstract class UploadConfig
             $this->objectManager->persist($upload);
             $this->objectManager->flush();
         }
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @param $upload
+     * @return string
+     */
+    private function createUniqueFilename(UploadedFile $file, Upload $upload)
+    {
+        return sprintf(
+            '%d_%s_%s.%s',
+            $upload->getId(),
+            $upload->getUploadedAt()->format('Ymd_his'),
+            md5(uniqid($upload->getId().$file->getClientOriginalName())),
+            $file->getClientOriginalExtension()
+        );
     }
 }
