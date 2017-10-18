@@ -112,3 +112,8 @@ services:
     upload_data.file_helper.local:
         class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper
         public: false
+
+    upload_data.headers_matcher.excel:
+        class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher
+        arguments:
+            - "@upload_data.excel_reader"
