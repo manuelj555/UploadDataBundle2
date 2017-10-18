@@ -6,7 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
-use Manuel\Bundle\UploadDataBundle\Metadata;
+use Manuel\Bundle\UploadDataBundle\Data\UploadedFileHelperInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -16,7 +16,16 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 abstract class BaseReader implements ReaderInterface
 {
+
+    /**
+     * @var string
+     */
     protected $routeConfig;
+
+    /**
+     * @var UploadedFileHelperInterface
+     */
+    protected $uploadedFileHelper;
 
     /**
      * @param mixed $routeConfig
@@ -24,6 +33,14 @@ abstract class BaseReader implements ReaderInterface
     public function setRouteConfig($routeConfig)
     {
         $this->routeConfig = $routeConfig;
+    }
+
+    /**
+     * @param UploadedFileHelperInterface $uploadedFileHelper
+     */
+    public function setUploadedFileHelper($uploadedFileHelper)
+    {
+        $this->uploadedFileHelper = $uploadedFileHelper;
     }
 
     /**
@@ -50,10 +67,14 @@ abstract class BaseReader implements ReaderInterface
         return $resolver->resolve($options);
     }
 
-    protected function verifyFile($filename)
+    protected function resolveFile($filename)
     {
+        $filename = $this->uploadedFileHelper->prepareFileForRead($filename);
+
         if (!file_exists($filename)) {
             throw new \InvalidArgumentException(sprintf('File "%s" not found.', $filename));
         }
+
+        return $filename;
     }
 }

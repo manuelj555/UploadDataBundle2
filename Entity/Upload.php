@@ -27,14 +27,14 @@ class Upload
     private $id;
 
     /**
-     * @var string
+     * @var string Nombre del archivo original que se cargó
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $filename;
 
     /**
-     * @var string
+     * @var string Nombre y Ruta del archivo procesado y renombrado por el sistema
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -48,7 +48,7 @@ class Upload
     private $items;
 
     /**
-     * @var string
+     * @var string Nombre corto del archivo procesado y renombrado por el sistema
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      */
@@ -157,7 +157,6 @@ class Upload
         return $this->id;
     }
 
-
     /**
      * Set type
      *
@@ -209,26 +208,26 @@ class Upload
     public function isReadable()
     {
         return $this->getUploadedAt() !== null
-        and $this->getAction('read')->isNotComplete()
-        and $this->getAction('validate')->isNotComplete()
-        and $this->getAction('transfer')->isNotComplete();
+            and $this->getAction('read')->isNotComplete()
+            and $this->getAction('validate')->isNotComplete()
+            and $this->getAction('transfer')->isNotComplete();
     }
 
     public function isValidatable()
     {
         return $this->getUploadedAt() !== null
-        and $this->getAction('read')->isComplete()
-        and !$this->getAction('validate')->isInProgress()
-        and $this->getAction('transfer')->isNotComplete();
+            and $this->getAction('read')->isComplete()
+            and !$this->getAction('validate')->isInProgress()
+            and $this->getAction('transfer')->isNotComplete();
     }
 
     public function isTransferable()
     {
         return $this->getUploadedAt() !== null
-        and $this->getAction('read')->isComplete()
-        and $this->getAction('validate')->isComplete()
-        and $this->getAction('transfer')->isNotComplete()
-        and $this->getValids() > 0;
+            and $this->getAction('read')->isComplete()
+            and $this->getAction('validate')->isComplete()
+            and $this->getAction('transfer')->isNotComplete()
+            and $this->getValids() > 0;
     }
 
     public function isDeletable()
@@ -593,5 +592,37 @@ class Upload
         }
 
         return false;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getColumnNames($all = false)
+    {
+        $config = $this->getAttributeValue('config_read');
+
+        if (!isset($config['header_mapping'][1])) {
+            return;
+        }
+
+        if ($all) {
+            return $config['header_mapping'][1];
+        } else {
+            return array_intersect_key($config['header_mapping'][1], $config['header_mapping'][0]);
+        }
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getColumnKeys()
+    {
+        $config = $this->getAttributeValue('config_read');
+
+        if (!isset($config['header_mapping'][0])) {
+            return;
+        }
+
+        return $config['header_mapping'][0];
     }
 }

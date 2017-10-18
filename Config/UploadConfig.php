@@ -20,9 +20,7 @@ use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -363,13 +361,13 @@ abstract class UploadConfig
         $this->objectManager->persist($upload);
         $this->objectManager->flush();
 
-        $newFilename = $upload->getId().'.'.$file->getClientOriginalExtension();
-        $file = $this->uploadedFileHelper->saveFile($file, $this->uploadDir, $newFilename);
+        $newFilename = $this->createUniqueFilename($file, $upload);
+        $filename = $this->uploadedFileHelper->saveFile($file, $this->uploadDir, $newFilename);
 
-        $upload->setFile($file->getFilename());
-        $upload->setFullFilename($file->getRealPath());
+        $upload->setFile(basename($filename));
+        $upload->setFullFilename($filename);
 
-        $this->onPostUpload($upload, $file, $formData);
+        $this->onPostUpload($upload, $filename, $formData);
 
         $this->objectManager->flush();
         $this->objectManager->commit();
@@ -392,8 +390,6 @@ abstract class UploadConfig
             $this->objectManager->flush();
 
             $this->onPreRead($upload);
-
-            $this->uploadedFileHelper->prepareFileForRead($upload);
 
             $reader = $this->readerLoader->get($upload->getFullFilename());
 
@@ -602,7 +598,7 @@ abstract class UploadConfig
     {
     }
 
-    public function onPostUpload(Upload $upload, File $file, array $formData = array())
+    public function onPostUpload(Upload $upload, $filename, array $formData = array())
     {
     }
 
@@ -679,5 +675,21 @@ abstract class UploadConfig
             $this->objectManager->persist($upload);
             $this->objectManager->flush();
         }
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @param $upload
+     * @return string
+     */
+    private function createUniqueFilename(UploadedFile $file, Upload $upload)
+    {
+        return sprintf(
+            '%d_%s_%s.%s',
+            $upload->getId(),
+            $upload->getUploadedAt()->format('Ymd_his'),
+            md5(uniqid($upload->getId().$file->getClientOriginalName())),
+            $file->getClientOriginalExtension()
+        );
     }
 }

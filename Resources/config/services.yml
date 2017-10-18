@@ -117,3 +117,9 @@ services:
         class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher
         arguments:
             - "@upload_data.excel_reader"
+
+    upload_data.twig.extension.upload:
+        class: Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension
+        public: false
+        tags:
+            - { name: twig.extension }

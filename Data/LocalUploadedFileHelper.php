@@ -15,13 +15,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class LocalUploadedFileHelper implements UploadedFileHelperInterface
 {
-    public function prepareFileForRead(Upload $upload)
+    public function prepareFileForRead($filename)
     {
-        // nada que hacer.
+        return $filename;
     }
 
     public function saveFile(UploadedFile $file, $path, $filename)
     {
-        return $file->move($path, $filename);
+        return $file->move($path, $filename)->getRealPath();
     }
 }
