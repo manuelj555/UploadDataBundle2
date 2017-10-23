@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Builder;
 
+use Manuel\Bundle\UploadDataBundle\Validator\Constraint\EntityExists;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -13,7 +14,6 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
-
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
@@ -69,6 +69,7 @@ class ValidationBuilder
     public function assertCallback($callback, $config = null)
     {
         $config['callback'] = $callback;
+
         return $this->addConstraint(new Callback($config));
     }
 
@@ -89,7 +90,7 @@ class ValidationBuilder
 
     public function assertType($type, $config = null)
     {
-        return $this->addConstraint(new Type(array('type' => $type) + (array) $config));
+        return $this->addConstraint(new Type(array('type' => $type) + (array)$config));
     }
 
     public function end()
@@ -102,5 +103,15 @@ class ValidationBuilder
     public function getValidations()
     {
         return $this->config;
+    }
+
+    public function assertEntityExist($class, $property, $config)
+    {
+        $config = [
+                'class' => $class,
+                'property' => $property,
+            ] + $config;
+
+        return $this->addConstraint(new EntityExists($config));
     }
 } 

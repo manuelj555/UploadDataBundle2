@@ -668,6 +668,14 @@ abstract class UploadConfig
         return $upload->isReadable();
     }
 
+    /**
+     * @return EntityManagerInterface
+     */
+    protected function getObjectManager()
+    {
+        return $this->objectManager;
+    }
+
     private function onActionException($action, $upload)
     {
         if ($this->objectManager->isOpen()) {
