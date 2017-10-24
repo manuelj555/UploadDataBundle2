@@ -29,6 +29,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('use_command')->defaultValue(true)->end()
                 ->scalarNode('php_bin')->defaultValue('php')->cannotBeEmpty()->end()
                 ->scalarNode('uploaded_file_helper')->defaultValue('upload_data.file_helper.local')->cannotBeEmpty()->end()
+                ->scalarNode('debugging_role')->defaultValue('ROLE_UPLOAD_DEBUGGING')->cannotBeEmpty()->end()
                 ->arrayNode('templates')
                     ->addDefaultsIfNotSet()
                     ->children()

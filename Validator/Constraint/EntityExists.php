@@ -3,6 +3,8 @@
 namespace Manuel\Bundle\UploadDataBundle\Validator\Constraint;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -30,6 +32,11 @@ class EntityExists extends Constraint
      * @var \Closure
      */
     public $query_builder;
+
+    /**
+     * @var int
+     */
+    public $hydrate = Query::HYDRATE_OBJECT;
 
     /**
      * @var \Closure
@@ -69,9 +76,9 @@ class EntityExists extends Constraint
         return call_user_func($this->comparator, $entity, $value, $this->property);
     }
 
-    public function callSuccess($entity, $value, $property)
+    public function callSuccess($entity, UploadedItem $item, $value)
     {
-        return call_user_func($this->success, $entity, $value, $this->property);
+        return call_user_func($this->success, $entity, $item, $value, $this->property);
     }
 
     public function useQueryBuilder()

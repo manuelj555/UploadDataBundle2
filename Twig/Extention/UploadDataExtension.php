@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Twig\Extention;
 
+use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\LoadedColumn;
 
@@ -14,6 +15,20 @@ use Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\LoadedColumn;
  */
 class UploadDataExtension extends \Twig_Extension
 {
+    /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    /**
+     * UploadDataExtension constructor.
+     *
+     * @param ConfigProvider $configProvider
+     */
+    public function __construct(ConfigProvider $configProvider)
+    {
+        $this->configProvider = $configProvider;
+    }
 
     /**
      * Returns the name of the extension.
@@ -31,6 +46,8 @@ class UploadDataExtension extends \Twig_Extension
             new \Twig_SimpleTest('upload_transfered', [$this, 'isUploadTransfered']),
             new \Twig_SimpleTest('upload_validated', [$this, 'isUploadValidated']),
             new \Twig_SimpleTest('upload_readed', [$this, 'isUploadReaded']),
+            new \Twig_SimpleTest('upload_action_actionable', [$this, 'isActionActionable']),
+            new \Twig_SimpleTest('upload_action_completed', [$this, 'isActionCompleted']),
         ];
     }
 
@@ -54,8 +71,22 @@ class UploadDataExtension extends \Twig_Extension
      * @param $actionName
      * @return bool
      */
-    private function isActionCompleted(Upload $upload, $actionName)
+    public  function isActionCompleted(Upload $upload, $actionName)
     {
-        return $upload->getAction($actionName)->isComplete();
+        $action = $upload->getAction($actionName);
+
+        return $action && $action->isComplete();
+    }
+
+    /**
+     * @param Upload $upload
+     * @param $actionName
+     * @return bool
+     */
+    public function isActionActionable(Upload $upload, $actionName)
+    {
+        $config = $this->configProvider->get($upload->getType());
+
+        return $config->isActionable($upload, $actionName);
     }
 }

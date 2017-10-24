@@ -452,7 +452,7 @@ abstract class UploadConfig
             $valids = $invalids = 0;
 
             foreach ($upload->getItems() as $item) {
-                $context = $this->validator->startContext();
+                $context = $this->validator->startContext($item);
                 $data = $item->getData();
                 foreach ($validations as $column => $constraints) {
                     $value = array_key_exists($column, $data) ? $data[$column] : null;
@@ -565,11 +565,11 @@ abstract class UploadConfig
 
     public function processActionByName(Upload $upload, $name)
     {
-        $action = $upload->getAction($name);
-
-        if (null == $action) {
+        if (!$this->isActionable($upload, $name)) {
             return false;
         }
+
+        $action = $upload->getAction($name);
 
         try {
             $action->setInProgress();
@@ -666,6 +666,21 @@ abstract class UploadConfig
     public function isReadable(Upload $upload)
     {
         return $upload->isReadable();
+    }
+
+    /**
+     * @param Upload $upload
+     * @param $actionName
+     * @return bool
+     */
+    public function isActionable(Upload $upload, $actionName)
+    {
+        if ($action = $upload->getAction($actionName)){
+            return $action->isNotComplete();
+        }
+
+        return false;
+
     }
 
     /**

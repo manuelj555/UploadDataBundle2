@@ -121,5 +121,7 @@ services:
     upload_data.twig.extension.upload:
         class: Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension
         public: false
+        arguments:
+            - "@upload_data.config_provider"
         tags:
             - { name: twig.extension }

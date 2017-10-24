@@ -93,7 +93,7 @@ class EntityExistsValidator extends ConstraintValidator
 
     private function notifySuccessItem(EntityExists $constraint, $value, $item)
     {
-        $constraint->callSuccess($item, $value);
+        $constraint->callSuccess($item, $this->context->getRoot(), $value);
     }
 
     private function findItemByValue(EntityExists $constraint, $value)
@@ -124,7 +124,7 @@ class EntityExistsValidator extends ConstraintValidator
         $repository = $this->entityManager->getRepository($constraint->class);
 
         if ($constraint->useQueryBuilder()) {
-            $data = $constraint->callQueryBuilder($repository)->getQuery()->getResult();
+            $data = $constraint->callQueryBuilder($repository)->getQuery()->getResult($constraint->hydrate);
         } else {
             $data = $repository->findAll();
         }
@@ -159,7 +159,7 @@ class EntityExistsValidator extends ConstraintValidator
 
     private function addValidValueToCache(EntityExists $constraint, $value, $item)
     {
-        $this->cachedData[$this->constraintUniqueId($constraint)]['valids'][$value] = item;
+        $this->cachedData[$this->constraintUniqueId($constraint)]['valids'][$value] = $item;
     }
 
     private function isValidFromCache(EntityExists $constraint, $value)

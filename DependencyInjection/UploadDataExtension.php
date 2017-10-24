@@ -29,6 +29,7 @@ class UploadDataExtension extends Extension
         $container->setParameter('upload_data.templates', $config['templates']);
         $container->setParameter('upload_data.use_command', $config['use_command']);
         $container->setParameter('upload_data.php_bin', $config['php_bin']);
+        $container->setParameter('upload_data.secuity.debugging_role', $config['debugging_role']);
 
         $container->setAlias('upload_data.file_helper.default', $config['uploaded_file_helper']);
     }
