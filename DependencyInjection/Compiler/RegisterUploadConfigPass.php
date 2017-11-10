@@ -67,7 +67,11 @@ class RegisterUploadConfigPass implements CompilerPassInterface
     {
         $definition->addMethodCall('setLabel', array($label));
         $definition->addMethodCall('setObjectManager', array(new Reference('doctrine.orm.entity_manager')));
-        $definition->addMethodCall('setUploadDir', array('%upload_data.files_dir%'));
+
+        if (!$definition->hasMethodCall('setUploadDir')) {
+            $definition->addMethodCall('setUploadDir', array('%upload_data.files_dir%'));
+        }
+
         $definition->addMethodCall('setType', array($type));
         $definition->addMethodCall('setValidator', array(new Reference('validator')));
         $definition->addMethodCall('setColumnListFactory', array(new Reference('upload_data.column_list_factory')));
