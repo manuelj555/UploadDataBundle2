@@ -63,7 +63,7 @@ class EntityExists extends Constraint
 
     public function validatedBy()
     {
-        return 'optime.sales_upload.entity_exists';
+        return 'upload_data.entity_exists';
     }
 
     public function callQueryBuilder(EntityRepository $er)

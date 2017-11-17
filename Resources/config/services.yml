@@ -125,3 +125,11 @@ services:
             - "@upload_data.config_provider"
         tags:
             - { name: twig.extension }
+
+    upload_data.constraint.validator.entity_exists:
+        class: Manuel\Bundle\UploadDataBundle\Validator\Constraint\EntityExistsValidator
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - "@property_accessor"
+        tags:
+            - { name: validator.constraint_validator, alias: 'upload_data.entity_exists' }
