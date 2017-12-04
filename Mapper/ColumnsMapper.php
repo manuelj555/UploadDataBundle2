@@ -56,6 +56,17 @@ class ColumnsMapper
         return $this->columns;
     }
 
+    public function getColumnsAsArray()
+    {
+        $columns = [];
+
+        foreach ($this->columns as $key => $config){
+            $columns[$key] = $config['label'];
+        }
+
+        return $columns;
+    }
+
     public function getNames()
     {
         return array_keys($this->columns);

@@ -625,4 +625,26 @@ class Upload
 
         return $config['header_mapping'][0];
     }
+
+    /**
+     * @return array
+     */
+    public function getColumns()
+    {
+        if ($columns = $this->getAttributeValue('configured_columns')) {
+            return $columns;
+        }
+
+        $fileNames = $this->getColumnNames(true);
+        $expectedNames = $this->getColumnKeys();
+        $columns = [];
+
+        foreach ($expectedNames as $index => $name) {
+            $key = isset($fileNames[$index]) ? $fileNames[$index] : ucfirst($name);
+
+            $columns[$key] = $name;
+        }
+
+        return $columns;
+    }
 }

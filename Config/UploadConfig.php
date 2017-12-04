@@ -334,6 +334,7 @@ abstract class UploadConfig
     public function getInstance()
     {
         $upload = new Upload();
+        $upload->setAttributeValue('configured_columns', $this->getColumnsMapper()->getColumnsAsArray());
 
         return $upload;
     }
@@ -393,7 +394,7 @@ abstract class UploadConfig
 
             $reader = $this->readerLoader->get($upload->getFullFilename());
 
-            $data = $reader->getData($upload->getFullFilename(), $upload->getAttribute('config_read')->getValue());
+            $data = $reader->getData($upload->getFullFilename(), $upload->getAttributeValue('config_read'));
 
             $columnsMapper = $this->columnsMapper->getColumns();
 
@@ -675,7 +676,23 @@ abstract class UploadConfig
      */
     public function isActionable(Upload $upload, $actionName)
     {
-        if ($action = $upload->getAction($actionName)){
+        if ($actionName == 'transfer') {
+            return $upload->isTransferable();
+        }
+
+        if ($actionName == 'read') {
+            return $upload->isReadable();
+        }
+
+        if ($actionName == 'validate') {
+            return $upload->isValidatable();
+        }
+
+        if ($actionName == 'delete') {
+            return $upload->isDeletable();
+        }
+
+        if ($action = $upload->getAction($actionName)) {
             return $action->isNotComplete();
         }
 
