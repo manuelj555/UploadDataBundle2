@@ -431,7 +431,7 @@ abstract class UploadConfig
         }
     }
 
-    public function processValidation(Upload $upload)
+    public function processValidation(Upload $upload, $onlyInvalids = false)
     {
         if (!$this->isValidatable($upload)) {
             return false;
@@ -449,10 +449,16 @@ abstract class UploadConfig
             $this->onPreValidate($upload);
 
             $validations = $this->validationBuilder->getValidations();
-
             $valids = $invalids = 0;
+            $items = $upload->getItems();
 
-            foreach ($upload->getItems() as $item) {
+            if ($action->isComplete() && $onlyInvalids) {
+                $items = $items->filter(function (UploadedItem $item) {
+                    return !$item->getIsValid();
+                });
+            }
+
+            foreach ($items as $item) {
                 $context = $this->validator->startContext($item);
                 $data = $item->getData();
                 foreach ($validations as $column => $constraints) {
