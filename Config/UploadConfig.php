@@ -440,7 +440,8 @@ abstract class UploadConfig
         $action = $upload->getAction('validate');
 
         try {
-            $validationGroup = $action->isComplete() ? 'upload-revalidate' : 'upload-validate';
+            $isRevalidation = $action->isComplete();
+            $validationGroup = $isRevalidation ? 'upload-revalidate' : 'upload-validate';
 
             $action->setInProgress();
             $this->objectManager->persist($upload);
@@ -452,10 +453,12 @@ abstract class UploadConfig
             $valids = $invalids = 0;
             $items = $upload->getItems();
 
-            if ($action->isComplete() && $onlyInvalids) {
+            if ($isRevalidation && $onlyInvalids) {
                 $items = $items->filter(function (UploadedItem $item) {
                     return !$item->getIsValid();
                 });
+
+                $valids = $upload->getValids();
             }
 
             foreach ($items as $item) {
