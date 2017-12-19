@@ -260,11 +260,17 @@ class UploadedItem implements \ArrayAccess
         return array_key_exists($key, $this->extras);
     }
 
-    public function getErrorsAsString($separator = ', ')
+    public function getErrorsAsString($separator = ', ', $showKeys = false)
     {
         $errors = [];
 
-        foreach ($this->getErrors() as $data) {
+        foreach ($this->getErrors() as $key => $data) {
+            if ($showKeys) {
+                $data = array_map(function ($data) use ($key) {
+                    return sprintf("[%s]: %s", $key, $data);
+                }, $data);
+            }
+
             $errors = array_merge($errors, $data);
         }
 
@@ -279,6 +285,6 @@ class UploadedItem implements \ArrayAccess
             $errors = array_merge($errors, $data);
         }
 
-        return  array_unique($errors);
+        return array_unique($errors);
     }
 }
