@@ -8,6 +8,7 @@ namespace Manuel\Bundle\UploadDataBundle\Config;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Data\UploadedFileHelperInterface;
@@ -49,6 +50,7 @@ abstract class UploadConfig
     private $processed = false;
     private $uploadDir = false;
     private $type = false;
+    private $showDeleted = true;
     private $label;
 
     /**
@@ -93,6 +95,22 @@ abstract class UploadConfig
     public function setLabel($label)
     {
         $this->label = $label;
+    }
+
+    /**
+     * @param bool $showDeleted
+     */
+    public function setShowDeleted($showDeleted)
+    {
+        $this->showDeleted = $showDeleted;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowDeleted()
+    {
+        return $this->showDeleted;
     }
 
     /**
@@ -201,7 +219,13 @@ abstract class UploadConfig
             $search = null;
         }
 
-        return $repository->getQueryForType($this->getType(), $search, $order);
+        $queryBuilder = $repository->getQueryForType($this->getType(), $search, $order);
+
+        if (!$this->isShowDeleted()){
+            $this->addDeleteExclusionFilter($queryBuilder);
+        }
+
+        return $queryBuilder;
     }
 
     abstract public function configureColumns(ColumnsMapper $mapper);
@@ -440,8 +464,7 @@ abstract class UploadConfig
         $action = $upload->getAction('validate');
 
         try {
-            $isRevalidation = $action->isComplete();
-            $validationGroup = $isRevalidation ? 'upload-revalidate' : 'upload-validate';
+            $validationGroup = $action->isComplete() ? 'upload-revalidate' : 'upload-validate';
 
             $action->setInProgress();
             $this->objectManager->persist($upload);
@@ -453,12 +476,10 @@ abstract class UploadConfig
             $valids = $invalids = 0;
             $items = $upload->getItems();
 
-            if ($isRevalidation && $onlyInvalids) {
+            if ($action->isComplete() && $onlyInvalids) {
                 $items = $items->filter(function (UploadedItem $item) {
                     return !$item->getIsValid();
                 });
-
-                $valids = $upload->getValids();
             }
 
             foreach ($items as $item) {
@@ -740,5 +761,24 @@ abstract class UploadConfig
             md5(uniqid($upload->getId().$file->getClientOriginalName())),
             $file->getClientOriginalExtension()
         );
+    }
+
+    protected function addDeleteExclusionFilter(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->andWhere(
+            $queryBuilder->expr()->not(
+                $queryBuilder->expr()->exists('
+                SELECT act
+                FROM UploadDataBundle:UploadAction act
+                WHERE
+                    act.upload = upload
+                  AND
+                    act.name = \'delete\'
+                  AND
+                    act.status = :action_status_completed
+                ')
+            )
+        )
+            ->setParameter('action_status_completed', Upload::STATUS_COMPLETE);
     }
 }
