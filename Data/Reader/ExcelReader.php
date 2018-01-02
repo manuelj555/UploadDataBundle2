@@ -57,7 +57,13 @@ class ExcelReader extends BaseReader
 
                 if (null !== $cell) {
                     $rawValue = $cell->getValue();
-                    $value = ($rawValue !== null) ? $cell->getFormattedValue() : null;
+                    if ($rawValue !== null) {
+                        $value = \PHPExcel_Style_NumberFormat::toFormattedString(
+                            $rawValue, $cell->getStyle()->getNumberFormat()->getFormatCode()
+                        );
+                    }else{
+                        $value = null;
+                    }
                 } else {
                     $rawValue = $value = null;
                 }
@@ -124,11 +130,7 @@ class ExcelReader extends BaseReader
      */
     protected function load($filename)
     {
-        /** @var \PHPExcel_Reader_Abstract $reader */
-        $reader = \PHPExcel_IOFactory::createReaderForFile($filename);
-        $reader->setReadDataOnly(true);
-
-        return $reader->load($filename);
+        return \PHPExcel_IOFactory::load($filename);
     }
 
 }
