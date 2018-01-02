@@ -8,7 +8,6 @@ namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
@@ -37,39 +36,45 @@ class ExcelReader extends BaseReader
 
         $lastColumn = $sheet->getHighestColumn($options['row_headers']);
 
-        $excelHeaders = $sheet->rangeToArray('A' . $options['row_headers']
-            . ':' . $lastColumn . $options['row_headers'], null, true, true, true);
+        $excelHeaders = $sheet->rangeToArray('A'.$options['row_headers']
+            .':'.$lastColumn.$options['row_headers'], null, true, true, true);
         $excelHeaders = current($excelHeaders);
 
         $sheet->garbageCollect();
         $maxRow = $sheet->getHighestRow();
-
-        $excelData = $sheet->rangeToArray('A' . ($options['row_headers'] + 1) . ':' . $lastColumn . $maxRow,
-            null, true, true, true);
-        $dataWithoutFormat = $sheet->rangeToArray('A' . ($options['row_headers'] + 1) . ':' . $lastColumn . $maxRow,
-            null, true, false, true);
-
-        $excel->disconnectWorksheets();
-        unset($excel, $sheet);
+        $rows = range($options['row_headers'] + 1, $maxRow);
+        $cols = range(1, \PHPExcel_Cell::columnIndexFromString($lastColumn));
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
 
-        foreach ($excelData as $rowIndex => $excelRow) {
-            if (!array_filter($excelRow)) {
-                continue;
-            }
+        foreach ($rows as $rowIndex) {
             $formattedRow = array();
-            foreach ($excelRow as $columnName => $value) {
-                if (isset($names[$columnName])) {
-                    $formattedRow[$names[$columnName]]['with_format'] = $value;
-                    $formattedRow[$names[$columnName]]['without_format'] = $dataWithoutFormat[$rowIndex][$columnName];
-                } elseif (isset($excelHeaders[$columnName])) {
-                    $formattedRow[self::EXTRA_FIELDS_NAME][$excelHeaders[$columnName]] = $value;
+
+            foreach ($cols as $colIndex) {
+                $cell = $sheet->getCellByColumnAndRow($colIndex, $rowIndex, false);
+                $colName = \PHPExcel_Cell::stringFromColumnIndex($colIndex);
+
+                if (null !== $cell) {
+                    $rawValue = $cell->getValue();
+                    $value = ($rawValue !== null) ? $cell->getFormattedValue() : null;
+                } else {
+                    $rawValue = $value = null;
+                }
+
+                if (isset($names[$colName])) {
+                    $formattedRow[$names[$colName]]['with_format'] = $value;
+                    $formattedRow[$names[$colName]]['without_format'] = $rawValue;
+                } elseif (isset($excelHeaders[$colName])) {
+                    $formattedRow[self::EXTRA_FIELDS_NAME][$excelHeaders[$colName]] = $value;
                 }
             }
+
             $formattedData[$rowIndex] = $formattedRow;
         }
+
+        $excel->disconnectWorksheets();
+        unset($excel, $sheet);
 
         return $formattedData;
     }
@@ -119,7 +124,11 @@ class ExcelReader extends BaseReader
      */
     protected function load($filename)
     {
-        return \PHPExcel_IOFactory::load($filename);
+        /** @var \PHPExcel_Reader_Abstract $reader */
+        $reader = \PHPExcel_IOFactory::createReaderForFile($filename);
+        $reader->setReadDataOnly(true);
+
+        return $reader->load($filename);
     }
 
 }
