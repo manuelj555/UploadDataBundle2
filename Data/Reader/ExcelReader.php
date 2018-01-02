@@ -32,7 +32,8 @@ class ExcelReader extends BaseReader
 
         $options = $this->resolveOptions($options);
 
-        $sheet = $this->load($filename)->getActiveSheet();
+        $excel = $this->load($filename);
+        $sheet = $excel->getActiveSheet();
 
         $lastColumn = $sheet->getHighestColumn($options['row_headers']);
 
@@ -45,6 +46,11 @@ class ExcelReader extends BaseReader
 
         $excelData = $sheet->rangeToArray('A' . ($options['row_headers'] + 1) . ':' . $lastColumn . $maxRow,
             null, true, true, true);
+        $dataWithoutFormat = $sheet->rangeToArray('A' . ($options['row_headers'] + 1) . ':' . $lastColumn . $maxRow,
+            null, true, false, true);
+
+        $excel->disconnectWorksheets();
+        unset($excel, $sheet);
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
@@ -54,11 +60,12 @@ class ExcelReader extends BaseReader
                 continue;
             }
             $formattedRow = array();
-            foreach ($excelRow as $columName => $value) {
-                if (isset($names[$columName])) {
-                    $formattedRow[$names[$columName]] = $value;
-                } elseif (isset($excelHeaders[$columName])) {
-                    $formattedRow[self::EXTRA_FIELDS_NAME][$excelHeaders[$columName]] = $value;
+            foreach ($excelRow as $columnName => $value) {
+                if (isset($names[$columnName])) {
+                    $formattedRow[$names[$columnName]]['with_format'] = $value;
+                    $formattedRow[$names[$columnName]]['without_format'] = $dataWithoutFormat[$rowIndex][$columnName];
+                } elseif (isset($excelHeaders[$columnName])) {
+                    $formattedRow[self::EXTRA_FIELDS_NAME][$excelHeaders[$columnName]] = $value;
                 }
             }
             $formattedData[$rowIndex] = $formattedRow;

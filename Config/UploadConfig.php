@@ -221,7 +221,7 @@ abstract class UploadConfig
 
         $queryBuilder = $repository->getQueryForType($this->getType(), $search, $order);
 
-        if (!$this->isShowDeleted()){
+        if (!$this->isShowDeleted()) {
             $this->addDeleteExclusionFilter($queryBuilder);
         }
 
@@ -427,13 +427,20 @@ abstract class UploadConfig
 
                 foreach ($item as $colName => $value) {
                     if (isset($columnsMapper[$colName])) {
+                        if (is_array($value)) {
+                            $withFormat = $value['with_format'];
+                            $withoutFormat = $value['without_format'];
+                        } else {
+                            $withFormat = $value;
+                            $withoutFormat = $value;
+                        }
+
                         $formattedItem[$colName] = call_user_func(
                             $columnsMapper[$colName]['formatter'],
-                            $value
+                            $withFormat, $withoutFormat
                         );
                     }
                 }
-
                 $uploadedItem = new UploadedItem();
                 $uploadedItem->setData($formattedItem);
                 $upload->addItem($uploadedItem);
