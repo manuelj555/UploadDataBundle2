@@ -43,7 +43,7 @@ class ExcelReader extends BaseReader
         $sheet->garbageCollect();
         $maxRow = $sheet->getHighestRow();
         $rows = range($options['row_headers'] + 1, $maxRow);
-        $cols = range(1, \PHPExcel_Cell::columnIndexFromString($lastColumn));
+        $cols = range(0, \PHPExcel_Cell::columnIndexFromString($lastColumn));
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
