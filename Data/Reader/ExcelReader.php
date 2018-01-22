@@ -59,9 +59,9 @@ class ExcelReader extends BaseReader
                     $rawValue = $cell->getValue();
                     if ($rawValue !== null) {
                         $value = \PHPExcel_Style_NumberFormat::toFormattedString(
-                            $rawValue, $cell->getStyle()->getNumberFormat()->getFormatCode()
+                            $cell->getCalculatedValue(), $cell->getStyle()->getNumberFormat()->getFormatCode()
                         );
-                    }else{
+                    } else {
                         $value = null;
                     }
                 } else {
