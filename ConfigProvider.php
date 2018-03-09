@@ -28,12 +28,13 @@ class ConfigProvider
     }
 
     /**
-     * @param $type
+     * @param string $type
+     * @param array $options
      *
      * @return UploadConfig
      * @throws \InvalidArgumentException
      */
-    public function get($type)
+    public function get($type, $options = [])
     {
         if (!$this->has($type)){
             throw new \InvalidArgumentException(sprintf('Tipo "%s" no definido', $type));
@@ -41,7 +42,7 @@ class ConfigProvider
 
         $config = $this->container->get($this->configs[$type]);
 
-        $config->processConfiguration();
+        $config->processConfiguration($options);
 
         return $config;
     }

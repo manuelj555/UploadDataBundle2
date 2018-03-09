@@ -21,6 +21,7 @@ use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -193,7 +194,7 @@ abstract class UploadConfig
         return $this->type;
     }
 
-    public function processConfiguration()
+    public function processConfiguration($options = [])
     {
         if ($this->processed) {
             return;
@@ -201,9 +202,18 @@ abstract class UploadConfig
 
         $this->processed = true;
 
-        $this->configureColumns($this->columnsMapper);
-        $this->configureValidations($this->validationBuilder);
-        $this->configureList($this->listMapper);
+        $optionsResolver = new OptionsResolver();
+        $this->configureOptions($optionsResolver);
+        $options = $optionsResolver->resolve($options);
+
+        $this->configureColumns($this->columnsMapper, $options);
+        $this->configureValidations($this->validationBuilder, $options);
+        $this->configureList($this->listMapper, $options);
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+
     }
 
     public function getViewPrefix()
