@@ -19,10 +19,14 @@ use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Manuel\Bundle\UploadDataBundle\Form\Type\UploadType;
 use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
+use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
+use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -499,24 +503,40 @@ abstract class UploadConfig
                 });
             }
 
+            /** @var UploadedItem $item */
             foreach ($items as $item) {
-                $context = $this->validator->startContext($item);
+                $violations = new GroupedConstraintViolations();
                 $data = $item->getData();
-                foreach ($validations as $column => $constraints) {
-                    $value = array_key_exists($column, $data) ? $data[$column] : null;
-                    $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
+                foreach ($validations as $group => $columnValidations) {
+                    $context = $this->validator->startContext($item);
+                    foreach ($columnValidations as $column => $constraints) {
+                        $value = array_key_exists($column, $data) ? $data[$column] : null;
+                        $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
+                    }
+
+                    // por cada categoria|grupo de validaciones, toca saber si hubieron errores.
+                    $violations->addAll($group, $context->getViolations());
                 }
 
+                if ($violations->hasViolationsForGroup('default')) {
+                    // Si hay errores en el grupo por defecto, lo marcamos en el item.
+                    $item->setHasDefaultErrors();
+                    // esto con la finalidad de poder obviar validaciones propias, cuando las
+                    // validaciones mínimas no fueron superadas.
+                }
+
+                // iniciamos un nuevo contexto para las validaciones propias.
+                $context = $this->validator->startContext($item);
                 $this->validateItem($item, $context, $upload);
 
-                $violations = $context->getViolations();
+                $this->mergeViolations($violations, $context);
 
-                if (count($violations)) {
-                    $item->setErrors($context->getViolations());
-                    ++$invalids;
-                } else {
-                    $item->setErrors(null);
+                $item->setErrors($violations);
+                $item->setIsValid($this->shouldItemCanBeConsideredAsValid($violations, $item));
+                if ($item->getIsValid()) {
                     ++$valids;
+                } else {
+                    ++$invalids;
                 }
 
                 $this->objectManager->persist($item);
@@ -797,5 +817,36 @@ abstract class UploadConfig
             )
         )
             ->setParameter('action_status_completed', Upload::STATUS_COMPLETE);
+    }
+
+    /**
+     * @param GroupedConstraintViolations $allViolations
+     * @param ContextualValidatorInterface $context
+     */
+    private function mergeViolations(GroupedConstraintViolations $violations, ContextualValidatorInterface $context)
+    {
+        foreach ($context->getViolations() as $violation) {
+            if ($violation instanceof ColumnError) {
+                $violations->addColumnError($violation);
+            } else {
+                $violations->add('default', $violation);
+            }
+        }
+    }
+
+    /**
+     * Determina cuando un item es considerado invalido y cuando es valido.
+     *
+     * Por defecto es invalido cuando hay errores de valicacion para la categoria|grupo por defecto.
+     *
+     * @param GroupedConstraintViolations $violations
+     * @param UploadedItem $item
+     * @return bool
+     */
+    protected function shouldItemCanBeConsideredAsValid(
+        GroupedConstraintViolations $violations,
+        UploadedItem $item
+    ) {
+        return !$violations->hasViolationsForGroup('default');
     }
 }

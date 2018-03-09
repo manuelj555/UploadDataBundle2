@@ -3,6 +3,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -64,6 +65,11 @@ class UploadedItem implements \ArrayAccess
      * @ORM\Column(name="status", type="integer", nullable=true)
      */
     private $status;
+
+    /**
+     * @var bool
+     */
+    private $hasDefaultErrors = false;
 
     /**
      * Get id
@@ -132,15 +138,19 @@ class UploadedItem implements \ArrayAccess
      */
     public function setErrors($errors)
     {
+        if (!($errors instanceof GroupedConstraintViolations)) {
+            $errors = GroupedConstraintViolations::fromArray($errors);
+        }
+
         $this->errors = $errors;
 
         return $this;
     }
 
     /**
-     * Get errors
-     *
-     * @return array|ConstraintViolationListInterface
+     * @param null $group
+     * @param bool $grouped
+     * @return GroupedConstraintViolations|array
      */
     public function getErrors()
     {
@@ -169,26 +179,6 @@ class UploadedItem implements \ArrayAccess
     public function getIsValid()
     {
         return $this->isValid;
-    }
-
-    /**
-     * @ORM\PrePersist()
-     * @ORM\PreUpdate()
-     */
-    public function adjustValues()
-    {
-        if ($this->errors instanceof ConstraintViolationListInterface) {
-            $errors = array();
-
-            foreach ($this->errors as $error) {
-                isset($errors[$error->getPropertyPath()]) || $errors[$error->getPropertyPath()] = array();
-                $errors[$error->getPropertyPath()][] = $error->getMessage();
-            }
-
-            $this->setErrors($errors);
-        }
-
-        $this->setIsValid(count($this->errors) == 0);
     }
 
     public function offsetExists($offset)
@@ -260,14 +250,32 @@ class UploadedItem implements \ArrayAccess
         return array_key_exists($key, $this->extras);
     }
 
-    public function getErrorsAsString($separator = ', ', $showKeys = false)
+    public function getErrorsAsString($separator = ', ', $showKeys = false, $allGroups = false)
+    {
+        $errors = [];
+        $group = $allGroups ? null : 'default';
+
+        foreach ($this->getErrors()->getAll($group, false) as $columnName => $data) {
+            if ($showKeys) {
+                $data = array_map(function ($data) use ($columnName) {
+                    return sprintf("[%s]: %s", $columnName, $data);
+                }, $data);
+            }
+
+            $errors = array_merge($errors, $data);
+        }
+
+        return join($separator, array_unique($errors));
+    }
+
+    public function getGroupErrorsAsString($group, $separator = ', ', $showKeys = false)
     {
         $errors = [];
 
-        foreach ($this->getErrors() as $key => $data) {
+        foreach ($this->getErrors()->getAll($group) as $columnName => $data) {
             if ($showKeys) {
-                $data = array_map(function ($data) use ($key) {
-                    return sprintf("[%s]: %s", $key, $data);
+                $data = array_map(function ($data) use ($columnName) {
+                    return sprintf("[%s]: %s", $columnName, $data);
                 }, $data);
             }
 
@@ -286,5 +294,44 @@ class UploadedItem implements \ArrayAccess
         }
 
         return array_unique($errors);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDefaultErrors()
+    {
+        return $this->hasDefaultErrors;
+    }
+
+    /**
+     * @param bool $hasDefaultErrors
+     */
+    public function setHasDefaultErrors($hasDefaultErrors = true)
+    {
+        $this->hasDefaultErrors = $hasDefaultErrors;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function convertErrorsToArray()
+    {
+        if ($this->errors instanceof GroupedConstraintViolations) {
+            $this->errors = $this->errors->getAll();
+        }
+    }
+
+    /**
+     * @ORM\PostPersist()
+     * @ORM\PostUpdate()
+     * @ORM\PostLoad()
+     */
+    public function convertErrorsToObject()
+    {
+        if (!($this->errors instanceof GroupedConstraintViolations)) {
+            $this->errors = GroupedConstraintViolations::fromArray($this->errors ?: []);
+        }
     }
 }

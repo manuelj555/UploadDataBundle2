@@ -24,13 +24,17 @@ class ValidationBuilder
 
     protected $in;
 
-    public function with($name)
+    public function with($name, $groups = 'default')
     {
-        if (!isset($this->config[$name])) {
-            $this->config[$name] = array();
+        $groups = (array)$groups;
+
+        foreach ($groups as $group) {
+            if (!isset($this->config[$group][$name])) {
+                $this->config[$group][$name] = [];
+            }
         }
 
-        $this->in = $name;
+        $this->in = [$name, $groups];
 
         return $this;
     }
@@ -46,7 +50,11 @@ class ValidationBuilder
     {
         $this->verifyIn();
 
-        $this->config[$this->in][] = $constraint;
+        list($name, $groups) = $this->in;
+
+        foreach ($groups as $group){
+            $this->config[$group][$name][] = $constraint;
+        }
 
         return $this;
     }
