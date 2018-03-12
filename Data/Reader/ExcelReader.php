@@ -56,10 +56,14 @@ class ExcelReader extends BaseReader
                 $colName = \PHPExcel_Cell::stringFromColumnIndex($colIndex);
 
                 if (null !== $cell) {
-                    $rawValue = $cell->getValue();
+                    if ($cell->isFormula()){
+                        $rawValue = $cell->getCalculatedValue();
+                    }else{
+                        $rawValue = $cell->getValue();
+                    }
                     if ($rawValue !== null) {
                         $value = \PHPExcel_Style_NumberFormat::toFormattedString(
-                            $cell->getCalculatedValue(), $cell->getStyle()->getNumberFormat()->getFormatCode()
+                            $rawValue, $cell->getStyle()->getNumberFormat()->getFormatCode()
                         );
                     } else {
                         $value = null;
