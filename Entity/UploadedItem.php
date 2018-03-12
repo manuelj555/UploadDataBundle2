@@ -181,6 +181,16 @@ class UploadedItem implements \ArrayAccess
         return $this->isValid;
     }
 
+    /**
+     * Get isValid
+     *
+     * @return boolean
+     */
+    public function isValidForGroup($name)
+    {
+        return !$this->getErrors()->hasViolationsForGroup($name);
+    }
+
     public function offsetExists($offset)
     {
         return array_key_exists($offset, $this->data);
