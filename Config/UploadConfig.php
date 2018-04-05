@@ -19,10 +19,12 @@ use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Manuel\Bundle\UploadDataBundle\Form\Type\UploadType;
 use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
+use Manuel\Bundle\UploadDataBundle\Profiler\ExceptionProfiler;
 use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
 use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -75,6 +77,11 @@ abstract class UploadConfig
      * @var UploadedFileHelperInterface
      */
     private $uploadedFileHelper;
+
+    /**
+     * @var ExceptionProfiler
+     */
+    private $exceptionProfiler;
     /**
      * @var array
      */
@@ -180,6 +187,14 @@ abstract class UploadConfig
     public function setTranslator($translator)
     {
         $this->translator = $translator;
+    }
+
+    /**
+     * @param ExceptionProfiler $exceptionProfiler
+     */
+    public function setExceptionProfiler(ExceptionProfiler $exceptionProfiler)
+    {
+        $this->exceptionProfiler = $exceptionProfiler;
     }
 
     /**
@@ -384,34 +399,40 @@ abstract class UploadConfig
 
     public function processUpload(UploadedFile $file, array $formData = array(), array $attributes = [])
     {
-        $upload = $this->getInstance();
+        try {
+            $upload = $this->getInstance();
 
-        $upload->setFilename($file->getClientOriginalName());
-        $upload->setType($this->getType());
+            $upload->setFilename($file->getClientOriginalName());
+            $upload->setType($this->getType());
 
-        foreach ($attributes as $name => $attrValue) {
-            $upload->setAttributeValue($name, $attrValue);
+            foreach ($attributes as $name => $attrValue) {
+                $upload->setAttributeValue($name, $attrValue);
+            }
+
+            $this->objectManager->beginTransaction();
+
+            $this->onPreUpload($upload, $file, $formData);
+
+            $this->objectManager->persist($upload);
+            $this->objectManager->flush();
+
+            $newFilename = $this->createUniqueFilename($file, $upload);
+            $filename = $this->uploadedFileHelper->saveFile($file, $this->uploadDir, $newFilename);
+
+            $upload->setFile(basename($filename));
+            $upload->setFullFilename($filename);
+
+            $this->onPostUpload($upload, $filename, $formData);
+
+            $this->objectManager->flush();
+            $this->objectManager->commit();
+
+            return $upload;
+        } catch (\Exception $e) {
+            $this->profileException($e);
+
+            throw $e;
         }
-
-        $this->objectManager->beginTransaction();
-
-        $this->onPreUpload($upload, $file, $formData);
-
-        $this->objectManager->persist($upload);
-        $this->objectManager->flush();
-
-        $newFilename = $this->createUniqueFilename($file, $upload);
-        $filename = $this->uploadedFileHelper->saveFile($file, $this->uploadDir, $newFilename);
-
-        $upload->setFile(basename($filename));
-        $upload->setFullFilename($filename);
-
-        $this->onPostUpload($upload, $filename, $formData);
-
-        $this->objectManager->flush();
-        $this->objectManager->commit();
-
-        return $upload;
 
     }
 
@@ -471,6 +492,7 @@ abstract class UploadConfig
             $this->onPostRead($upload);
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
+            $this->profileException($e);
 
             throw $e;
         }
@@ -552,6 +574,7 @@ abstract class UploadConfig
             $this->onPostValidate($upload);
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
+            $this->profileException($e);
 
             throw $e;
         }
@@ -578,6 +601,7 @@ abstract class UploadConfig
             $this->objectManager->flush();
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
+            $this->profileException($e);
 
             throw $e;
         }
@@ -609,6 +633,7 @@ abstract class UploadConfig
 
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
+            $this->profileException($e);
 
             throw $e;
         }
@@ -653,6 +678,7 @@ abstract class UploadConfig
 
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
+            $this->profileException($e);
 
             throw $e;
         }
@@ -848,5 +874,10 @@ abstract class UploadConfig
         UploadedItem $item
     ) {
         return !$violations->hasViolationsForGroup('default');
+    }
+
+    public function profileException(\Exception $e)
+    {
+        $this->exceptionProfiler->addException($e);
     }
 }

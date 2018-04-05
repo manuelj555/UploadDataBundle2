@@ -133,3 +133,10 @@ services:
             - "@property_accessor"
         tags:
             - { name: validator.constraint_validator, alias: 'upload_data.entity_exists' }
+
+    upload_data.profiler.exception:
+        class: Manuel\Bundle\UploadDataBundle\Profiler\ExceptionProfiler
+        public: false
+        arguments:
+            - "@event_dispatcher"
+            - "@?profiler"
