@@ -505,9 +505,10 @@ abstract class UploadConfig
         }
 
         $action = $upload->getAction('validate');
+        $isActionCompleted = $action->isComplete();
 
         try {
-            $validationGroup = $action->isComplete() ? 'upload-revalidate' : 'upload-validate';
+            $validationGroup = $isActionCompleted ? 'upload-revalidate' : 'upload-validate';
 
             $action->setInProgress();
             $this->objectManager->persist($upload);
@@ -519,9 +520,11 @@ abstract class UploadConfig
             $valids = $invalids = 0;
             $items = $upload->getItems();
 
-            if ($action->isComplete() && $onlyInvalids) {
+            if ($isActionCompleted && $onlyInvalids) {
+                $valids = $upload->getValids();
+
                 $items = $items->filter(function (UploadedItem $item) {
-                    return !$item->getIsValid();
+                    return !$this->isUploadedItemValid($item);
                 });
             }
 
@@ -732,7 +735,7 @@ abstract class UploadConfig
      */
     public function isDeletable(Upload $upload)
     {
-        return $upload->isDeletable();
+        return $this->isActionable($upload, 'delete');
     }
 
     /**
@@ -741,7 +744,7 @@ abstract class UploadConfig
      */
     public function isTransferable(Upload $upload)
     {
-        return $upload->isTransferable();
+        return $this->isActionable($upload, 'transfer');
     }
 
     /**
@@ -750,7 +753,7 @@ abstract class UploadConfig
      */
     public function isValidatable(Upload $upload)
     {
-        return $upload->isValidatable();
+        return $this->isActionable($upload, 'validate');
     }
 
     /**
@@ -879,5 +882,10 @@ abstract class UploadConfig
     public function profileException(\Exception $e)
     {
         $this->exceptionProfiler->addException($e);
+    }
+
+    private function isUploadedItemValid(UploadedItem $item)
+    {
+        return $item->getIsValid();
     }
 }

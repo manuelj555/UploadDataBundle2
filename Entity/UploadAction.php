@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="upload_data_upload_action")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class UploadAction
 {
@@ -51,10 +52,18 @@ class UploadAction
      */
     private $completedAt;
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="completed", type="boolean")
+     */
+    private $actionCompleted = null;
+
     function __construct($name = null)
     {
         $this->setName($name);
         $this->setStatus(self::STATUS_NOT_COMPLETE);
+        $this->actionCompleted = false;
     }
 
     /**
@@ -126,6 +135,10 @@ class UploadAction
     {
         $this->status = $status;
 
+        if ($status == self::STATUS_COMPLETE) {
+            $this->actionCompleted = true;
+        }
+
         return $this;
     }
 
@@ -170,7 +183,7 @@ class UploadAction
 
     public function isComplete()
     {
-        return $this->getStatus() == self::STATUS_COMPLETE;
+        return ($this->getStatus() == self::STATUS_COMPLETE) || $this->actionCompleted;
     }
 
     public function isInProgress()
@@ -181,6 +194,7 @@ class UploadAction
     public function setComplete()
     {
         $this->setStatus(self::STATUS_COMPLETE);
+        $this->actionCompleted = true;
         $this->setCompletedAt(new \DateTime());
     }
 
@@ -194,4 +208,15 @@ class UploadAction
         $this->setStatus(self::STATUS_NOT_COMPLETE);
         $this->setCompletedAt(null);
     }
+
+    /**
+     * @ORM\PostLoad()
+     */
+    public function load()
+    {
+        if (!$this->actionCompleted && ($this->status == self::STATUS_COMPLETE) ) {
+            $this->actionCompleted = true;
+        }
+    }
+
 }
