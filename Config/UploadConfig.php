@@ -576,8 +576,8 @@ abstract class UploadConfig
 
             $this->onPostValidate($upload);
         } catch (\Exception $e) {
-            $this->onActionException($action, $upload);
             $this->profileException($e);
+            $this->onActionException($action, $upload);
 
             throw $e;
         }
@@ -809,7 +809,7 @@ abstract class UploadConfig
         if ($this->objectManager->isOpen()) {
             $action->setNotComplete();
             $this->objectManager->persist($upload);
-            $this->objectManager->flush();
+            $this->objectManager->flush($upload);
         }
     }
 
@@ -884,7 +884,13 @@ abstract class UploadConfig
         $this->exceptionProfiler->addException($e);
     }
 
-    private function isUploadedItemValid(UploadedItem $item)
+    /**
+     * Determina si un item es completamente válido.
+     *
+     * @param UploadedItem $item
+     * @return bool
+     */
+    protected function isUploadedItemValid(UploadedItem $item)
     {
         return $item->getIsValid();
     }

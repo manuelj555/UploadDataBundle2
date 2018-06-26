@@ -131,8 +131,8 @@ class GroupedConstraintViolations implements \Countable, \IteratorAggregate
     {
         $violations = $this->violations;
         unset($violations['default']);
-
-        return 0 < count(array_filter($groups, function ($errors) {
+dump($violations);
+        return 0 < count(array_filter($violations, function ($errors) {
                 return count($errors) > 0;
             }));
     }
