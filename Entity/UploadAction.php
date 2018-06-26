@@ -181,9 +181,13 @@ class UploadAction
         return $this->getStatus() == self::STATUS_NOT_COMPLETE;
     }
 
-    public function isComplete()
+    public function isComplete($checkPreviousCompleted = true)
     {
-        return ($this->getStatus() == self::STATUS_COMPLETE) || $this->actionCompleted;
+        if ($checkPreviousCompleted && $this->actionCompleted) {
+            return true;
+        }
+
+        return ($this->getStatus() == self::STATUS_COMPLETE);
     }
 
     public function isInProgress()
@@ -214,7 +218,7 @@ class UploadAction
      */
     public function load()
     {
-        if (!$this->actionCompleted && ($this->status == self::STATUS_COMPLETE) ) {
+        if (!$this->actionCompleted && ($this->status == self::STATUS_COMPLETE)) {
             $this->actionCompleted = true;
         }
     }
