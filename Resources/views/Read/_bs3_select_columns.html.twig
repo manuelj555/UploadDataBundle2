@@ -36,7 +36,7 @@ file_headers
                                 <select name="columns[{{ name }}]" class="form-control file-header" title="Select Column"
                                         {%- if options.required %} required="required" {% endif -%}>
                                     {%- if not options.required %}
-                                        <option>{{ emptyOptionLabel|default('-----------') }}</option>
+                                        <option value="">{{ emptyOptionLabel|default('-----------') }}</option>
                                     {% endif %}
                                     {% for index, file_header in match_info.fileHeaders %}
                                         <option {% if match_info.hasMatch(name, file_header) %}selected="selected"
