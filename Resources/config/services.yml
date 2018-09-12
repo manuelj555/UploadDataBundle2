@@ -5,15 +5,15 @@ services:
 
     upload_data.config_provider:
         class: Manuel\Bundle\UploadDataBundle\ConfigProvider
-        arguments: [@service_container, []]
+        arguments: ['@service_container', []]
 
     upload_data.column_list_factory:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory
-        arguments: [@service_container, []]
+        arguments: ['@service_container', []]
 
     upload_data.list_mapper:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ListMapper
-        arguments: [@upload_data.column_list_factory]
+        arguments: ['@upload_data.column_list_factory']
         public: false
 
     upload_data.column_list.text:
@@ -88,9 +88,9 @@ services:
 
     upload_data.block.upload_list:
         class: Manuel\Bundle\UploadDataBundle\Block\UploadListBlockService
-        arguments: [upload_data.block.upload_list, @templating]
+        arguments: ['upload_data.block.upload_list', '@templating']
         calls:
-            - [setUploadTypes, [%upload_data.upload_types%]]
+            - ['setUploadTypes', ['%upload_data.upload_types%']]
         tags:
             - { name: sonata.block }
 
@@ -98,14 +98,14 @@ services:
         class: Manuel\Bundle\UploadDataBundle\Entity\UploadRepository
         factory_service: doctrine.orm.entity_manager
         factory_method: getRepository
-        arguments: [UploadDataBundle:Upload]
+        arguments: ['UploadDataBundle:Upload']
 
     upload_data.command.process_action:
         class: Manuel\Bundle\UploadDataBundle\Command\ProcessActionCommand
         arguments:
-            - @upload_data.config_provider
-            - @upload_data.upload_repository
-            - @?logger
+            - '@upload_data.config_provider'
+            - '@upload_data.upload_repository'
+            - '@?logger'
         tags:
             - { name: console.command }
 
