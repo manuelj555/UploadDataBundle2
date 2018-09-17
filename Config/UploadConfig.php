@@ -394,7 +394,7 @@ abstract class UploadConfig
 
     public function createUploadForm()
     {
-        return new UploadType();
+        return UploadType::class;
     }
 
     public function processUpload(UploadedFile $file, array $formData = array(), array $attributes = [])
