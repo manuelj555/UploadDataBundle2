@@ -6,7 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 /**
@@ -20,7 +20,7 @@ class NumberLinkColumn extends AbstractColumn
         return 'number_link';
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         parent::setDefaultOptions($resolver);
 
@@ -32,10 +32,8 @@ class NumberLinkColumn extends AbstractColumn
             'template' => '@UploadData/Default/column_number_link.html.twig',
         ));
 
-        $resolver->setOptional(array('condition'));
-        $resolver->setAllowedTypes(array(
-            'condition' => array('Closure', 'callable'),
-        ));
+        $resolver->setDefined(array('condition'));
+        $resolver->setAllowedTypes('condition',['Closure', 'callable']);
     }
 
 
