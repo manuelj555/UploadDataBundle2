@@ -8,7 +8,7 @@ namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 /**
@@ -22,7 +22,7 @@ class ActionColumn extends AbstractColumn
         return 'action';
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         parent::setDefaultOptions($resolver);
 
@@ -43,12 +43,10 @@ class ActionColumn extends AbstractColumn
             'condition'
         ));
 
-        $resolver->setOptional(array('modal_route', 'action_name'));
+        $resolver->setDefined(array('modal_route', 'action_name'));
 
-        $resolver->setAllowedTypes(array(
-            'condition' => array('Closure', 'callable'),
-            'route' => 'string',
-            'action_name' => 'string',
-        ));
+        $resolver->setAllowedTypes('condition',['Closure', 'callable']);
+        $resolver->setAllowedTypes('route','string');
+        $resolver->setAllowedTypes('action_name','string');
     }
 }
