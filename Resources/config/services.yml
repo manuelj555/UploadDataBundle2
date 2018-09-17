@@ -96,8 +96,7 @@ services:
 
     upload_data.upload_repository:
         class: Manuel\Bundle\UploadDataBundle\Entity\UploadRepository
-        factory_service: doctrine.orm.entity_manager
-        factory_method: getRepository
+        factory: ['@doctrine.orm.entity_manager', 'getRepository']
         arguments: ['UploadDataBundle:Upload']
 
     upload_data.command.process_action:
