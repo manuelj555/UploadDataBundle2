@@ -6,7 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
 /**
@@ -16,7 +16,7 @@ abstract class AbstractColumn
 {
     abstract public function getType();
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'label' => null,
@@ -25,9 +25,7 @@ abstract class AbstractColumn
             'position' => 0,
         ));
 
-        $resolver->setAllowedTypes(array(
-            'position' => array('float', 'integer'),
-            'use_show' => 'bool',
-        ));
+        $resolver->setAllowedTypes('position',['float', 'integer']);
+        $resolver->setAllowedTypes('use_show','bool');
     }
 } 

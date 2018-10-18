@@ -33,14 +33,13 @@ class ColumnsMapper
             },
             'formatter' => function ($value) { return $value; },
         ));
-        $resolver->setNormalizers(array(
-            'aliases' => function (Options $options, $value) {
+        $resolver->setNormalizer('aliases', function (Options $options, $value) {
                 $value[] = $options['label'];
                 $value[] = $options['name'];
 
                 return array_map(function ($alias) { return strtolower($alias); }, $value);
-            },
-        ));
+            }
+        );
 
         $options = $resolver->resolve($options);
 
