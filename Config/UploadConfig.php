@@ -365,7 +365,7 @@ abstract class UploadConfig
     public function getTemplate($name)
     {
         if (!isset($this->templates[$name])) {
-            throw new \InvalidArgumentException('No existe el template '.$name);
+            throw new \InvalidArgumentException('No existe el template ' . $name);
         }
 
         return $this->templates[$name];
@@ -824,7 +824,7 @@ abstract class UploadConfig
             '%d_%s_%s.%s',
             $upload->getId(),
             $upload->getUploadedAt()->format('Ymd_his'),
-            md5(uniqid($upload->getId().$file->getClientOriginalName())),
+            md5(uniqid($upload->getId() . $file->getClientOriginalName())),
             $file->getClientOriginalExtension()
         );
     }
@@ -846,6 +846,26 @@ abstract class UploadConfig
             )
         )
             ->setParameter('action_status_completed', Upload::STATUS_COMPLETE);
+    }
+
+    protected function addAttributeFilter(QueryBuilder $queryBuilder, $attribute, $value)
+    {
+        $alias = '_attr_'.time();
+
+        $queryBuilder->andWhere(
+            $queryBuilder->expr()->exists("
+                SELECT {$alias}
+                FROM UploadDataBundle:UploadAttribute {$alias}
+                WHERE
+                    {$alias}.upload = upload
+                  AND
+                    {$alias}.name = :{$alias}_name
+                  AND
+                    {$alias}.value = :{$alias}_value
+            ")
+        )
+            ->setParameter("{$alias}_name", $attribute)
+            ->setParameter("{$alias}_value", $value);
     }
 
     /**
@@ -875,7 +895,8 @@ abstract class UploadConfig
     protected function shouldItemCanBeConsideredAsValid(
         GroupedConstraintViolations $violations,
         UploadedItem $item
-    ) {
+    )
+    {
         return !$violations->hasViolationsForGroup('default');
     }
 
