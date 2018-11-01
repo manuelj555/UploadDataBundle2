@@ -7,6 +7,7 @@ use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuel\Bundle\UploadDataBundle\Form\Type\AttributeType;
 use Manuel\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,8 +38,8 @@ class ExcelReadController extends BaseReadController
         ))
             ->setAction($request->getRequestUri())
             ->setMethod('post')
-            ->add('attributes', 'collection', array(
-                'type' => new AttributeType(),
+            ->add('attributes', CollectionType::class, array(
+                'entry_type' => AttributeType::class,
                 'data' => array($attr),
             ))
             ->add('preview', 'button', array(
