@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -120,7 +121,7 @@ class ExcelReader extends BaseReader
         return in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), $this->extensions);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver, $headers = false)
+    public function setDefaultOptions(OptionsResolver $resolver, $headers = false)
     {
         parent::setDefaultOptions($resolver, $headers);
 
