@@ -1,6 +1,6 @@
-{% set _header = block('header') %}
+{% set _header = block('header') is defined ? block('header') : null %}
 {% set _body = block('body') %}
-{% set _footer = block('footer') %}
+{% set _footer = block('footer') is defined ? block('footer') : null %}
 
 <div class="panel panel-{{ type|default('default') }}">
     {% if _header is not empty %}

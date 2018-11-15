@@ -7,7 +7,9 @@ use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuel\Bundle\UploadDataBundle\Form\Type\AttributeType;
 use Manuel\Bundle\UploadDataBundle\Form\Type\CsvConfigurationType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -42,11 +44,11 @@ class ExcelReadController extends BaseReadController
                 'entry_type' => AttributeType::class,
                 'data' => array($attr),
             ))
-            ->add('preview', 'button', array(
+            ->add('preview', ButtonType::class, array(
                 'attr' => array('class' => 'btn-info'),
                 'label' => 'button.preview_row',
             ))
-            ->add('send', 'submit', array(
+            ->add('send', SubmitType::class, array(
                 'attr' => array('class' => 'btn-primary'),
                 'label' => 'button.next_step',
             ))

@@ -8,6 +8,8 @@ use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -334,12 +336,12 @@ class UploadController extends Controller
 
     protected function createFilterListForm()
     {
-        return $this->get('form.factory')->createNamedBuilder('filter', 'form', null, array(
+        return $this->get('form.factory')->createNamedBuilder('filter', FormType::class, null, array(
             'method' => 'GET',
             'csrf_protection' => false,
             'attr' => array('class' => 'upload_filter_form'),
         ))
-            ->add('search', 'text', array('required' => false))
+            ->add('search', TextType::class, array('required' => false))
             ->getForm();
     }
 
