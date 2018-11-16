@@ -7,6 +7,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 
@@ -28,7 +29,7 @@ class UploadType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('file', 'file', array(
+        $builder->add('file', FileType::class, array(
             'label' => 'label.file',
             'translation_domain' => 'upload_data',
         ));
