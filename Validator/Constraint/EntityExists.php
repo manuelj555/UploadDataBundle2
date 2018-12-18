@@ -48,6 +48,13 @@ class EntityExists extends Constraint
      */
     public $success;
 
+    /**
+     * Funcion encargada de crear un registro que no exista.
+     *
+     * @var \Closure|null
+     */
+    public $create_factory;
+
     public function getRequiredOptions()
     {
         return [
@@ -76,6 +83,11 @@ class EntityExists extends Constraint
         return call_user_func($this->comparator, $entity, $value, $this->property);
     }
 
+    public function callCreateFactory(UploadedItem $item, $value)
+    {
+        return call_user_func($this->create_factory, $item, $value, $this->property);
+    }
+
     public function callSuccess($entity, UploadedItem $item, $value)
     {
         return call_user_func($this->success, $entity, $item, $value, $this->property);
@@ -94,5 +106,10 @@ class EntityExists extends Constraint
     public function useSuccess()
     {
         return $this->success instanceof \Closure;
+    }
+
+    public function canCreate()
+    {
+        return  $this->create_factory instanceof \Closure;
     }
 }
