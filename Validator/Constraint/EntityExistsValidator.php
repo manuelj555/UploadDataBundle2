@@ -106,8 +106,10 @@ class EntityExistsValidator extends ConstraintValidator
             ? [$constraint, 'callComparator']
             : $this->createDefaultComparator($constraint->property);
 
+        $uploadedItem = $this->context->getRoot();
+
         foreach ($this->getData($constraint) as $item) {
-            if ($comparator($item, $value)) {
+            if ($comparator($item, $value, $uploadedItem)) {
                 return $item;
             }
         }
