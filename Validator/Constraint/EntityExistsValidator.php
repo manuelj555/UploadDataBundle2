@@ -9,6 +9,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Validator\Constraint;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -34,7 +35,7 @@ class EntityExistsValidator extends ConstraintValidator
     /**
      * EntityExistsValidator constructor.
      *
-     * @param EntityManagerInterface $entityManager
+     * @param EntityManagerInterface    $entityManager
      * @param PropertyAccessorInterface $propertyAccesor
      */
     public function __construct(EntityManagerInterface $entityManager, PropertyAccessorInterface $propertyAccesor)
@@ -46,7 +47,7 @@ class EntityExistsValidator extends ConstraintValidator
     /**
      * Checks if the passed value is valid.
      *
-     * @param mixed $value The value that should be validated
+     * @param mixed        $value The value that should be validated
      * @param EntityExists $constraint The constraint for the validation
      */
     public function validate($value, Constraint $constraint)
@@ -81,6 +82,9 @@ class EntityExistsValidator extends ConstraintValidator
         if ($item = $this->findItemByValue($constraint, $value)) {
             $this->addValidValueToCache($constraint, $value, $item);
             $notifySuccess and $this->notifySuccessItem($constraint, $value, $item);
+        } elseif ($item = $this->createItemIfApply($constraint, $value)) {
+            $this->addValidValueToCache($constraint, $value, $item);
+            $notifySuccess and $this->notifySuccessItem($constraint, $value, $item);
         } else {
             $this->context
                 ->buildViolation($constraint->message)
@@ -102,8 +106,10 @@ class EntityExistsValidator extends ConstraintValidator
             ? [$constraint, 'callComparator']
             : $this->createDefaultComparator($constraint->property);
 
+        $uploadedItem = $this->context->getRoot();
+
         foreach ($this->getData($constraint) as $item) {
-            if ($comparator($item, $value)) {
+            if ($comparator($item, $value, $uploadedItem)) {
                 return $item;
             }
         }
@@ -175,5 +181,20 @@ class EntityExistsValidator extends ConstraintValidator
     private function isInvalidFromCache(EntityExists $constraint, $value)
     {
         return isset($this->cachedData[$this->constraintUniqueId($constraint)]['invalids'][$value]);
+    }
+
+    private function createItemIfApply(EntityExists $entityExists, $value)
+    {
+        if (!$entityExists->canCreate()) {
+            return;
+        }
+
+        if (!$object = $entityExists->callCreateFactory($this->context->getRoot(), $value)) {
+            throw new \LogicException("El create factory debe retornar un objeto de tipo " . $entityExists->class);
+        }
+
+        $this->entityManager->persist($object);
+
+        return $object;
     }
 }

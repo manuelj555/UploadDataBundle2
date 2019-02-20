@@ -672,12 +672,16 @@ abstract class UploadConfig
             $this->objectManager->persist($upload);
             $this->objectManager->flush();
 
+            $this->callActionFilter($upload, $name, 'onPre');
+
             $this->processAction($upload, $action);
 
             $action->setComplete();
 
             $this->objectManager->persist($upload);
             $this->objectManager->flush();
+
+            $this->callActionFilter($upload, $name, 'onPost');
 
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
@@ -914,5 +918,26 @@ abstract class UploadConfig
     protected function isUploadedItemValid(UploadedItem $item)
     {
         return $item->getIsValid();
+    }
+
+    /**
+     * @param Upload $upload
+     * @param $name
+     * @param $prefix
+     */
+    private function callActionFilter(Upload $upload, $name, $prefix)
+    {
+        $methodPreActionName = $prefix . $this->camelize($name);
+        if (method_exists($this, $methodPreActionName)) {
+            $this->{$methodPreActionName}($upload);
+        }
+    }
+
+    private function camelize($string)
+    {
+        $words = explode('_', str_replace('-', '_', $string));
+        $words = array_map('ucfirst', $words);
+
+        return implode('', $words);
     }
 }
