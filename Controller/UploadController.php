@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
@@ -390,6 +391,9 @@ class UploadController extends Controller
     private function runCommand($action, $id)
     {
         $dir = $this->container->getParameter('kernel.root_dir');
+        if (Kernel::MINOR_VERSION >= 4 || (Kernel::MAJOR_VERSION == 3 && Kernel::MINOR_VERSION >= 4)) {
+        	$dir = $this->container->getParameter('kernel.project_dir') . '/bin';
+		}
         $php = $this->container->getParameter('upload_data.php_bin');
 
         $command = sprintf('%s %s/console uploaddata:process %s %d', $php, $dir, $action, $id);
