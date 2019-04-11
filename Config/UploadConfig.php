@@ -257,7 +257,7 @@ abstract class UploadConfig
         return $queryBuilder;
     }
 
-    abstract public function configureColumns(ColumnsMapper $mapper);
+    abstract public function configureColumns(ColumnsMapper $mapper, array $options);
 
     public function getColumnsForShow()
     {
@@ -268,8 +268,9 @@ abstract class UploadConfig
 
     /**
      * @param ListMapper $mapper
+     * @param array $options
      */
-    public function configureList(ListMapper $mapper)
+    public function configureList(ListMapper $mapper, array $options)
     {
         $uploadConfig = $this;
 
@@ -339,7 +340,7 @@ abstract class UploadConfig
         ));
     }
 
-    abstract public function configureValidations(ValidationBuilder $builder);
+    abstract public function configureValidations(ValidationBuilder $builder, array $options);
 
     public function getColumnsMapper()
     {
