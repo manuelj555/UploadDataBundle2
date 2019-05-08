@@ -12,6 +12,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * @ORM\Table(name="upload_data_uploaded_item")
  * @ORM\Entity(repositoryClass="Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
  */
 class UploadedItem implements \ArrayAccess
 {

@@ -8,6 +8,7 @@ namespace Manuel\Bundle\UploadDataBundle\Config;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
@@ -599,6 +600,10 @@ abstract class UploadConfig
 
             $data = $this->transfer($upload, $upload->getItems());
 
+            if (!$this->objectManager->contains($upload)) {
+                $upload = $this->objectManager->merge($upload);
+            }
+
             $action->setComplete();
 
             $this->objectManager->persist($upload);
@@ -651,9 +656,9 @@ abstract class UploadConfig
      * @param string|null $domain The domain for the message or null to use the default
      * @param string|null $locale The locale or null to use the default
      *
+     * @return string The translated string
      * @throws \InvalidArgumentException If the locale contains invalid characters
      *
-     * @return string The translated string
      */
     protected function trans($id, array $parameters = array(), $domain = null, $locale = null)
     {
@@ -811,10 +816,14 @@ abstract class UploadConfig
 
     private function onActionException($action, $upload)
     {
-        if ($this->objectManager->isOpen()) {
-            $action->setNotComplete();
-            $this->objectManager->persist($upload);
-            $this->objectManager->flush($upload);
+        try {
+            if ($this->objectManager->isOpen()) {
+                $action->setNotComplete();
+                $this->objectManager->persist($upload);
+                $this->objectManager->flush($upload);
+            }
+        } catch (\Exception $e) {
+
         }
     }
 
@@ -855,7 +864,7 @@ abstract class UploadConfig
 
     protected function addAttributeFilter(QueryBuilder $queryBuilder, $attribute, $value)
     {
-        $alias = '_attr_'.time();
+        $alias = '_attr_' . time();
 
         $queryBuilder->andWhere(
             $queryBuilder->expr()->exists("
