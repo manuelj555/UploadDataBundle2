@@ -604,6 +604,10 @@ abstract class UploadConfig
                 $upload = $this->objectManager->merge($upload);
             }
 
+            if (!$this->objectManager->contains($action)) {
+                $action = $this->objectManager->merge($action);
+            }
+
             $action->setComplete();
 
             $this->objectManager->persist($upload);
