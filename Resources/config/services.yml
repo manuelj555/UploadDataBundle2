@@ -1,8 +1,4 @@
 services:
-#    upload_data.example:
-#        class: Manuel\Bundle\UploadDataBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]
-
     upload_data.config_provider:
         class: Manuel\Bundle\UploadDataBundle\ConfigProvider
         arguments: ['@service_container', []]
@@ -63,36 +59,6 @@ services:
 
     upload_data.reader_loader:
         class: Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
-#
-#    upload_data.twig.callable_extension:
-#        class: Manuel\Bundle\UploadDataBundle\Twig\Extention\CallbackExtension
-#        tags:
-#            - { name: twig.extension }
-#
-#    upload_config_test:
-#        class: Manuel\Bundle\UploadDataBundle\VentasConfig
-#        tags:
-#            - { name: upload_data.config, id: ventas, label: Ventas }
-
-#    upload_data.block.column_list:
-#        class: Manuel\Bundle\UploadDataBundle\Block\ColumnListBlockService
-#        arguments: [upload_data.block.column_list, @templating]
-#        tags:
-#            - { name: sonata.block }
-#
-#    upload_data.block.header_column_list:
-#        class: Manuel\Bundle\UploadDataBundle\Block\HeaderColumnListBlockService
-#        arguments: [upload_data.block.header_column_list, @templating]
-#        tags:
-#            - { name: sonata.block }
-
-    upload_data.block.upload_list:
-        class: Manuel\Bundle\UploadDataBundle\Block\UploadListBlockService
-        arguments: ['upload_data.block.upload_list', '@templating']
-        calls:
-            - ['setUploadTypes', ['%upload_data.upload_types%']]
-        tags:
-            - { name: sonata.block }
 
     upload_data.upload_repository:
         class: Manuel\Bundle\UploadDataBundle\Entity\UploadRepository
