@@ -809,7 +809,28 @@ abstract class UploadConfig
         return false;
 
     }
+    
+    
+    /**
+     * Este método es para cuando se quiere hacer un match automático en los procesos de carga,
+     * es decir, que no se le quiere permitir al usuario hacer un match manual de las columnas
+     * del excel.
+     *
+     * @param Upload $upload
+     * @param array $options
+     */
+    public function configureDefaultMatch(Upload $upload, $options = [])
+    {
+        isset($options['row_headers']) || $options['row_headers'] = 1;
 
+        $reader = $this->readerLoader->get($upload->getFullFilename());
+        $headers = $reader->getRowHeaders($upload->getFullFilename(), $options);
+        $mapping = $this->getColumnsMapper()->getDefaultMapping($headers);
+        $options['header_mapping'] = $mapping;
+
+        $upload->setAttributeValue('config_read', $options);
+    }
+    
     /**
      * @return EntityManagerInterface
      */
