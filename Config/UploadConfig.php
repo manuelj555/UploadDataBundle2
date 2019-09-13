@@ -29,6 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -533,7 +534,7 @@ abstract class UploadConfig
                 $violations = new GroupedConstraintViolations();
                 $data = $item->getData();
                 foreach ($validations as $group => $columnValidations) {
-                    $context = $this->validator->startContext($item);
+                    $context = $this->validator->inContext($this->createValidationContext($item));
                     foreach ($columnValidations as $column => $constraints) {
                         $value = array_key_exists($column, $data) ? $data[$column] : null;
                         $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
@@ -939,5 +940,12 @@ abstract class UploadConfig
         $words = array_map('ucfirst', $words);
 
         return implode('', $words);
+    }
+
+    private function createValidationContext($item)
+    {
+        return (new ExecutionContextFactory($this->translator, 'validators'))->createContext(
+            $this->validator, $item
+        );
     }
 }
