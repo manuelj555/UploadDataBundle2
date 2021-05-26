@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
+use Psr\Container\ContainerInterface;
 use Psr\Log\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,24 +16,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ColumnFactory
 {
-    protected $types = array();
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
 
-    function __construct($container, $types)
+    function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->types = $types;
     }
 
     public function create($name, $type = null, $options = array())
     {
         $type = $type ? : 'text';
 
-        if (!isset($this->types[$type])) {
+        if (!$this->container->has($type)) {
             throw new InvalidArgumentException(sprintf('Column List Type "%s" does not exist', $type));
         }
 
-        $type = $this->container->get($this->types[$type]);
+        $type = $this->container->get($type);
 
         $resolver = new OptionsResolver();
         $type->setDefaultOptions($resolver);

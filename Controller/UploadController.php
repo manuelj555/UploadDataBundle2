@@ -63,7 +63,7 @@ class UploadController extends Controller
             ->get('type');
     }
 
-    public function render($view, array $parameters = array(), Response $response = null)
+    public function render($view, array $parameters = array(), Response $response = null) : Response
     {
         $parameters = array_merge($parameters, array(
             'type' => $this->type,

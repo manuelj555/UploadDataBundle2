@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\DependencyInjection\Compiler;
 
+use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -55,7 +56,7 @@ class RegisterUploadConfigPass implements CompilerPassInterface
 
         $container->setParameter('upload_data.upload_types', $uploadTypes);
 
-        $container->findDefinition('upload_data.config_provider')
+        $container->findDefinition(ConfigProvider::class)
             ->replaceArgument(1, $uploadTypesServices);
     }
 

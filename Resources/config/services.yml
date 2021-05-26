@@ -1,16 +1,19 @@
 services:
-    upload_data.config_provider:
-        class: Manuel\Bundle\UploadDataBundle\ConfigProvider
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    Manuel\Bundle\UploadDataBundle\ConfigProvider:
         arguments: ['@service_container', []]
 
     upload_data.column_list_factory:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory
-        arguments: ['@service_container', []]
+        arguments:
+            - !tagged_locator { tag: 'upload_data.column_list', index_by: 'alias' }
 
     upload_data.list_mapper:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ListMapper
         arguments: ['@upload_data.column_list_factory']
-        public: false
 
     upload_data.column_list.text:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\TextColumn
@@ -60,23 +63,17 @@ services:
     upload_data.reader_loader:
         class: Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
 
-    upload_data.upload_repository:
-        class: Manuel\Bundle\UploadDataBundle\Entity\UploadRepository
+    Manuel\Bundle\UploadDataBundle\Entity\UploadRepository:
         factory: ['@doctrine.orm.entity_manager', 'getRepository']
         arguments: ['UploadDataBundle:Upload']
 
     upload_data.command.process_action:
         class: Manuel\Bundle\UploadDataBundle\Command\ProcessActionCommand
-        arguments:
-            - '@upload_data.config_provider'
-            - '@upload_data.upload_repository'
-            - '@?logger'
         tags:
             - { name: console.command }
 
     upload_data.file_helper.local:
         class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper
-        public: false
 
     upload_data.headers_matcher.excel:
         class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher
@@ -86,8 +83,6 @@ services:
     upload_data.twig.extension.upload:
         class: Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension
         public: false
-        arguments:
-            - "@upload_data.config_provider"
         tags:
             - { name: twig.extension }
 

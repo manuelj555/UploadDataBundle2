@@ -13,7 +13,6 @@ class UploadDataBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new RegisterUploadConfigPass());
-        $container->addCompilerPass(new RegisterColumnListPass());
         $container->addCompilerPass(new RegisterUploadReaderPass());
     }
 
