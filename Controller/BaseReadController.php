@@ -3,6 +3,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Controller;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -23,10 +24,9 @@ class BaseReadController extends Controller
     /**
      * @return UploadConfig
      */
-    protected function getConfig(Upload $upload)
+    protected function getConfig(Upload $upload, ReaderLoader $readerLoader)
     {
-        return $this->container->get('upload_data.config_provider')
-            ->get($upload->getType());
+        return $readerLoader->get($upload->getType());
     }
 
     protected function processRead(Upload $upload)
