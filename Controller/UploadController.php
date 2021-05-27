@@ -120,7 +120,7 @@ class UploadController extends Controller
         $form = $this->createForm($this->config->createUploadForm());
         $form->handleRequest($request);
 
-        if ($request->isMethod('POST') and $form->isValid()) {
+        if ($request->isMethod('POST') && $form->isSubmitted() && $form->isValid()) {
             $file = $form['file']->getData();
 
             $this->config->processUpload($file, $form->getData());
