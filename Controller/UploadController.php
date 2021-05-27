@@ -4,6 +4,7 @@ namespace Manuel\Bundle\UploadDataBundle\Controller;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\ConfigProvider;
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
@@ -147,10 +148,9 @@ class UploadController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function readAction(Upload $upload, Request $request)
+    public function readAction(Upload $upload, Request $request, ReaderLoader $readerLoader)
     {
-        $reader = $this->get('upload_data.reader_loader')
-            ->get($upload->getFullFilename());
+        $reader = $readerLoader->get($upload->getFullFilename());
 
         return $this->redirectToRoute($reader->getRouteConfig(), array(
             'id' => $upload->getId(),

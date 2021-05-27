@@ -65,8 +65,7 @@ services:
         tags:
             - { name: upload_data.reader, route_config: upload_data_upload_read_excel }
 
-    upload_data.reader_loader:
-        class: Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader
+    Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader: ~
 
     Manuel\Bundle\UploadDataBundle\Entity\UploadRepository:
         factory: ['@doctrine.orm.entity_manager', 'getRepository']

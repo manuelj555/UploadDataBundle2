@@ -2,6 +2,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Controller;
 
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuel\Bundle\UploadDataBundle\Form\Type\AttributeType;
@@ -102,7 +103,7 @@ class ExcelReadController extends BaseReadController
      *
      * @return Response
      */
-    public function selectColumnsAction(Request $request, Upload $upload)
+    public function selectColumnsAction(Request $request, Upload $upload, ReaderLoader $readerLoader)
     {
         $config = $this->getConfig($upload);
         //la idea acá es leer las columnas del archivo y mostrarlas
@@ -113,8 +114,7 @@ class ExcelReadController extends BaseReadController
             'row_headers' => $upload->getAttribute('row_headers')->getValue(),
         );
 
-        $headers = $this->get('upload_data.reader_loader')
-            ->get($upload->getFullFilename())
+        $headers = $readerLoader->get($upload->getFullFilename())
             ->getRowHeaders($upload->getFullFilename(), $options);
 
         $columnsMapper = $config->getColumnsMapper();

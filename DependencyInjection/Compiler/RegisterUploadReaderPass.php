@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\DependencyInjection\Compiler;
 
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -19,7 +20,7 @@ class RegisterUploadReaderPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $readerLoader = $container->findDefinition('upload_data.reader_loader');
+        $readerLoader = $container->findDefinition(ReaderLoader::class);
 
         foreach ($container->findTaggedServiceIds('upload_data.reader') as $id => $configs) {
             $definition = $container->getDefinition($id);
