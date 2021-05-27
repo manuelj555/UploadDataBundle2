@@ -22,11 +22,25 @@ use Symfony\Component\Process\Process;
 class BaseReadController extends Controller
 {
     /**
+     * @var ReaderLoader
+     */
+    private $readerLoader;
+
+    /**
+     * BaseReadController constructor.
+     * @param ReaderLoader $readerLoader
+     */
+    public function __construct(ReaderLoader $readerLoader)
+    {
+        $this->readerLoader = $readerLoader;
+    }
+
+    /**
      * @return UploadConfig
      */
-    protected function getConfig(Upload $upload, ReaderLoader $readerLoader)
+    protected function getConfig(Upload $upload)
     {
-        return $readerLoader->get($upload->getType());
+        return $this->readerLoader->get($upload->getType());
     }
 
     protected function processRead(Upload $upload)
