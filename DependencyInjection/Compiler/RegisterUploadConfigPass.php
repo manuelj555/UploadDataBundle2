@@ -55,9 +55,6 @@ class RegisterUploadConfigPass implements CompilerPassInterface
         }
 
         $container->setParameter('upload_data.upload_types', $uploadTypes);
-
-        $container->findDefinition(ConfigProvider::class)
-            ->replaceArgument(1, $uploadTypesServices);
     }
 
     protected function throwAttribute($attribute, $service)

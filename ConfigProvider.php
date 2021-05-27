@@ -7,7 +7,7 @@
 namespace Manuel\Bundle\UploadDataBundle;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 
 /**
@@ -15,16 +15,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ConfigProvider
 {
-    protected $configs = array();
     /**
      * @var ContainerInterface
      */
     protected $container;
 
-    function __construct($container, $configs)
+    function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->configs = $configs;
     }
 
     /**
@@ -36,11 +34,11 @@ class ConfigProvider
      */
     public function get($type, $options = [])
     {
-        if (!$this->has($type)){
+        if (!$this->container->has($type)){
             throw new \InvalidArgumentException(sprintf('Tipo "%s" no definido', $type));
         }
 
-        $config = $this->container->get($this->configs[$type]);
+        $config = $this->container->get($type);
 
         $config->processConfiguration($options);
 

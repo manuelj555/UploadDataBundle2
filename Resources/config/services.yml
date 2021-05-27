@@ -3,8 +3,13 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    Manuel\Bundle\UploadDataBundle\Controller\:
+        resource: '../../Controller/'
+        tags: [ 'controller.service_arguments' ]
+
     Manuel\Bundle\UploadDataBundle\ConfigProvider:
-        arguments: ['@service_container', []]
+        arguments:
+            - !tagged_locator { tag: 'upload_data.config', index_by: 'id' }
 
     upload_data.column_list_factory:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory

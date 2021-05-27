@@ -3,9 +3,11 @@
 namespace Manuel\Bundle\UploadDataBundle\Controller;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
+use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -30,6 +32,16 @@ class UploadController extends Controller
      */
     protected $type;
 
+    /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    public function __construct(ConfigProvider $configProvider)
+    {
+        $this->configProvider = $configProvider;
+    }
+
     public function setContainer(ContainerInterface $container = null)
     {
         parent::setContainer($container);
@@ -50,10 +62,7 @@ class UploadController extends Controller
 
         $this->type = $type;
 
-        return $this->config = $this
-            ->container
-            ->get('upload_data.config_provider')
-            ->get($type);
+        return $this->config = $this->configProvider->get($type);
     }
 
     public function getRequestType()
@@ -80,13 +89,13 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function listAction(Request $request)
+    public function listAction(Request $request, UploadRepository $uploadRepository)
     {
         $filterForm = $this->createFilterListForm();
         $filterForm->handleRequest($request);
 
         $query = $this->config->getQueryList(
-            $this->get('upload_data.upload_repository'), $filterForm->getData()
+            $uploadRepository, $filterForm->getData()
         );
 
         $items = $this->get('knp_paginator')->paginate($query, $request->get('page', 1));
