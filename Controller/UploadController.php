@@ -2,6 +2,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Controller;
 
+use Ku\AjaxBundle\AjaxHandler;
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
@@ -113,7 +114,7 @@ class UploadController extends Controller
      *
      * @return Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request, AjaxHandler $ajaxHandler)
     {
         $response = null;
 
@@ -130,7 +131,7 @@ class UploadController extends Controller
                 $this->get('translator')->trans('label.upload_complete', array(), 'upload_data')
             );
 
-            $this->get('ku_ajax.handler')->success();
+            $ajaxHandler->success();
             return $this->redirectToRoute('upload_data_upload_list', array(
                 'type' => $this->getRequestType(),
             ));
@@ -205,7 +206,6 @@ class UploadController extends Controller
 
                 $this->addFlash('success', 'Transfered!');
             } catch (\Exception $e) {
-
                 if ($this->container->has('logger')) {
                     $this->get('logger')->critical('No se pudo procesar la transferencia del excel', array(
                         'error' => $e->getMessage(),
