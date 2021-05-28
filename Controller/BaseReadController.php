@@ -3,6 +3,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Controller;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
@@ -22,17 +23,17 @@ use Symfony\Component\Process\Process;
 class BaseReadController extends Controller
 {
     /**
-     * @var ReaderLoader
+     * @var ConfigProvider
      */
-    private $readerLoader;
+    private $configProvider;
 
     /**
      * BaseReadController constructor.
-     * @param ReaderLoader $readerLoader
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(ReaderLoader $readerLoader)
+    public function __construct(ConfigProvider $configProvider)
     {
-        $this->readerLoader = $readerLoader;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -40,7 +41,7 @@ class BaseReadController extends Controller
      */
     protected function getConfig(Upload $upload)
     {
-        return $this->readerLoader->get($upload->getType());
+        return $this->configProvider->get($upload->getType());
     }
 
     protected function processRead(Upload $upload)
