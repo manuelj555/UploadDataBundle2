@@ -2,6 +2,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Controller;
 
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelReader;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
@@ -79,15 +80,14 @@ class ExcelReadController extends BaseReadController
      *
      * @return Response
      */
-    public function previewHeadersAction(Request $request, Upload $upload)
+    public function previewHeadersAction(Request $request, Upload $upload, ExcelReader $excelReader)
     {
         $config = $this->getConfig($upload);
 
         $row = $request->get('row', 1);
 
         //previsualizamos las cabeceras
-        $headers = $this->get('upload_data.excel_reader')
-            ->getRowHeaders($upload->getFullFilename(), array(
+        $headers = $excelReader->getRowHeaders($upload->getFullFilename(), array(
                 'row_headers' => $row,
             ));
 

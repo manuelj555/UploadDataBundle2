@@ -16,15 +16,6 @@ class ExcelReader extends BaseReader
 {
 
     protected $extensions = array('xls', 'xlsx');
-//    /**
-//     * @var \PHPExcel
-//     */
-//    protected $excel;
-//
-//    function __construct($excel = null)
-//    {
-//        $this->excel = $excel ? : new \PHPExcel();
-//    }
 
     public function getData($filename, $options)
     {

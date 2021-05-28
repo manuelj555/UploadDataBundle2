@@ -60,8 +60,7 @@ services:
         tags:
             - { name: upload_data.reader, route_config: upload_data_upload_read_csv }
 
-    upload_data.excel_reader:
-        class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelReader
+    Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelReader:
         tags:
             - { name: upload_data.reader, route_config: upload_data_upload_read_excel }
 
@@ -81,8 +80,6 @@ services:
 
     upload_data.headers_matcher.excel:
         class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher
-        arguments:
-            - "@upload_data.excel_reader"
 
     upload_data.twig.extension.upload:
         class: Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension
