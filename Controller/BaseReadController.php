@@ -7,6 +7,7 @@ use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
@@ -44,7 +45,7 @@ class BaseReadController extends Controller
         return $this->configProvider->get($upload->getType());
     }
 
-    protected function processRead(Upload $upload)
+    protected function processRead(Upload $upload, LoggerInterface $logger)
     {
         $config = $this->getConfig($upload);
         try {
@@ -53,13 +54,11 @@ class BaseReadController extends Controller
             return true;
         } catch (\Exception $e) {
 
-            if ($this->container->has('logger')) {
-                $this->get('logger')->critical('No se pudo procesar la lectura del excel', array(
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ));
-            }
+            $logger->get('logger')->critical('No se pudo procesar la lectura del excel', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
 
             $this->addFlash('error', 'there has been an error, we could not complete the operation!');
         }

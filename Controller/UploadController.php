@@ -10,6 +10,7 @@ use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -19,7 +20,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  */
@@ -39,9 +39,15 @@ class UploadController extends Controller
      */
     private $configProvider;
 
-    public function __construct(ConfigProvider $configProvider)
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(ConfigProvider $configProvider, LoggerInterface $logger)
     {
         $this->configProvider = $configProvider;
+        $this->logger = $logger;
     }
 
     public function setContainer(ContainerInterface $container = null)
@@ -175,13 +181,11 @@ class UploadController extends Controller
                 $this->addFlash('success', 'Validated!');
             } catch (\Exception $e) {
 
-                if ($this->container->has('logger')) {
-                    $this->get('logger')->critical('No se pudo procesar la lectura del excel', array(
-                        'error' => $e->getMessage(),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine(),
-                    ));
-                }
+                $this->logger->critical('No se pudo procesar la lectura del excel', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
 
                 $this->addFlash('error', 'there has been an error, we could not complete the operation!');
             }
@@ -206,13 +210,12 @@ class UploadController extends Controller
 
                 $this->addFlash('success', 'Transfered!');
             } catch (\Exception $e) {
-                if ($this->container->has('logger')) {
-                    $this->get('logger')->critical('No se pudo procesar la transferencia del excel', array(
-                        'error' => $e->getMessage(),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine(),
-                    ));
-                }
+
+                $this->logger->critical('No se pudo procesar la transferencia del excel', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
 
                 $this->addFlash('error', 'there has been an error, we could not complete the operation!');
             }
@@ -238,14 +241,12 @@ class UploadController extends Controller
                 $this->addFlash('success', 'Action Completed!');
             } catch (\Exception $e) {
 
-                if ($this->container->has('logger')) {
-                    $this->get('logger')->critical('No se pudo procesar la acción {action} del excel', array(
-                        'action' => $action,
-                        'error' => $e->getMessage(),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine(),
-                    ));
-                }
+                $this->logger->critical('No se pudo procesar la acción {action} del excel', [
+                    'action' => $action,
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
 
                 $this->addFlash('error', 'there has been an error, we could not complete the operation!');
             }
@@ -302,13 +303,11 @@ class UploadController extends Controller
             $this->addFlash('success', 'Deleted!');
         } catch (\Exception $e) {
 
-            if ($this->container->has('logger')) {
-                $this->get('logger')->critical('No se pudo procesar la eliminación del excel', array(
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                ));
-            }
+            $this->logger->critical('No se pudo procesar la eliminación del excel', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
 
             $this->addFlash('error', 'there has been an error, we could not complete the operation!');
         }
