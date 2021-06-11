@@ -29,12 +29,22 @@ class BaseReadController extends Controller
     private $configProvider;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * BaseReadController constructor.
      * @param ConfigProvider $configProvider
+     * @param LoggerInterface $logger
      */
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(
+        ConfigProvider $configProvider,
+        LoggerInterface $logger
+    )
     {
         $this->configProvider = $configProvider;
+        $this->logger = $logger;
     }
 
     /**
@@ -45,7 +55,7 @@ class BaseReadController extends Controller
         return $this->configProvider->get($upload->getType());
     }
 
-    protected function processRead(Upload $upload, LoggerInterface $logger)
+    protected function processRead(Upload $upload)
     {
         $config = $this->getConfig($upload);
         try {
@@ -54,7 +64,7 @@ class BaseReadController extends Controller
             return true;
         } catch (\Exception $e) {
 
-            $logger->get('logger')->critical('No se pudo procesar la lectura del excel', [
+            $this->logger->get('logger')->critical('No se pudo procesar la lectura del excel', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
