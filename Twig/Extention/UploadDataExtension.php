@@ -9,11 +9,13 @@ namespace Manuel\Bundle\UploadDataBundle\Twig\Extention;
 use Manuel\Bundle\UploadDataBundle\ConfigProvider;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\LoadedColumn;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigTest;
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
-class UploadDataExtension extends \Twig_Extension
+class UploadDataExtension extends AbstractExtension
 {
     /**
      * @var ConfigProvider
@@ -30,24 +32,14 @@ class UploadDataExtension extends \Twig_Extension
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'upload_data.callback_extension';
-    }
-
     public function getTests()
     {
         return [
-            new \Twig_SimpleTest('upload_transfered', [$this, 'isUploadTransfered']),
-            new \Twig_SimpleTest('upload_validated', [$this, 'isUploadValidated']),
-            new \Twig_SimpleTest('upload_readed', [$this, 'isUploadReaded']),
-            new \Twig_SimpleTest('upload_action_actionable', [$this, 'isActionActionable']),
-            new \Twig_SimpleTest('upload_action_completed', [$this, 'isActionCompleted']),
+            new TwigTest('upload_transfered', [$this, 'isUploadTransfered']),
+            new TwigTest('upload_validated', [$this, 'isUploadValidated']),
+            new TwigTest('upload_readed', [$this, 'isUploadReaded']),
+            new TwigTest('upload_action_actionable', [$this, 'isActionActionable']),
+            new TwigTest('upload_action_completed', [$this, 'isActionCompleted']),
         ];
     }
 

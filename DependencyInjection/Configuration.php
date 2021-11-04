@@ -17,17 +17,15 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('upload_data');
+        $treeBuilder = new TreeBuilder('upload_data');
+        $rootNode    = $treeBuilder->getRootNode();
 
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
 
         $rootNode->children()
-                ->scalarNode('files_dir')->defaultValue('%kernel.root_dir%/cache/uploads/data/')->end()
-                ->booleanNode('use_command')->defaultValue(true)->end()
-                ->scalarNode('php_bin')->defaultValue('php')->cannotBeEmpty()->end()
+                ->scalarNode('files_dir')->defaultValue('%kernel.cache_dir%/../uploads/data/')->end()
                 ->scalarNode('uploaded_file_helper')->defaultValue('upload_data.file_helper.local')->cannotBeEmpty()->end()
                 ->scalarNode('debugging_role')->defaultValue('ROLE_UPLOAD_DEBUGGING')->cannotBeEmpty()->end()
                 ->arrayNode('templates')

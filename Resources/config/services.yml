@@ -66,11 +66,6 @@ services:
         factory: ['@doctrine.orm.entity_manager', 'getRepository']
         arguments: ['UploadDataBundle:Upload']
 
-    upload_data.command.process_action:
-        class: Manuel\Bundle\UploadDataBundle\Command\ProcessActionCommand
-        tags:
-            - { name: console.command }
-
     upload_data.file_helper.local:
         class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper
 
