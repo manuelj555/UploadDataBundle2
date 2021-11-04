@@ -2,10 +2,11 @@
 
 namespace Manuel\Bundle\UploadDataBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -30,5 +31,7 @@ class UploadDataExtension extends Extension
         $container->setParameter('upload_data.secuity.debugging_role', $config['debugging_role']);
 
         $container->setAlias('upload_data.file_helper.default', $config['uploaded_file_helper']);
+
+        $container->registerForAutoconfiguration(UploadConfig::class)->addTag('upload_data.config');
     }
 }

@@ -436,7 +436,6 @@ abstract class UploadConfig
 
             throw $e;
         }
-
     }
 
     public function processRead(Upload $upload)

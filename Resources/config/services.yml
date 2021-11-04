@@ -5,7 +5,9 @@ services:
 
     Manuel\Bundle\UploadDataBundle\ConfigProvider:
         arguments:
-            - !tagged_locator { tag: 'upload_data.config', index_by: 'id' }
+            - !tagged_locator { tag: 'upload_data.config' }
+
+    Manuel\Bundle\UploadDataBundle\Config\ConfigHelperFactory: ~
 
     upload_data.column_list_factory:
         class: Manuel\Bundle\UploadDataBundle\Mapper\ColumnList\ColumnFactory
@@ -61,22 +63,13 @@ services:
             - { name: upload_data.reader, route_config: upload_data_upload_read_excel }
 
     Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader: ~
-
-    Manuel\Bundle\UploadDataBundle\Entity\UploadRepository:
-        factory: ['@doctrine.orm.entity_manager', 'getRepository']
-        arguments: ['UploadDataBundle:Upload']
+    Manuel\Bundle\UploadDataBundle\Entity\UploadRepository: ~
+    Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository: ~
+    Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher: ~
+    Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension: ~
 
     upload_data.file_helper.local:
         class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper
-
-    upload_data.headers_matcher.excel:
-        class: Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher
-
-    upload_data.twig.extension.upload:
-        class: Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension
-        public: false
-        tags:
-            - { name: twig.extension }
 
     upload_data.constraint.validator.entity_exists:
         class: Manuel\Bundle\UploadDataBundle\Validator\Constraint\EntityExistsValidator

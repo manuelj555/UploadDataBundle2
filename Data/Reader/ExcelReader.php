@@ -6,6 +6,9 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -28,14 +31,14 @@ class ExcelReader extends BaseReader
 
         $lastColumn = $sheet->getHighestColumn($options['row_headers']);
 
-        $excelHeaders = $sheet->rangeToArray('A'.$options['row_headers']
-            .':'.$lastColumn.$options['row_headers'], null, true, true, true);
+        $excelHeaders = $sheet->rangeToArray('A' . $options['row_headers']
+            . ':' . $lastColumn . $options['row_headers'], null, true, true, true);
         $excelHeaders = current($excelHeaders);
 
         $sheet->garbageCollect();
         $maxRow = $sheet->getHighestRow();
         $rows = range($options['row_headers'] + 1, $maxRow);
-        $cols = range(0, \PHPExcel_Cell::columnIndexFromString($lastColumn));
+        $cols = range(0, Cell::columnIndexFromString($lastColumn));
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
@@ -48,9 +51,9 @@ class ExcelReader extends BaseReader
                 $colName = \PHPExcel_Cell::stringFromColumnIndex($colIndex);
 
                 if (null !== $cell) {
-                    if ($cell->isFormula()){
+                    if ($cell->isFormula()) {
                         $rawValue = $cell->getCalculatedValue();
-                    }else{
+                    } else {
                         $rawValue = $cell->getValue();
                     }
                     if ($rawValue !== null) {
@@ -121,12 +124,9 @@ class ExcelReader extends BaseReader
         ));
     }
 
-    /**
-     * @param \PHPExcel
-     */
-    protected function load($filename)
+    protected function load($filename): Spreadsheet
     {
-        return \PHPExcel_IOFactory::load($filename);
+        return IOFactory::load($filename);
     }
 
 }

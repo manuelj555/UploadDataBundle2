@@ -8,11 +8,14 @@ namespace Manuel\Bundle\UploadDataBundle\Config;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
+use Manuel\Bundle\UploadDataBundle\Data\MatchInfo;
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,6 +27,10 @@ class ConfigHelper
      * @var UploadConfig
      */
     private $config;
+    /**
+     * @var ExcelHeadersMatcher
+     */
+    private $headersMatcher;
     /**
      * @var EntityManagerInterface
      */
@@ -51,6 +58,7 @@ class ConfigHelper
 
     public function __construct(
         UploadConfig $config,
+        ExcelHeadersMatcher $headersMatcher,
         EntityManagerInterface $entityManager,
         UploadRepository $repository,
         UploadedItemRepository $itemRepository,
@@ -58,6 +66,7 @@ class ConfigHelper
         ?LoggerInterface $logger = null
     ) {
         $this->config = $config;
+        $this->headersMatcher = $headersMatcher;
         $this->entityManager = $entityManager;
         $this->repository = $repository;
         $this->itemRepository = $itemRepository;
@@ -77,6 +86,11 @@ class ConfigHelper
         );
 
         return $this->paginateIfApply($query, $request);
+    }
+
+    public function upload(UploadedFile $uploadedFile, array $formData = [], array $uploadAttributes = []): Upload
+    {
+        return $this->getConfig()->processUpload($uploadedFile, $formData, $uploadAttributes);
     }
 
     public function validate(Upload $upload): bool
@@ -143,11 +157,9 @@ class ConfigHelper
         return false;
     }
 
-    public function showAction(Upload $upload, Request $request): array
+    public function show(Upload $upload, Request $request): array
     {
-        $query = $this->getDoctrine()
-            ->getRepository('UploadDataBundle:UploadedItem')
-            ->getQueryByUpload($upload, $request->query->all());
+        $query = $this->itemRepository->getQueryByUpload($upload, $request->query->all());
 
         return $this->paginateIfApply($query, $request);
     }
@@ -189,6 +201,26 @@ class ConfigHelper
     public function getLastException(): ?Exception
     {
         return $this->lastException;
+    }
+
+    public function getDefaultMatchInfo(Upload $upload, array $options = []): MatchInfo
+    {
+        return $this->headersMatcher->getDefaultMatchInfo($this->getConfig(), $upload, $options);
+    }
+
+    public function applyMatch(MatchInfo $matchInfo, array $matchData): array
+    {
+        $match = $this->headersMatcher->applyMatch($this->getConfig(), $matchInfo, $matchData);
+
+        $this->entityManager->persist($matchInfo->getUpload());
+        $this->entityManager->flush();
+
+        return $match;
+    }
+
+    public function configureDefaultMatch(Upload $upload, array $options = []):void
+    {
+        $this->getConfig()->configureDefaultMatch($upload, $options);
     }
 
     private function paginateIfApply(QueryBuilder $query, Request $request)

@@ -7,9 +7,8 @@
 namespace Manuel\Bundle\UploadDataBundle\Profiler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 
@@ -48,7 +47,7 @@ class ExceptionProfiler
 
         $this->eventDispatcher->addListener(
             KernelEvents::RESPONSE,
-            function (FilterResponseEvent $event) use ($exception) {
+            function (ResponseEvent $event) use ($exception) {
                 if (!$event->isMasterRequest()) {
                     return;
                 }

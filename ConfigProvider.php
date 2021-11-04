@@ -8,6 +8,7 @@ namespace Manuel\Bundle\UploadDataBundle;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Psr\Container\ContainerInterface;
+use function dd;
 
 
 /**
@@ -37,9 +38,8 @@ class ConfigProvider
         if (!$this->container->has($type)){
             throw new \InvalidArgumentException(sprintf('Tipo "%s" no definido', $type));
         }
-
+        /** @var UploadConfig $config */
         $config = $this->container->get($type);
-
         $config->processConfiguration($options);
 
         return $config;

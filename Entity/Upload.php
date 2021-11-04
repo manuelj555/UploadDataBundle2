@@ -640,10 +640,12 @@ class Upload
         $expectedNames = $this->getColumnKeys();
         $columns = [];
 
-        foreach ($expectedNames as $index => $name) {
-            $key = isset($fileNames[$index]) ? $fileNames[$index] : ucfirst($name);
+        if ($expectedNames) {
+            foreach ($expectedNames as $index => $name) {
+                $key = isset($fileNames[$index]) ? $fileNames[$index] : ucfirst($name);
 
-            $columns[$key] = $name;
+                $columns[$key] = $name;
+            }
         }
 
         return $columns;

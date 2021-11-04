@@ -52,52 +52,32 @@ class MatchInfo
         $this->options = $options;
     }
 
-    /**
-     * @return Upload
-     */
-    public function getUpload()
+    public function getUpload():Upload
     {
         return $this->upload;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFileHeaders()
+    public function getFileHeaders():array
     {
         return $this->fileHeaders;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getConfiguredColumns()
+    public function getConfiguredColumns():?array
     {
         return $this->configuredColumns;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMatchedColumns()
+    public function getMatchedColumns():?array
     {
         return $this->matchedColumns;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions():array
     {
         return $this->options;
     }
 
-    /**
-     * @param $columnName
-     * @param $fileHeaderName
-     * @return bool
-     */
-    public function hasMatch($columnName, $fileHeaderName)
+    public function matched(string $columnName, string $fileHeaderName):bool
     {
         return isset($this->matchedColumns[$columnName]) && $fileHeaderName == $this->matchedColumns[$columnName];
     }

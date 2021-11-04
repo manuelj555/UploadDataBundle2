@@ -7,6 +7,7 @@ namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Data\MatchInfo;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use function dd;
 
 /**
  * Class ExcelHeadersMatcher
@@ -36,10 +37,10 @@ class ExcelHeadersMatcher
      * @param array $options
      * @return MatchInfo
      */
-    public function getDefaultMatchInfo(UploadConfig $config, Upload $upload, array $options = [])
+    public function getDefaultMatchInfo(UploadConfig $config, Upload $upload, array $options = []): MatchInfo
     {
         $options = array_filter([
-                'row_headers' => $upload->getAttributeValue('row_headers'),
+                'row_headers' => $upload->getAttributeValue('row_headers') ?: 1,
             ]) + $options;
 
         $headers = $this->excelReader->getRowHeaders($upload->getFullFilename(), $options);
@@ -56,7 +57,7 @@ class ExcelHeadersMatcher
      * @param array $matchData
      * @return array
      */
-    public function applyMatch(UploadConfig $config, MatchInfo $info, array $matchData)
+    public function applyMatch(UploadConfig $config, MatchInfo $info, array $matchData): array
     {
         $columnsMapper = $config->getColumnsMapper();
         $upload = $info->getUpload();

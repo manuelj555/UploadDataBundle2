@@ -9,7 +9,7 @@
                     <th class="text-center">{{ 'table.file_columns'|trans }}</th>
                 </tr>
             </thead>
-            {% for name, options in columns %}
+            {% for name, options in match_info.configuredColumns %}
                 <tr>
                     <td style="width: 50%">
                         <label class="control-label">{{ options.label|title }}</label>
@@ -19,8 +19,8 @@
                         <select name="columns[{{ name }}]" class="form-control file-header"
                                 {% if options.required %}required="required" {% endif %}>
                             <option value="">- Seleccione -</option>
-                            {% for index, file_header in file_headers %}
-                                <option {% if matches[name] is defined and file_header == matches[name] %}selected="selected"
+                            {% for index, file_header in match_info.fileHeaders %}
+                                <option {% if match_info.matched(name, file_header) %}selected="selected"
                                         {% endif %}value="{{ index }}">{{ file_header|title }}</option>
                             {% endfor %}
                         </select>

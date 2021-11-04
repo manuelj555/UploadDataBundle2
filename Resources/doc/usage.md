@@ -1,11 +1,11 @@
 # Usando el Bundle
 
-El funcionamiento del bundle se basa en una clase de configuración que existende [UploadConfig](https://github.com/manuel/UploadDataBundle2/blob/master/Config/UploadConfig.php), por ejemplo:
+El funcionamiento del bundle se basa en una clase de configuración que existende [UploadConfig](./Config/UploadConfig.php), por ejemplo:
 
 ```php
 <?php
 
-namespace AppBundle\Upload;
+namespace App\Upload;
 
 use Doctrine\Common\Collections\Collection;
 use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
@@ -35,7 +35,7 @@ class UploadCardConfig extends UploadConfig
             ->add('expiration_date', array(
                 'required' => false,
                 //podemos formatear los datos leidos del archivo subido.
-                'formatter' => function($value){ return strtoupper($value); },
+                'formatter' => function($value) { return strtoupper($value); },
             ))
             ->add('name', array(
                 'required' => false,
@@ -88,7 +88,7 @@ class UploadCardConfig extends UploadConfig
 }
 ```
 
-la clase consta de 4 métodos, de los cuales solo son obligatorios los métodos **configureColumns, configureValidations y transfer**, ya que es por medio de estos, que se leerá la data del archivo, se validará y se procesará para llevar los datos a la lógica de la aplicación.
+La clase consta de 4 métodos, de los cuales solo son obligatorios los métodos **configureColumns, configureValidations y transfer**, ya que es por medio de estos, que se leerá la data del archivo, se validará y se procesará para llevar los datos a la lógica de la aplicación.
 
 ## configureColumns()
 
@@ -114,19 +114,62 @@ Este método permite especificar validaciones para cada una de las columnas que 
 
 Con este método realizaremos el proceso de transferencia de los datos leidos a la aplicación.
 
-## Registrar la clase como un Servicio:
+## Cargando y procesando un archivo
 
-Para poder hacer uso de la carga de Tarjetas, debemos registrar la clase `AppBundle\Upload\UploadCardConfig` como un servicio y agregarle las etiquetas necesarias:
+Este es un controlador de ejemplo para llevar a cabo la carga de un archivo en diferentes pasos:
 
-```yaml
-services:
-    app.upload.card_config:
-        class: AppBundle\Upload\UploadCardConfig
-        tags:
-            - { name: upload_data.config, id: 'cards' }
+```php
+<?php
+
+use Manuel\Bundle\UploadDataBundle\Controller\AbstractUploadController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use App\Upload\UploadCardConfig;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+
+class UploadCardController extends AbstractUploadController
+{
+    /**
+     * En esta ruta hacemos la carga del archivo excel y lo procesamos con el configHelper 
+     * @Route("/upload", methods={"post"})
+     */
+    public function process(Request $request): Response
+    {
+        $configHelper = $this->getHelper(UploadCardConfig::class);
+        $upload = $configHelper->upload(
+            $request->files->get('file'), 
+            [], // acá pasamos datos adicionales del formulario si hace falta
+            [
+                'created_by' => $this->getUser()->getId(),
+            ], // acá pasamos atributos que quedarán guardados en bd si hace falta
+        );
+        
+        $this->addFlash('success', 'Archivo cargado con exito');
+
+        return $this->redirectToRoute('list');
+    }
+
+    /**
+     * En esta ruta hacemos la carga del archivo excel y lo procesamos con el configHelper 
+     * @Route("/read/{id}")
+     */
+    public function read(Request $request, Upload $upload): Response
+    {
+        $configHelper = $this->getHelper(UploadCardConfig::class);
+        $upload = $configHelper->read(
+            $request->files->get('file'), 
+            [], // acá pasamos datos adicionales del formulario si hace falta
+            [
+                'created_by' => $this->getUser()->getId(),
+            ], // acá pasamos atributos que quedarán guardados en bd si hace falta
+        );
+        
+        $this->addFlash('success', 'Archivo cargado con exito');
+
+        return $this->redirectToRoute('list');
+    }
+}
 ```
 
-La etiqueta `upload_data.config` le indica a symfony que el servicio `app.upload.card_config` es una clase para administrar carga de archivos, donde `id` es el nombre unico que define el tipo de carga, y es usado como parte de la url para la administración y lectura de los ficheros que se suben.
-
-### Visualizar la página de carga de tarjetas
 
