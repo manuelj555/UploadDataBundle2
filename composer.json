@@ -12,7 +12,6 @@
         }
     ],
     "require": {
-        "knplabs/knp-paginator-bundle": ">=2.4",
         "phpoffice/phpspreadsheet": "^1.10",
         "symfony/framework-bundle": ">=5.0"
     },
