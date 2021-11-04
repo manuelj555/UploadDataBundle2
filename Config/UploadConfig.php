@@ -241,7 +241,7 @@ abstract class UploadConfig
         return '@UploadData/Upload';
     }
 
-    public function getQueryList(UploadRepository $repository, $filters = null, $order = 'DESC')
+    public function getQueryList(UploadRepository $repository, $filters = null, $order = 'DESC'): QueryBuilder
     {
         if (is_array($filters) and array_key_exists('search', $filters)) {
             $search = $filters['search'];
@@ -426,6 +426,7 @@ abstract class UploadConfig
 
             $this->onPostUpload($upload, $filename, $formData);
 
+            $this->objectManager->persist($upload);
             $this->objectManager->flush();
             $this->objectManager->commit();
 

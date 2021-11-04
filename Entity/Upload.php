@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="upload_data_upload")
  * @ORM\Entity(repositoryClass="Manuel\Bundle\UploadDataBundle\Entity\UploadRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
  */
 class Upload
 {
