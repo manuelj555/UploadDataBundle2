@@ -13,15 +13,14 @@
     ],
     "require": {
         "knplabs/knp-paginator-bundle": ">=2.4",
-        "phpoffice/phpexcel": "~1.8.0",
-        "manuelj555/ajax-bundle": "2.0.*@dev"
+        "phpoffice/phpspreadsheet": "^1.16"
     },
     "autoload": {
         "psr-4": { "Manuel\\Bundle\\UploadDataBundle\\": "" }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "4.0-dev"
         }
     }
 }
