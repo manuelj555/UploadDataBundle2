@@ -123,16 +123,10 @@ services:
     app.upload.card_config:
         class: AppBundle\Upload\UploadCardConfig
         tags:
-            - { name: upload_data.config, id: 'cards', label: 'label.upload_cards_list' }
+            - { name: upload_data.config, id: 'cards' }
 ```
 
-La etiqueta `upload_data.config` le indica a symfony que el servicio `app.upload.card_config` es una clase para administrar carga de archivos, donde `id` es el nombre unico que define el tipo de carga, y es usado como parte de la url para la administración y lectura de los ficheros que se suben. Y `label` es el título de la página de carga de tarjetas.
+La etiqueta `upload_data.config` le indica a symfony que el servicio `app.upload.card_config` es una clase para administrar carga de archivos, donde `id` es el nombre unico que define el tipo de carga, y es usado como parte de la url para la administración y lectura de los ficheros que se suben.
 
 ### Visualizar la página de carga de tarjetas
 
-Luego de registrar el servicio podemos acceder a la url `/proyecto/app_dev.php/uploads/cards` y visualizar un listado de los archivos de cards cargados hasta el momento.
-
-En este punto es importante entender como se estructura la url a la que hemos accedido:
-
- * /uploads es el patron de ruta que hemos colocado en nuestro `app/config/routing.yml` al importar las rutas del bundle.
- * /cards es el id que le hemos colocado al servicio al etiquetarlo con `upload_data.config`.
