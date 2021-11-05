@@ -7,6 +7,9 @@
 namespace Manuel\Bundle\UploadDataBundle\Mapper\ColumnList;
 
 
+use function array_key_exists;
+use function dd;
+
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
@@ -24,7 +27,6 @@ class LoadedColumn
         $this->type = $type;
         $this->setTemplate($options['template']);
     }
-
 
     /**
      * @param mixed $name
@@ -81,7 +83,7 @@ class LoadedColumn
      */
     public function getOption($name)
     {
-        if (!array_key_exists($name, $this->options)) {
+        if (!$this->hasOption($name)) {
             throw new \InvalidArgumentException(sprintf('The Option "%s" does not exists', $name));
         }
 
@@ -122,15 +124,20 @@ class LoadedColumn
 
     public function callOption($name, $arguments)
     {
-        if (!isset($this->options[$name])) {
+        if (!$this->hasOption($name)) {
             throw new \InvalidArgumentException(sprintf('The Option "%s" does not exists', $name));
         }
 
         if (!is_callable($this->options[$name])) {
+            dd($this);
             throw new \InvalidArgumentException(sprintf('The Option "%s" is not callable', $name));
         }
 
-        return call_user_func_array($this->options[$name], (array) $arguments);
+        return call_user_func_array($this->options[$name], (array)$arguments);
     }
 
+    public function hasOption($name): bool
+    {
+        return array_key_exists($name, $this->options);
+    }
 } 

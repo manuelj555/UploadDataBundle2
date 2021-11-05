@@ -35,8 +35,7 @@ class ActionColumn extends AbstractColumn
             },
             'confirm_text' => false,
             'position' => 301,
-            'route' => 'upload_data_upload_custom_action',
-            'parameters' => array(),
+            'url' => null,
         ));
 
         $resolver->setRequired(array(
@@ -46,7 +45,7 @@ class ActionColumn extends AbstractColumn
         $resolver->setDefined(array('modal_route', 'action_name'));
 
         $resolver->setAllowedTypes('condition',['Closure', 'callable']);
-        $resolver->setAllowedTypes('route','string');
+        $resolver->setAllowedTypes('url',['Closure', 'callable']);
         $resolver->setAllowedTypes('action_name','string');
     }
 }

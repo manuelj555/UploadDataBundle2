@@ -63,7 +63,7 @@ class EntityExistsValidator extends ConstraintValidator
 
         if ($this->isValidFromCache($constraint, $value)) {
             if ($notifySuccess) {
-                $item = $this->getValidIemFromCache($constraint, $value);
+                $item = $this->getValidItemFromCache($constraint, $value);
                 $this->notifySuccessItem($constraint, $value, $item);
             }
 
@@ -167,7 +167,7 @@ class EntityExistsValidator extends ConstraintValidator
         return isset($this->cachedData[$this->constraintUniqueId($constraint)]['valids'][$value]);
     }
 
-    private function getValidIemFromCache(EntityExists $constraint, $value)
+    private function getValidItemFromCache(EntityExists $constraint, $value)
     {
         return $this->cachedData[$this->constraintUniqueId($constraint)]['valids'][$value];
     }

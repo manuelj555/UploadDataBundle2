@@ -8,7 +8,6 @@ namespace Manuel\Bundle\UploadDataBundle\Config;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
@@ -17,6 +16,7 @@ use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
+use Manuel\Bundle\UploadDataBundle\Exception\UploadProcessException;
 use Manuel\Bundle\UploadDataBundle\Form\Type\UploadType;
 use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
 use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
@@ -25,11 +25,9 @@ use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
 use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ConstraintViolationInterface;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -83,6 +81,11 @@ abstract class UploadConfig
      * @var ExceptionProfiler
      */
     private $exceptionProfiler;
+
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
     /**
      * @var array
      */
@@ -92,22 +95,6 @@ abstract class UploadConfig
     {
         $this->columnsMapper = new ColumnsMapper();
         $this->validationBuilder = new ValidationBuilder();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLabel()
-    {
-        return $this->label;
-    }
-
-    /**
-     * @param mixed $label
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
     }
 
     /**
@@ -132,6 +119,11 @@ abstract class UploadConfig
     public function setObjectManager($objectManager)
     {
         $this->objectManager = $objectManager;
+    }
+
+    public function setUrlGenerator(UrlGeneratorInterface $urlGenerator): void
+    {
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -223,6 +215,21 @@ abstract class UploadConfig
         $this->processed = true;
 
         $optionsResolver = new OptionsResolver();
+
+        $optionsResolver->setDefaults([
+            'show_url' => null,
+            'read_url' => null,
+            'validate_url' => null,
+            'transfer_url' => null,
+            'delete_url' => null,
+        ]);
+
+        $optionsResolver->setAllowedTypes('show_url', ['null', 'callable', 'Closure']);
+        $optionsResolver->setAllowedTypes('read_url', ['null', 'callable', 'Closure']);
+        $optionsResolver->setAllowedTypes('validate_url', ['null', 'callable', 'Closure']);
+        $optionsResolver->setAllowedTypes('transfer_url', ['null', 'callable', 'Closure']);
+        $optionsResolver->setAllowedTypes('delete_url', ['null', 'callable', 'Closure']);
+
         $this->configureOptions($optionsResolver);
         $options = $optionsResolver->resolve($options);
 
@@ -233,7 +240,6 @@ abstract class UploadConfig
 
     public function configureOptions(OptionsResolver $resolver)
     {
-
     }
 
     public function getViewPrefix()
@@ -276,17 +282,16 @@ abstract class UploadConfig
         $uploadConfig = $this;
 
         $mapper->add('id', null, array('use_show' => true,));
-        $mapper->add('filename', 'link', array(
-            'route' => 'upload_data_upload_show',
-            'condition' => function (Upload $upload) {
-                return $upload->getTotal() > 0;
-            },
-        ));
+        $mapper->add('filename', 'text');
         $mapper->add('uploadedAt', 'datetime');
         $mapper->add('total', 'number_link', array(
             'position' => 10,
             'use_show' => true,
-            'route' => 'upload_data_upload_show',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['show_url']) {
+                    return $options['show_url']($this->urlGenerator, $upload, 'total');
+                }
+            },
             'condition' => function (Upload $upload) {
                 return $upload->getTotal() > 0;
             },
@@ -294,27 +299,37 @@ abstract class UploadConfig
         $mapper->add('valids', 'number_link', array(
             'position' => 20,
             'use_show' => true,
-            'route' => 'upload_data_upload_show',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['show_url']) {
+                    return $options['show_url']($this->urlGenerator, $upload, 'valids');
+                }
+            },
             'condition' => function (Upload $upload) {
                 return $upload->getValids() > 0;
             },
-            'parameters' => array('valid' => 1),
         ));
         $mapper->add('invalids', 'number_link', array(
             'position' => 30,
             'use_show' => true,
-            'route' => 'upload_data_upload_show',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['show_url']) {
+                    return $options['show_url']($this->urlGenerator, $upload, 'invalids');
+                }
+            },
             'condition' => function (Upload $upload) {
                 return $upload->getInvalids() > 0;
             },
-            'parameters' => array('valid' => 0),
         ));
         $mapper->addAction('read', array(
             'position' => 100,
             'condition' => function (Upload $upload) use ($uploadConfig) {
                 return $uploadConfig->isReadable($upload);
             },
-            'route' => 'upload_data_upload_read',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['read_url']) {
+                    return $options['read_url']($this->urlGenerator, $upload);
+                }
+            },
             'modal' => true,
         ));
         $mapper->addAction('validate', array(
@@ -322,21 +337,35 @@ abstract class UploadConfig
             'condition' => function (Upload $upload) use ($uploadConfig) {
                 return $uploadConfig->isValidatable($upload);
             },
-            'route' => 'upload_data_upload_validate',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['validate_url']) {
+                    return $options['validate_url']($this->urlGenerator, $upload);
+                }
+            },
         ));
+
         $mapper->addAction('transfer', array(
             'position' => 300,
             'condition' => function (Upload $upload) use ($uploadConfig) {
                 return $uploadConfig->isTransferable($upload);
             },
-            'route' => 'upload_data_upload_transfer',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['transfer_url']) {
+                    return $options['transfer_url']($this->urlGenerator, $upload);
+                }
+            },
         ));
+
         $mapper->addAction('delete', array(
             'position' => 500,
             'condition' => function (Upload $upload) use ($uploadConfig) {
                 return $uploadConfig->isDeletable($upload);
             },
-            'route' => 'upload_data_upload_delete',
+            'url' => function (Upload $upload) use ($options) {
+                if ($options['delete_url']) {
+                    return $options['delete_url']($this->urlGenerator, $upload);
+                }
+            },
             'confirm_text' => 'upload_data.confirm_delete',
         ));
     }
@@ -434,7 +463,7 @@ abstract class UploadConfig
         } catch (\Exception $e) {
             $this->profileException($e);
 
-            throw $e;
+            throw new UploadProcessException($e, 'upload');
         }
     }
 
@@ -460,7 +489,7 @@ abstract class UploadConfig
             $columnsMapper = $this->columnsMapper->getColumns();
 
             foreach ($data as $item) {
-                $formattedItem = array();
+                $formattedItemData = [];
 
                 foreach ($item as $colName => $value) {
                     if (isset($columnsMapper[$colName])) {
@@ -472,16 +501,14 @@ abstract class UploadConfig
                             $withoutFormat = $value;
                         }
 
-                        $formattedItem[$colName] = call_user_func(
+                        $formattedItemData[$colName] = call_user_func(
                             $columnsMapper[$colName]['formatter'],
                             $withFormat, $withoutFormat
                         );
                     }
                 }
-                $uploadedItem = new UploadedItem();
-                $uploadedItem->setData($formattedItem);
-                $upload->addItem($uploadedItem);
 
+                $uploadedItem = $upload->addItem($formattedItemData);
                 $this->objectManager->persist($uploadedItem);
             }
 
@@ -496,7 +523,7 @@ abstract class UploadConfig
             $this->onActionException($action, $upload);
             $this->profileException($e);
 
-            throw $e;
+            throw new UploadProcessException($e, 'read');
         }
     }
 
@@ -581,7 +608,7 @@ abstract class UploadConfig
             $this->profileException($e);
             $this->onActionException($action, $upload);
 
-            throw $e;
+            throw new UploadProcessException($e, 'validate');
         }
     }
 
@@ -616,7 +643,7 @@ abstract class UploadConfig
             $this->onActionException($action, $upload);
             $this->profileException($e);
 
-            throw $e;
+            throw new UploadProcessException($e, 'transfer');
         }
 
         return $data;
@@ -643,12 +670,11 @@ abstract class UploadConfig
             $action->setComplete();
 
             $this->onPostDelete($upload);
-
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
             $this->profileException($e);
 
-            throw $e;
+            throw new UploadProcessException($e, 'delete');
         }
     }
 
@@ -692,12 +718,11 @@ abstract class UploadConfig
             $this->objectManager->flush();
 
             $this->callActionFilter($upload, $name, 'onPost');
-
         } catch (\Exception $e) {
             $this->onActionException($action, $upload);
             $this->profileException($e);
 
-            throw $e;
+            throw new UploadProcessException($e, 'action_'.$name);
         }
     }
 
@@ -807,10 +832,8 @@ abstract class UploadConfig
         }
 
         return false;
-
     }
-    
-    
+
     /**
      * Este método es para cuando se quiere hacer un match automático en los procesos de carga,
      * es decir, que no se le quiere permitir al usuario hacer un match manual de las columnas
@@ -830,7 +853,7 @@ abstract class UploadConfig
 
         $upload->setAttributeValue('config_read', $options);
     }
-    
+
     /**
      * @return EntityManagerInterface
      */
@@ -848,7 +871,6 @@ abstract class UploadConfig
                 $this->objectManager->flush($upload);
             }
         } catch (\Exception $e) {
-
         }
     }
 
@@ -934,8 +956,7 @@ abstract class UploadConfig
     protected function shouldItemCanBeConsideredAsValid(
         GroupedConstraintViolations $violations,
         UploadedItem $item
-    )
-    {
+    ) {
         return !$violations->hasViolationsForGroup('default');
     }
 

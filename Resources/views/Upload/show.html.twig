@@ -1,5 +1,7 @@
 {% trans_default_domain 'upload_data' %}
 {% set is_ajax = app.request.isXmlHttpRequest() %}
+{% set config = config_helper.config %}
+{% set pagination = config_helper.show(upload, app.request) %}
 {% extends config.getTemplate('layout') %}
 
 {% set _target = 'show' %}{# usado para determinar la ruta a la cuar redirigir al ejecutar un proceso (validar, transferiri, eliminar) #}
@@ -34,12 +36,6 @@
 {% block actions %}
     <div class="row">
         <div class="col-md-5 col-md-push-7 text-right" style="margin-bottom: 10px">
-            <a href="{{ path('upload_data_upload_list', {type: type}) }}"
-               class="btn btn-default btn-sm ">{{ 'link.back_to_list'|trans }}</a>
-            {% if upload.hasInProgressActions() %}
-                <a href="{{ path('upload_data_upload_restore_actions', {type: type, id: upload.id}) }}"
-                   class="btn btn-danger btn-sm ">{{ 'link.restore_incomplete_process'|trans }}</a>
-            {% endif %}
         </div>
         <div class="col-md-7 col-md-pull-5">
             {{ include(config.getTemplate('show_small_info')) }}

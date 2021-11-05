@@ -2,6 +2,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Entity;
 
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -60,129 +61,59 @@ class UploadAction
      */
     private $actionCompleted = null;
 
-    function __construct($name = null)
+    function __construct(Upload $upload, $name = null)
     {
+        $this->upload = $upload;
         $this->setName($name);
         $this->setStatus(self::STATUS_NOT_COMPLETE);
         $this->actionCompleted = false;
     }
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set upload
-     *
-     * @param \stdClass $upload
-     *
-     * @return UploadAction
-     */
-    public function setUpload($upload)
-    {
-        $this->upload = $upload;
-
-        return $this;
-    }
-
-    /**
-     * Get upload
-     *
-     * @return \stdClass
-     */
-    public function getUpload()
-    {
-        return $this->upload;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return UploadAction
-     */
-    public function setName($name)
+    private function setName(string $name): void
     {
         $this->name = strtolower($name);
-
-        return $this;
     }
 
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * Set status
-     *
-     * @param integer $status
-     *
-     * @return UploadAction
-     */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
 
         if ($status == self::STATUS_COMPLETE) {
             $this->actionCompleted = true;
         }
-
-        return $this;
     }
 
-    /**
-     * Get status
-     *
-     * @return integer
-     */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
 
-    /**
-     * Set completedAt
-     *
-     * @param \DateTime $completedAt
-     *
-     * @return UploadAction
-     */
-    public function setCompletedAt($completedAt)
+    public function setCompletedAt($completedAt): void
     {
         $this->completedAt = $completedAt;
-
-        return $this;
     }
 
-    /**
-     * Get completedAt
-     *
-     * @return \DateTime
-     */
-    public function getCompletedAt()
+    public function getCompletedAt(): ?DateTimeInterface
     {
         return $this->completedAt;
     }
 
-    public function isNotComplete()
+    public function isNotComplete(): bool
     {
         return $this->getStatus() == self::STATUS_NOT_COMPLETE;
     }
 
-    public function isComplete($checkPreviousCompleted = true)
+    public function isComplete($checkPreviousCompleted = true): bool
     {
         if ($checkPreviousCompleted && $this->actionCompleted) {
             return true;
@@ -191,24 +122,24 @@ class UploadAction
         return ($this->getStatus() == self::STATUS_COMPLETE);
     }
 
-    public function isInProgress()
+    public function isInProgress(): bool
     {
         return $this->getStatus() == self::STATUS_IN_PROGRESS;
     }
 
-    public function setComplete()
+    public function setComplete(): void
     {
         $this->setStatus(self::STATUS_COMPLETE);
         $this->actionCompleted = true;
         $this->setCompletedAt(new \DateTime());
     }
 
-    public function setInProgress()
+    public function setInProgress(): void
     {
         $this->setStatus(self::STATUS_IN_PROGRESS);
     }
 
-    public function setNotComplete()
+    public function setNotComplete(): void
     {
         $this->setStatus(self::STATUS_NOT_COMPLETE);
         $this->setCompletedAt(null);
@@ -217,7 +148,7 @@ class UploadAction
     /**
      * @ORM\PostLoad()
      */
-    public function load()
+    public function load(): void
     {
         if (!$this->actionCompleted && ($this->status == self::STATUS_COMPLETE)) {
             $this->actionCompleted = true;

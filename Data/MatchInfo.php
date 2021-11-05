@@ -77,7 +77,7 @@ class MatchInfo
         return $this->options;
     }
 
-    public function matched(string $columnName, string $fileHeaderName):bool
+    public function matched(?string $columnName, ?string $fileHeaderName):bool
     {
         return isset($this->matchedColumns[$columnName]) && $fileHeaderName == $this->matchedColumns[$columnName];
     }

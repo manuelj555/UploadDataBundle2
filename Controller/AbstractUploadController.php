@@ -8,6 +8,7 @@ namespace Manuel\Bundle\UploadDataBundle\Controller;
 use Manuel\Bundle\UploadDataBundle\Config\ConfigHelper;
 use Manuel\Bundle\UploadDataBundle\Config\ConfigHelperFactory;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**

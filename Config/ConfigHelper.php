@@ -6,6 +6,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Config;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
 use Manuel\Bundle\UploadDataBundle\Data\MatchInfo;
@@ -14,6 +15,7 @@ use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadRepository;
+use Manuel\Bundle\UploadDataBundle\Exception\UploadProcessException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,7 +81,7 @@ class ConfigHelper
         return $this->config;
     }
 
-    public function getListData(Request $request, array $filters = null): array
+    public function getListData(Request $request, array $filters = null)
     {
         $query = $this->config->getQueryList(
             $this->repository, $filters
@@ -93,28 +95,57 @@ class ConfigHelper
         return $this->getConfig()->processUpload($uploadedFile, $formData, $uploadAttributes);
     }
 
-    public function validate(Upload $upload): bool
+    public function read(Upload $upload, bool $throwOnFail = false): bool
     {
         try {
-            $this->getConfig()->processValidation($upload);
+            $this->getConfig()->processRead($upload);
 
             return true;
         } catch (\Exception $e) {
             $this->lastException = $e;
 
             if ($this->logger) {
-                $this->logger->critical('No se pudo procesar la lectura del excel', [
+                $this->logger->critical('No se pudo procesar la validación del excel', [
                     'error' => $e->getMessage(),
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ]);
+            }
+
+            if ($throwOnFail) {
+                throw $e;
             }
         }
 
         return false;
     }
 
-    public function transfer(Upload $upload): bool
+    public function validate(Upload $upload, $onlyInvalids = false, bool $throwOnFail = false): bool
+    {
+        try {
+            $this->getConfig()->processValidation($upload, $onlyInvalids);
+
+            return true;
+        } catch (\Exception $e) {
+            $this->lastException = $e;
+
+            if ($this->logger) {
+                $this->logger->critical('No se pudo procesar la validación del excel', [
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+            }
+
+            if ($throwOnFail) {
+                throw $e;
+            }
+        }
+
+        return false;
+    }
+
+    public function transfer(Upload $upload, bool $throwOnFail = false): bool
     {
         try {
             $this->config->processTransfer($upload);
@@ -130,12 +161,16 @@ class ConfigHelper
                     'line' => $e->getLine(),
                 ]);
             }
+
+            if ($throwOnFail) {
+                throw $e;
+            }
         }
 
         return false;
     }
 
-    public function customAction(Upload $upload, string $action): bool
+    public function customAction(Upload $upload, string $action, bool $throwOnFail = false): bool
     {
         try {
             $this->config->processActionByName($upload, $action);
@@ -152,19 +187,48 @@ class ConfigHelper
                     'line' => $e->getLine(),
                 ]);
             }
+
+            if ($throwOnFail) {
+                throw $e;
+            }
         }
 
         return false;
     }
 
-    public function show(Upload $upload, Request $request): array
+    public function processAll(Upload $upload, bool $preventTransferOnInvalid = true): bool
+    {
+        if (!$upload->isReadable()) {
+            throw UploadProcessException::fromMessage(
+                'Esta carga ya fué leida y no se puede volver a procesar',
+                'process_all'
+            );
+        }
+
+        if (null == $upload->getAttributeValue('config_read')) {
+            $this->configureDefaultMatch($upload);
+        }
+
+        $this->read($upload, true);
+        $this->validate($upload, false, true);
+
+        if ($preventTransferOnInvalid && $upload->getInvalids() > 0) {
+            return false;
+        }
+
+        $this->transfer($upload, true);
+
+        return true;
+    }
+
+    public function show(Upload $upload, Request $request)
     {
         $query = $this->itemRepository->getQueryByUpload($upload, $request->query->all());
 
         return $this->paginateIfApply($query, $request);
     }
 
-    public function delete(Upload $upload): bool
+    public function delete(Upload $upload, bool $throwOnFail = false): bool
     {
         try {
             $this->config->processDelete($upload);
@@ -179,6 +243,10 @@ class ConfigHelper
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ]);
+            }
+
+            if ($throwOnFail) {
+                throw $e;
             }
         }
 
@@ -218,9 +286,12 @@ class ConfigHelper
         return $match;
     }
 
-    public function configureDefaultMatch(Upload $upload, array $options = []):void
+    public function configureDefaultMatch(Upload $upload, array $options = []): void
     {
         $this->getConfig()->configureDefaultMatch($upload, $options);
+
+        $this->entityManager->persist($upload);
+        $this->entityManager->flush();
     }
 
     private function paginateIfApply(QueryBuilder $query, Request $request)

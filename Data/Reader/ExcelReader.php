@@ -7,8 +7,10 @@
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -38,7 +40,7 @@ class ExcelReader extends BaseReader
         $sheet->garbageCollect();
         $maxRow = $sheet->getHighestRow();
         $rows = range($options['row_headers'] + 1, $maxRow);
-        $cols = range(0, Cell::columnIndexFromString($lastColumn));
+        $cols = range(0, Coordinate::columnIndexFromString($lastColumn));
 
         list($names, $headers) = $options['header_mapping'];
         $formattedData = array();
@@ -48,7 +50,7 @@ class ExcelReader extends BaseReader
 
             foreach ($cols as $colIndex) {
                 $cell = $sheet->getCellByColumnAndRow($colIndex, $rowIndex, false);
-                $colName = \PHPExcel_Cell::stringFromColumnIndex($colIndex);
+                $colName = Coordinate::stringFromColumnIndex($colIndex);
 
                 if (null !== $cell) {
                     if ($cell->isFormula()) {
@@ -57,7 +59,7 @@ class ExcelReader extends BaseReader
                         $rawValue = $cell->getValue();
                     }
                     if ($rawValue !== null) {
-                        $value = \PHPExcel_Style_NumberFormat::toFormattedString(
+                        $value = NumberFormat::toFormattedString(
                             $rawValue, $cell->getStyle()->getNumberFormat()->getFormatCode()
                         );
                     } else {

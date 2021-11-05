@@ -4,7 +4,6 @@ namespace Manuel\Bundle\UploadDataBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * UploadedItem
@@ -35,21 +34,21 @@ class UploadedItem implements \ArrayAccess
     /**
      * @var array
      *
-     * @ORM\Column(name="data", type="array", nullable=true)
+     * @ORM\Column(name="data", type="json", nullable=true)
      */
     private $data;
 
     /**
      * @var array
      *
-     * @ORM\Column(name="extras", type="json_array", nullable=true)
+     * @ORM\Column(name="extras", type="json", nullable=true)
      */
     private $extras = array();
 
     /**
      * @var array
      *
-     * @ORM\Column(name="errors", type="array", nullable=true)
+     * @ORM\Column(name="errors", type="json", nullable=true)
      */
     private $errors;
 
@@ -72,80 +71,34 @@ class UploadedItem implements \ArrayAccess
      */
     private $hasDefaultErrors = false;
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function __construct(Upload $upload, array $data)
+    {
+        $this->upload = $upload;
+        $this->setData($data);
+    }
+
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set upload
-     *
-     * @param string $upload
-     *
-     * @return UploadedItem
-     */
-    public function setUpload($upload)
-    {
-        $this->upload = $upload;
-
-        return $this;
-    }
-
-    /**
-     * Get upload
-     *
-     * @return string
-     */
-    public function getUpload()
-    {
-        return $this->upload;
-    }
-
-    /**
-     * Set data
-     *
-     * @param array $data
-     *
-     * @return UploadedItem
-     */
-    public function setData($data)
+    public function setData(array $data): void
     {
         $this->data = $data;
-
-        return $this;
     }
 
-    /**
-     * Get data
-     *
-     * @return array
-     */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
 
-    /**
-     * Set errors
-     *
-     * @param array $errors
-     *
-     * @return UploadedItem
-     */
-    public function setErrors($errors)
+    public function setErrors($errors): void
     {
         if (!($errors instanceof GroupedConstraintViolations)) {
             $errors = GroupedConstraintViolations::fromArray($errors);
         }
 
         $this->errors = $errors;
-
-        return $this;
     }
 
     /**
@@ -158,36 +111,17 @@ class UploadedItem implements \ArrayAccess
         return $this->errors;
     }
 
-    /**
-     * Set isValid
-     *
-     * @param boolean $isValid
-     *
-     * @return UploadedItem
-     */
-    public function setIsValid($isValid)
+    public function setIsValid(bool $isValid): void
     {
         $this->isValid = $isValid;
-
-        return $this;
     }
 
-    /**
-     * Get isValid
-     *
-     * @return boolean
-     */
-    public function getIsValid()
+    public function getIsValid(): bool
     {
         return $this->isValid;
     }
 
-    /**
-     * Get isValid
-     *
-     * @return boolean
-     */
-    public function isValidForGroup($name)
+    public function isValidForGroup($name): bool
     {
         return !$this->getErrors()->hasViolationsForGroup($name);
     }
@@ -214,34 +148,22 @@ class UploadedItem implements \ArrayAccess
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
 
-    /**
-     * @param int $status
-     */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
 
-    /**
-     * @return array
-     */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }
 
-    /**
-     * @param array $extras
-     */
-    public function setExtras($extras)
+    public function setExtras(array $extras)
     {
         $this->extras = $extras;
     }
@@ -307,18 +229,12 @@ class UploadedItem implements \ArrayAccess
         return array_unique($errors);
     }
 
-    /**
-     * @return bool
-     */
-    public function hasDefaultErrors()
+    public function hasDefaultErrors(): bool
     {
         return $this->hasDefaultErrors;
     }
 
-    /**
-     * @param bool $hasDefaultErrors
-     */
-    public function setHasDefaultErrors($hasDefaultErrors = true)
+    public function setHasDefaultErrors(bool $hasDefaultErrors = true): void
     {
         $this->hasDefaultErrors = $hasDefaultErrors;
     }

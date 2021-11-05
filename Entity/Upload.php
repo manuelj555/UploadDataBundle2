@@ -84,48 +84,6 @@ class Upload
      */
     private $uploadedAt;
 
-//    /**
-//     * @var smallint
-//     *
-//     * @ORM\Column(type="smallint")
-//     */
-//    private $readed;
-//
-//    /**
-//     * @var \DateTime
-//     *
-//     * @ORM\Column(name="readedAt", type="datetime", nullable=true)
-//     */
-//    private $readedAt;
-//
-//    /**
-//     * @var smallint
-//     *
-//     * @ORM\Column(type="smallint")
-//     */
-//    private $validated;
-//
-//    /**
-//     * @var \DateTime
-//     *
-//     * @ORM\Column(name="validatedAt", type="datetime", nullable=true)
-//     */
-//    private $validatedAt;
-//
-//    /**
-//     * @var smallint
-//     *
-//     * @ORM\Column(type="smallint")
-//     */
-//    private $transfered;
-//
-//    /**
-//     * @var \DateTime
-//     *
-//     * @ORM\Column(name="transferedAt", type="datetime", nullable=true)
-//     */
-//    private $transferedAt;
-
     /**
      * @ORM\OneToMany(
      *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute",
@@ -149,6 +107,16 @@ class Upload
     private $actions;
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->attributes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
      * Get id
      *
      * @return integer
@@ -156,6 +124,16 @@ class Upload
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
@@ -172,14 +150,22 @@ class Upload
         return $this;
     }
 
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType()
+    public function isReadable()
     {
-        return $this->type;
+        return $this->getUploadedAt() !== null
+            and $this->getAction('read')->isNotComplete()
+            and $this->getAction('validate')->isNotComplete()
+            and $this->getAction('transfer')->isNotComplete();
+    }
+
+    /**
+     * Get uploadedAt
+     *
+     * @return \DateTime
+     */
+    public function getUploadedAt()
+    {
+        return $this->uploadedAt;
     }
 
     /**
@@ -194,320 +180,6 @@ class Upload
         $this->uploadedAt = $uploadedAt;
 
         return $this;
-    }
-
-    /**
-     * Get uploadedAt
-     *
-     * @return \DateTime
-     */
-    public function getUploadedAt()
-    {
-        return $this->uploadedAt;
-    }
-
-    public function isReadable()
-    {
-        return $this->getUploadedAt() !== null
-            and $this->getAction('read')->isNotComplete()
-            and $this->getAction('validate')->isNotComplete()
-            and $this->getAction('transfer')->isNotComplete();
-    }
-
-    public function isValidatable()
-    {
-        return $this->getUploadedAt() !== null
-            and $this->getAction('read')->isComplete()
-            and !$this->getAction('validate')->isInProgress()
-            and $this->getAction('transfer')->isNotComplete();
-    }
-
-    public function isTransferable()
-    {
-        return $this->getUploadedAt() !== null
-            and $this->getAction('read')->isComplete()
-            and $this->getAction('validate')->isComplete()
-            and $this->getAction('transfer')->isNotComplete()
-            and $this->getValids() > 0;
-    }
-
-    public function isDeletable()
-    {
-        return $this->getAction('transfer')->isNotComplete();
-    }
-
-    /**
-     * Set file
-     *
-     * @param string $file
-     *
-     * @return Upload
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    /**
-     * Get file
-     *
-     * @return string
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * Set filename
-     *
-     * @param string $filename
-     *
-     * @return Upload
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-
-        return $this;
-    }
-
-    /**
-     * Get filename
-     *
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-    /**
-     * @ORM\PrePersist()
-     */
-    public function prePersist()
-    {
-        $this->setUploadedAt(new \DateTime());
-//        $this->setReaded(self::STATUS_NOT_COMPLETE);
-//        $this->setValidated(self::STATUS_NOT_COMPLETE);
-//        $this->setTransfered(self::STATUS_NOT_COMPLETE);
-
-        $this->addAction(new UploadAction('read'));
-        $this->addAction(new UploadAction('validate'));
-        $this->addAction(new UploadAction('transfer'));
-        $this->addAction(new UploadAction('delete'));
-    }
-
-    /**
-     * Add items
-     *
-     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items
-     *
-     * @return Upload
-     */
-    public function addItem(\Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items)
-    {
-        $this->items[] = $items;
-
-        $items->setUpload($this);
-
-        return $this;
-    }
-
-    /**
-     * Remove items
-     *
-     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items
-     */
-    public function removeItem(\Manuel\Bundle\UploadDataBundle\Entity\UploadedItem $items)
-    {
-        $this->items->removeElement($items);
-
-        $items->setUpload(null);
-    }
-
-    /**
-     * Get items
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getItems()
-    {
-        return $this->items;
-    }
-
-    /**
-     * Set fullFilename
-     *
-     * @param string $fullFilename
-     *
-     * @return Upload
-     */
-    public function setFullFilename($fullFilename)
-    {
-        $this->fullFilename = $fullFilename;
-
-        return $this;
-    }
-
-    /**
-     * Get fullFilename
-     *
-     * @return string
-     */
-    public function getFullFilename()
-    {
-        return $this->fullFilename;
-    }
-
-    /**
-     * Set valids
-     *
-     * @param integer $valids
-     *
-     * @return Upload
-     */
-    public function setValids($valids)
-    {
-        $this->valids = $valids;
-
-        return $this;
-    }
-
-    /**
-     * Get valids
-     *
-     * @return integer
-     */
-    public function getValids()
-    {
-        return $this->valids;
-    }
-
-    /**
-     * Set invalids
-     *
-     * @param integer $invalids
-     *
-     * @return Upload
-     */
-    public function setInvalids($invalids)
-    {
-        $this->invalids = $invalids;
-
-        return $this;
-    }
-
-    /**
-     * Get invalids
-     *
-     * @return integer
-     */
-    public function getInvalids()
-    {
-        return $this->invalids;
-    }
-
-    /**
-     * Set total
-     *
-     * @param integer $total
-     *
-     * @return Upload
-     */
-    public function setTotal($total)
-    {
-        $this->total = $total;
-
-        return $this;
-    }
-
-    /**
-     * Get total
-     *
-     * @return integer
-     */
-    public function getTotal()
-    {
-        return $this->total;
-    }
-
-    /**
-     * Add attributes
-     *
-     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
-     *
-     * @return Upload
-     */
-    public function addAttribute(\Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
-    {
-        $this->attributes[] = $attributes;
-
-        $attributes->setUpload($this);
-
-        return $this;
-    }
-
-    /**
-     * Remove attributes
-     *
-     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes
-     */
-    public function removeAttribute(\Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute $attributes)
-    {
-        $this->attributes->removeElement($attributes);
-
-        $attributes->setUpload(null);
-    }
-
-    /**
-     * Get attributes
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Add actions
-     *
-     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions
-     *
-     * @return Upload
-     */
-    public function addAction(\Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions)
-    {
-        $this->actions[] = $actions;
-
-        $actions->setUpload($this);
-
-        return $this;
-    }
-
-    /**
-     * Remove actions
-     *
-     * @param \Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions
-     */
-    public function removeAction(\Manuel\Bundle\UploadDataBundle\Entity\UploadAction $actions)
-    {
-        $this->actions->removeElement($actions);
-
-        $actions->setUpload(null);
-    }
-
-    /**
-     * Get actions
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getActions()
-    {
-        return $this->actions;
     }
 
     /**
@@ -527,11 +199,231 @@ class Upload
     }
 
     /**
+     * Get actions
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    public function isValidatable()
+    {
+        return $this->getUploadedAt() !== null
+            and $this->getAction('read')->isComplete()
+            and !$this->getAction('validate')->isInProgress()
+            and $this->getAction('transfer')->isNotComplete();
+    }
+
+    public function isTransferable()
+    {
+        return $this->getUploadedAt() !== null
+            and $this->getAction('read')->isComplete()
+            and $this->getAction('validate')->isComplete()
+            and $this->getAction('transfer')->isNotComplete()
+            and $this->getValids() > 0;
+    }
+
+    /**
+     * Get valids
+     *
+     * @return integer
+     */
+    public function getValids()
+    {
+        return $this->valids;
+    }
+
+    /**
+     * Set valids
+     *
+     * @param integer $valids
+     *
+     * @return Upload
+     */
+    public function setValids($valids)
+    {
+        $this->valids = $valids;
+
+        return $this;
+    }
+
+    public function isDeletable()
+    {
+        return $this->getAction('transfer')->isNotComplete();
+    }
+
+    /**
+     * Get file
+     *
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * Set file
+     *
+     * @param string $file
+     *
+     * @return Upload
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * Get filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * Set filename
+     *
+     * @param string $filename
+     *
+     * @return Upload
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     */
+    public function prePersist()
+    {
+        $this->setUploadedAt(new \DateTime());
+
+        $this->addAction(new UploadAction($this, 'read'));
+        $this->addAction(new UploadAction($this, 'validate'));
+        $this->addAction(new UploadAction($this, 'transfer'));
+        $this->addAction(new UploadAction($this, 'delete'));
+    }
+
+    private function addAction(UploadAction $actions)
+    {
+        $this->actions[] = $actions;
+    }
+
+    public function addItem(array $data): UploadedItem
+    {
+        $this->items[] = $item = new UploadedItem($this, $data);
+
+        return $item;
+    }
+
+    /**
+     * Get fullFilename
+     *
+     * @return string
+     */
+    public function getFullFilename()
+    {
+        return $this->fullFilename;
+    }
+
+    /**
+     * Set fullFilename
+     *
+     * @param string $fullFilename
+     *
+     * @return Upload
+     */
+    public function setFullFilename($fullFilename)
+    {
+        $this->fullFilename = $fullFilename;
+
+        return $this;
+    }
+
+    /**
+     * Get invalids
+     *
+     * @return integer
+     */
+    public function getInvalids()
+    {
+        return $this->invalids;
+    }
+
+    /**
+     * Set invalids
+     *
+     * @param integer $invalids
+     *
+     * @return Upload
+     */
+    public function setInvalids($invalids)
+    {
+        $this->invalids = $invalids;
+
+        return $this;
+    }
+
+    /**
+     * Get total
+     *
+     * @return integer
+     */
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    /**
+     * Set total
+     *
+     * @param integer $total
+     *
+     * @return Upload
+     */
+    public function setTotal($total)
+    {
+        $this->total = $total;
+
+        return $this;
+    }
+
+    /**
+     * Remove actions
+     *
+     * @param UploadAction $actions
+     */
+    public function removeAction(UploadAction $actions)
+    {
+        $this->actions->removeElement($actions);
+    }
+
+    public function setAttributeValue(string $name, $value)
+    {
+        if ($attr = $this->getAttribute($name)) {
+            $attr->setValue($value);
+        } else {
+            $this->attributes[] = new UploadAttribute($this, $name, $value);
+        }
+    }
+
+    /**
      * @param $name
      *
      * @return UploadAttribute|null
      */
-    public function getAttribute($name)
+    public function getAttribute(string $name)
     {
         $name = strtolower($name);
 
@@ -543,36 +435,13 @@ class Upload
     }
 
     /**
-     * @param $name
+     * Get attributes
      *
-     * @return mixed|null
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getAttributeValue($name)
+    public function getAttributes()
     {
-        if ($attr = $this->getAttribute($name)) {
-            return $attr->getValue();
-        }
-    }
-
-    public function setAttributeValue($name, $value)
-    {
-        if ($attr = $this->getAttribute($name)) {
-            $attr->setValue($value);
-        } else {
-            $this->addAttribute($attr = new UploadAttribute($name, $value));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->attributes = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
+        return $this->attributes;
     }
 
     public function getValidItems()
@@ -581,6 +450,16 @@ class Upload
             ->filter(function (UploadedItem $item) {
                 return $item->getIsValid();
             });
+    }
+
+    /**
+     * Get items
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getItems()
+    {
+        return $this->items;
     }
 
     public function hasInProgressActions()
@@ -593,6 +472,42 @@ class Upload
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getColumns()
+    {
+        if ($columns = $this->getAttributeValue('configured_columns')) {
+            return $columns;
+        }
+
+        $fileNames = $this->getColumnNames(true);
+        $expectedNames = $this->getColumnKeys();
+        $columns = [];
+
+        if ($expectedNames) {
+            foreach ($expectedNames as $index => $name) {
+                $key = isset($fileNames[$index]) ? $fileNames[$index] : ucfirst($name);
+
+                $columns[$key] = $name;
+            }
+        }
+
+        return $columns;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return mixed|null
+     */
+    public function getAttributeValue($name)
+    {
+        if ($attr = $this->getAttribute($name)) {
+            return $attr->getValue();
+        }
     }
 
     /**
@@ -625,29 +540,5 @@ class Upload
         }
 
         return $config['header_mapping'][0];
-    }
-
-    /**
-     * @return array
-     */
-    public function getColumns()
-    {
-        if ($columns = $this->getAttributeValue('configured_columns')) {
-            return $columns;
-        }
-
-        $fileNames = $this->getColumnNames(true);
-        $expectedNames = $this->getColumnKeys();
-        $columns = [];
-
-        if ($expectedNames) {
-            foreach ($expectedNames as $index => $name) {
-                $key = isset($fileNames[$index]) ? $fileNames[$index] : ucfirst($name);
-
-                $columns[$key] = $name;
-            }
-        }
-
-        return $columns;
     }
 }

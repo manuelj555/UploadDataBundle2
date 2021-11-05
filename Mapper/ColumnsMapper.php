@@ -9,6 +9,10 @@ namespace Manuel\Bundle\UploadDataBundle\Mapper;
 use Manuel\Bundle\UploadDataBundle\Mapper\Exception\DefaultMappingException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use function array_intersect;
+use function array_intersect_key;
+use function dd;
+use function dump;
 
 
 /**
@@ -16,15 +20,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ColumnsMapper
 {
-    protected $columns = array();
-    protected $labels = array();
-    protected $matches = array();
+    protected $columns = [];
+    protected $labels = [];
+    protected $matches = [];
 
-    public function add($name, array $options = array())
+    public function add($name, array $options = [])
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(array(
-            'aliases' => array(),
+        $resolver->setDefaults([
+            'aliases' => [],
             'label' => $name,
             'name' => $name,
             'required' => true,
@@ -32,7 +36,7 @@ class ColumnsMapper
                 return count($options['aliases']) > 0;
             },
             'formatter' => function ($value) { return $value; },
-        ));
+        ]);
         $resolver->setNormalizer('aliases', function (Options $options, $value) {
                 $value[] = $options['label'];
                 $value[] = $options['name'];
@@ -78,7 +82,7 @@ class ColumnsMapper
 
     public function getLabel($name)
     {
-        return isset($this->labels[$name]) ? $this->labels[$name] : null;
+        return $this->labels[$name] ?? null;
     }
 
     /**
@@ -98,7 +102,7 @@ class ColumnsMapper
      */
     public function match($fileHeaders = array())
     {
-        $this->matches = array();
+        $this->matches = [];
 
         $originals = $fileHeaders;
 
@@ -186,7 +190,10 @@ class ColumnsMapper
      */
     public function mapForm(array $data, array $fileHeaders)
     {
-        return array(array_flip($data), $fileHeaders);
+        $matchedData = array_flip($data);
+        $validFileHeader = array_intersect_key($fileHeaders, $matchedData);
+
+        return [$matchedData, $validFileHeader];
     }
 
     /**
@@ -241,6 +248,6 @@ class ColumnsMapper
         // Ordenamos por las claves para que concuerde con los headers en el archivo.
         ksort($expectedColumns);
 
-        return array($expectedColumns, $fileHeaders);
+        return [$expectedColumns, $fileHeaders];
     }
 }

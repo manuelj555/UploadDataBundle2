@@ -7,6 +7,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Builder;
 
 use Manuel\Bundle\UploadDataBundle\Validator\Constraint\EntityExists;
+use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -23,6 +24,11 @@ class ValidationBuilder
     protected $config = array();
 
     protected $in;
+
+    public function for($name, $groups = 'default')
+    {
+        return $this->with($name, $groups);
+    }
 
     public function with($name, $groups = 'default')
     {
@@ -71,7 +77,7 @@ class ValidationBuilder
 
     public function assertBlank($config = null)
     {
-        return $this->addConstraint(new NotBlank($config));
+        return $this->addConstraint(new Blank($config));
     }
 
     public function assertCallback($callback, $config = null)
@@ -113,7 +119,7 @@ class ValidationBuilder
         return $this->config;
     }
 
-    public function assertEntityExist($class, $property, $config)
+    public function assertEntityExist($class, $property, $config = [])
     {
         $config = [
                 'class' => $class,

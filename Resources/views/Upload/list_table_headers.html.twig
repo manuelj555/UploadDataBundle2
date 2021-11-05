@@ -1,6 +1,6 @@
 {% trans_default_domain 'upload_data' %}
 <tr>
-    {% for name, column in config.listMapper.columns if not is_show or column.options.use_show %}
+    {% for name, column in config.listMapper.columns|filter(v => is_show or v.options.use_show) %}
         <th>{{ column.options.label|default(name)|title|trans }}</th>
     {% endfor %}
 </tr>

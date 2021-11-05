@@ -51,6 +51,7 @@ class RegisterUploadConfigPass implements CompilerPassInterface
             array(new Reference('translator', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
         $definition->addMethodCall('setUploadedFileHelper', array(new Reference('upload_data.file_helper.default')));
         $definition->addMethodCall('setExceptionProfiler', array(new Reference('upload_data.profiler.exception')));
+        $definition->addMethodCall('setUrlGenerator', array(new Reference('router')));
         $definition->addMethodCall('initialize');
 
         $this->fixTemplates($container, $definition);

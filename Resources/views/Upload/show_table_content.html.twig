@@ -9,7 +9,6 @@
                 {% for name in columns %}
                     <th>{{ config.columnsMapper.label(name)|title|trans }}</th>
                 {% endfor %}
-                <th style="width: 130px">{{ 'table.details'|trans }}</th>
             </tr>
         </thead>
     {% endblock %}
@@ -33,15 +32,6 @@
                 {% for name in columns %}
                     <td>{{ item.data[name]|default }}</td>
                 {% endfor %}
-                <td>
-                    {% if show_detail %}
-                        <a class="btn btn-info btn-xs"
-                           href="{{ path('upload_data_upload_show_item', {type: type, id: item.id}) }}"
-                           data-ajax data-after="showModal">
-                            {{ 'link.detail'|trans }}
-                        </a>
-                    {%- endif %}
-                </td>
             </tr>
         {% endfor %}
     {% endblock %}

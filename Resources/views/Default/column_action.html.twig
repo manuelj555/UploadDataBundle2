@@ -3,19 +3,14 @@
 {% set action = item.getAction(name) %}
 {% set status = action.getStatus()|default(constant('Manuel\\Bundle\\UploadDataBundle\\Entity\\UploadAction::STATUS_NOT_COMPLETE')) %}
 {% set is_actionable = action and column.callOption('condition', [item]) %}
-{% set routeParams = column.options.parameters|default({})
-|merge({id: item.id, type: upload_type})
-|merge(_target is defined ? {_target: _target}: {}) %}
-{% if column.options.action_name is defined %}
-    {%- set routeParams = routeParams|merge({'action': column.options.action_name}) -%}
-{% endif %}
+
 <td class="text-center">
     {% if action %}
         {%- if action.isInProgress() -%}
             <span class="label label-warning">{{ bs_icon('refresh') }}...</span>
         {%- elseif is_actionable -%}
             <a class="upload-process upload-process-{{ name }} btn btn-{{ action.isComplete() ? 'success' : 'info' }} btn-xs"
-               href="{{ path(column.options.route, app.request.query.all()|merge(routeParams)) }}"
+               href="{{ column.callOption('url', [item]) }}"
                {% if column.options.confirm -%}data-confirm="{{ column.options.confirm_text|trans }}"{%- endif -%}
                     {% if column.options.modal -%}data-modal{%- endif -%}>
                 {{ bs_icon(action.isComplete() ? 'refresh' : 'eject') }}
