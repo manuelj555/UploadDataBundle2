@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Builder;
 
+use InvalidArgumentException;
 use Manuel\Bundle\UploadDataBundle\Validator\Constraint\EntityExists;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -15,6 +16,8 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use function is_callable;
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
@@ -45,24 +48,52 @@ class ValidationBuilder
         return $this;
     }
 
-    protected function verifyIn()
+    public function assertTrue($callback, $config = null)
     {
-        if (null == $this->in) {
-            throw new \LogicException(sprintf('No puede agregar una regla de validación sin antes llamar al método "->with()"'));
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException('El argumento no es un callable');
         }
+
+        $message = $config['message'] ?? 'Invalid Value';
+        unset($config['message']);
+
+        [$name, $groups] = $this->in;
+
+        return $this->assertCallback(function ($value, ExecutionContextInterface $context)
+        use ($callback, $message) {
+            if (!$callback($value)) {
+                $context->buildViolation($message)
+                    ->setInvalidValue($value)
+                    ->addViolation();
+            }
+        }, $config);
+    }
+
+    public function assertCallback($callback, $config = null)
+    {
+        $config['callback'] = $callback;
+
+        return $this->addConstraint(new Callback($config));
     }
 
     public function addConstraint($constraint)
     {
         $this->verifyIn();
 
-        list($name, $groups) = $this->in;
+        [$name, $groups] = $this->in;
 
-        foreach ($groups as $group){
+        foreach ($groups as $group) {
             $this->config[$group][$name][] = $constraint;
         }
 
         return $this;
+    }
+
+    protected function verifyIn()
+    {
+        if (null == $this->in) {
+            throw new \LogicException(sprintf('No puede agregar una regla de validación sin antes llamar al método "->with()"'));
+        }
     }
 
     public function assertNotNull($config = null)
@@ -78,13 +109,6 @@ class ValidationBuilder
     public function assertBlank($config = null)
     {
         return $this->addConstraint(new Blank($config));
-    }
-
-    public function assertCallback($callback, $config = null)
-    {
-        $config['callback'] = $callback;
-
-        return $this->addConstraint(new Callback($config));
     }
 
     public function assertDate($config = null)

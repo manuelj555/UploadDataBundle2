@@ -37,6 +37,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 abstract class UploadConfig
 {
     /**
+     * @var EntityManagerInterface
+     */
+    protected $objectManager;
+    /**
      * @var ColumnsMapper
      */
     private $columnsMapper;
@@ -55,14 +59,8 @@ abstract class UploadConfig
     private $columnListFactory;
     private $processed = false;
     private $uploadDir = false;
-    private $type = false;
     private $showDeleted = true;
     private $label;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $objectManager;
     /**
      * @var ValidatorInterface
      */
@@ -97,41 +95,9 @@ abstract class UploadConfig
         $this->validationBuilder = new ValidationBuilder();
     }
 
-    /**
-     * @param bool $showDeleted
-     */
-    public function setShowDeleted($showDeleted)
-    {
-        $this->showDeleted = $showDeleted;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowDeleted()
-    {
-        return $this->showDeleted;
-    }
-
-    /**
-     * @param EntityManagerInterface $objectManager
-     */
-    public function setObjectManager($objectManager)
-    {
-        $this->objectManager = $objectManager;
-    }
-
     public function setUrlGenerator(UrlGeneratorInterface $urlGenerator): void
     {
         $this->urlGenerator = $urlGenerator;
-    }
-
-    /**
-     * @param \Manuel\Bundle\UploadDataBundle\Mapper\ListMapper $listMapper
-     */
-    public function setListMapper($listMapper)
-    {
-        $this->listMapper = $listMapper;
     }
 
     /**
@@ -190,22 +156,6 @@ abstract class UploadConfig
         $this->exceptionProfiler = $exceptionProfiler;
     }
 
-    /**
-     * @param boolean $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
     public function processConfiguration($options = [])
     {
         if ($this->processed) {
@@ -238,46 +188,19 @@ abstract class UploadConfig
         $this->configureList($this->listMapper, $options);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver)
     {
     }
 
-    public function getViewPrefix()
-    {
-        return '@UploadData/Upload';
-    }
+    abstract protected function configureColumns(ColumnsMapper $mapper, array $options);
 
-    public function getQueryList(UploadRepository $repository, $filters = null, $order = 'DESC'): QueryBuilder
-    {
-        if (is_array($filters) and array_key_exists('search', $filters)) {
-            $search = $filters['search'];
-        } else {
-            $search = null;
-        }
-
-        $queryBuilder = $repository->getQueryForType($this->getType(), $search, $order);
-
-        if (!$this->isShowDeleted()) {
-            $this->addDeleteExclusionFilter($queryBuilder);
-        }
-
-        return $queryBuilder;
-    }
-
-    abstract public function configureColumns(ColumnsMapper $mapper, array $options);
-
-    public function getColumnsForShow()
-    {
-        $columns = array_chunk($this->getColumnsMapper()->getNames(), 6);
-
-        return current($columns);
-    }
+    abstract protected function configureValidations(ValidationBuilder $builder, array $options);
 
     /**
      * @param ListMapper $mapper
      * @param array $options
      */
-    public function configureList(ListMapper $mapper, array $options)
+    protected function configureList(ListMapper $mapper, array $options)
     {
         $uploadConfig = $this;
 
@@ -370,7 +293,135 @@ abstract class UploadConfig
         ));
     }
 
-    abstract public function configureValidations(ValidationBuilder $builder, array $options);
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isReadable(Upload $upload)
+    {
+        return $upload->isReadable();
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isValidatable(Upload $upload)
+    {
+        return $this->isActionable($upload, 'validate');
+    }
+
+    /**
+     * @param Upload $upload
+     * @param $actionName
+     * @return bool
+     */
+    public function isActionable(Upload $upload, $actionName)
+    {
+        if ($actionName == 'transfer') {
+            return $upload->isTransferable();
+        }
+
+        if ($actionName == 'read') {
+            return $upload->isReadable();
+        }
+
+        if ($actionName == 'validate') {
+            return $upload->isValidatable();
+        }
+
+        if ($actionName == 'delete') {
+            return $upload->isDeletable();
+        }
+
+        if ($action = $upload->getAction($actionName)) {
+            return $action->isNotComplete();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isTransferable(Upload $upload)
+    {
+        return $this->isActionable($upload, 'transfer');
+    }
+
+    /**
+     * @param Upload $upload
+     * @return bool
+     */
+    public function isDeletable(Upload $upload)
+    {
+        return $this->isActionable($upload, 'delete');
+    }
+
+    public function getViewPrefix()
+    {
+        return '@UploadData/Upload';
+    }
+
+    public function getQueryList(UploadRepository $repository, $filters = null, $order = 'DESC'): QueryBuilder
+    {
+        if (is_array($filters) and array_key_exists('search', $filters)) {
+            $search = $filters['search'];
+        } else {
+            $search = null;
+        }
+
+        $queryBuilder = $repository->getQueryForType($this->getType(), $search, $order);
+
+        if (!$this->isShowDeleted()) {
+            $this->addDeleteExclusionFilter($queryBuilder);
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowDeleted()
+    {
+        return $this->showDeleted;
+    }
+
+    /**
+     * @param bool $showDeleted
+     */
+    public function setShowDeleted($showDeleted)
+    {
+        $this->showDeleted = $showDeleted;
+    }
+
+    protected function addDeleteExclusionFilter(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->andWhere(
+            $queryBuilder->expr()->not(
+                $queryBuilder->expr()->exists('
+                SELECT act
+                FROM UploadDataBundle:UploadAction act
+                WHERE
+                    act.upload = upload
+                  AND
+                    act.name = \'delete\'
+                  AND
+                    act.status = :action_status_completed
+                ')
+            )
+        )
+            ->setParameter('action_status_completed', Upload::STATUS_COMPLETE);
+    }
+
+    public function getColumnsForShow()
+    {
+        $columns = array_chunk($this->getColumnsMapper()->getNames(), 6);
+
+        return current($columns);
+    }
 
     public function getColumnsMapper()
     {
@@ -410,17 +461,17 @@ abstract class UploadConfig
     /**
      * @return \Manuel\Bundle\UploadDataBundle\Mapper\ListMapper
      */
-    public function getListMapper()
+    protected function getListMapper()
     {
         return $this->listMapper;
     }
 
-    public function getInstance()
+    /**
+     * @param \Manuel\Bundle\UploadDataBundle\Mapper\ListMapper $listMapper
+     */
+    public function setListMapper($listMapper)
     {
-        $upload = new Upload();
-        $upload->setAttributeValue('configured_columns', $this->getColumnsMapper()->getColumnsAsArray());
-
-        return $upload;
+        $this->listMapper = $listMapper;
     }
 
     public function createUploadForm()
@@ -465,6 +516,43 @@ abstract class UploadConfig
 
             throw new UploadProcessException($e, 'upload');
         }
+    }
+
+    public function getInstance()
+    {
+        $upload = new Upload();
+        $upload->setAttributeValue('configured_columns', $this->getColumnsMapper()->getColumnsAsArray());
+
+        return $upload;
+    }
+
+    protected function onPreUpload(Upload $upload, File $file, array $formData = array())
+    {
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @param $upload
+     * @return string
+     */
+    private function createUniqueFilename(UploadedFile $file, Upload $upload)
+    {
+        return sprintf(
+            '%d_%s_%s.%s',
+            $upload->getId(),
+            $upload->getUploadedAt()->format('Ymd_his'),
+            md5(uniqid($upload->getId() . $file->getClientOriginalName())),
+            $file->getClientOriginalExtension()
+        );
+    }
+
+    protected function onPostUpload(Upload $upload, $filename, array $formData = array())
+    {
+    }
+
+    protected function profileException(\Exception $e)
+    {
+        $this->exceptionProfiler->addException($e);
     }
 
     public function processRead(Upload $upload)
@@ -527,6 +615,26 @@ abstract class UploadConfig
         }
     }
 
+    protected function onPreRead(Upload $upload)
+    {
+    }
+
+    protected function onPostRead(Upload $upload)
+    {
+    }
+
+    private function onActionException($action, $upload)
+    {
+        try {
+            if ($this->objectManager->isOpen()) {
+                $action->setNotComplete();
+                $this->objectManager->persist($upload);
+                $this->objectManager->flush($upload);
+            }
+        } catch (\Exception $e) {
+        }
+    }
+
     public function processValidation(Upload $upload, $onlyInvalids = false)
     {
         if (!$this->isValidatable($upload)) {
@@ -559,6 +667,10 @@ abstract class UploadConfig
 
             /** @var UploadedItem $item */
             foreach ($items as $item) {
+                if ($this->itsAnexcludedItem($item)) {
+                    continue;
+                }
+
                 $violations = new GroupedConstraintViolations();
                 $data = $item->getData();
                 foreach ($validations as $group => $columnValidations) {
@@ -612,6 +724,60 @@ abstract class UploadConfig
         }
     }
 
+    protected function onPreValidate(Upload $upload)
+    {
+    }
+
+    /**
+     * Determina si un item es completamente válido.
+     *
+     * @param UploadedItem $item
+     * @return bool
+     */
+    protected function isUploadedItemValid(UploadedItem $item)
+    {
+        return $item->getIsValid();
+    }
+
+    protected function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
+    {
+    }
+
+    /**
+     * @param GroupedConstraintViolations $allViolations
+     * @param ContextualValidatorInterface $context
+     */
+    private function mergeViolations(GroupedConstraintViolations $violations, ContextualValidatorInterface $context)
+    {
+        foreach ($context->getViolations() as $violation) {
+            if ($violation instanceof ColumnError) {
+                $violations->addColumnError($violation);
+            } else {
+                $violations->add('default', $violation);
+            }
+        }
+    }
+
+    /**
+     * Determina cuando un item es considerado invalido y cuando es valido.
+     *
+     * Por defecto es invalido cuando hay errores de valicacion para la categoria|grupo por defecto.
+     *
+     * @param GroupedConstraintViolations $violations
+     * @param UploadedItem $item
+     * @return bool
+     */
+    protected function shouldItemCanBeConsideredAsValid(
+        GroupedConstraintViolations $violations,
+        UploadedItem $item
+    ) {
+        return !$violations->hasViolationsForGroup('default');
+    }
+
+    protected function onPostValidate(Upload $upload)
+    {
+    }
+
     public function processTransfer(Upload $upload)
     {
         if (!$this->isTransferable($upload)) {
@@ -649,6 +815,8 @@ abstract class UploadConfig
         return $data;
     }
 
+    abstract protected function transfer(Upload $upload, Collection $items);
+
     public function processDelete(Upload $upload)
     {
         if (!$this->isDeletable($upload)) {
@@ -678,21 +846,12 @@ abstract class UploadConfig
         }
     }
 
-    /**
-     * Translates the given message.
-     *
-     * @param string $id The message id (may also be an object that can be cast to string)
-     * @param array $parameters An array of parameters for the message
-     * @param string|null $domain The domain for the message or null to use the default
-     * @param string|null $locale The locale or null to use the default
-     *
-     * @return string The translated string
-     * @throws \InvalidArgumentException If the locale contains invalid characters
-     *
-     */
-    protected function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    protected function onPreDelete(Upload $upload)
     {
-        return $this->translator->trans($id, $parameters, $domain, $locale);
+    }
+
+    protected function onPostDelete(Upload $upload)
+    {
     }
 
     public function processActionByName(Upload $upload, $name)
@@ -722,116 +881,33 @@ abstract class UploadConfig
             $this->onActionException($action, $upload);
             $this->profileException($e);
 
-            throw new UploadProcessException($e, 'action_'.$name);
+            throw new UploadProcessException($e, 'action_' . $name);
         }
+    }
+
+    /**
+     * @param Upload $upload
+     * @param $name
+     * @param $prefix
+     */
+    private function callActionFilter(Upload $upload, $name, $prefix)
+    {
+        $methodPreActionName = $prefix . $this->camelize($name);
+        if (method_exists($this, $methodPreActionName)) {
+            $this->{$methodPreActionName}($upload);
+        }
+    }
+
+    private function camelize($string)
+    {
+        $words = explode('_', str_replace('-', '_', $string));
+        $words = array_map('ucfirst', $words);
+
+        return implode('', $words);
     }
 
     protected function processAction(Upload $upload, UploadAction $action)
     {
-    }
-
-    public function onPreUpload(Upload $upload, File $file, array $formData = array())
-    {
-    }
-
-    public function onPostUpload(Upload $upload, $filename, array $formData = array())
-    {
-    }
-
-    public function onPreRead(Upload $upload)
-    {
-    }
-
-    public function onPostRead(Upload $upload)
-    {
-    }
-
-    public function onPreValidate(Upload $upload)
-    {
-    }
-
-    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
-    {
-    }
-
-    public function onPostValidate(Upload $upload)
-    {
-    }
-
-    abstract public function transfer(Upload $upload, Collection $items);
-
-    public function onPreDelete(Upload $upload)
-    {
-    }
-
-    public function onPostDelete(Upload $upload)
-    {
-    }
-
-    /**
-     * @param Upload $upload
-     * @return bool
-     */
-    public function isDeletable(Upload $upload)
-    {
-        return $this->isActionable($upload, 'delete');
-    }
-
-    /**
-     * @param Upload $upload
-     * @return bool
-     */
-    public function isTransferable(Upload $upload)
-    {
-        return $this->isActionable($upload, 'transfer');
-    }
-
-    /**
-     * @param Upload $upload
-     * @return bool
-     */
-    public function isValidatable(Upload $upload)
-    {
-        return $this->isActionable($upload, 'validate');
-    }
-
-    /**
-     * @param Upload $upload
-     * @return bool
-     */
-    public function isReadable(Upload $upload)
-    {
-        return $upload->isReadable();
-    }
-
-    /**
-     * @param Upload $upload
-     * @param $actionName
-     * @return bool
-     */
-    public function isActionable(Upload $upload, $actionName)
-    {
-        if ($actionName == 'transfer') {
-            return $upload->isTransferable();
-        }
-
-        if ($actionName == 'read') {
-            return $upload->isReadable();
-        }
-
-        if ($actionName == 'validate') {
-            return $upload->isValidatable();
-        }
-
-        if ($actionName == 'delete') {
-            return $upload->isDeletable();
-        }
-
-        if ($action = $upload->getAction($actionName)) {
-            return $action->isNotComplete();
-        }
-
-        return false;
     }
 
     /**
@@ -854,6 +930,28 @@ abstract class UploadConfig
         $upload->setAttributeValue('config_read', $options);
     }
 
+    protected function itsAnexcludedItem(UploadedItem $item): bool
+    {
+        return false;
+    }
+
+    /**
+     * Translates the given message.
+     *
+     * @param string $id The message id (may also be an object that can be cast to string)
+     * @param array $parameters An array of parameters for the message
+     * @param string|null $domain The domain for the message or null to use the default
+     * @param string|null $locale The locale or null to use the default
+     *
+     * @return string The translated string
+     * @throws \InvalidArgumentException If the locale contains invalid characters
+     *
+     */
+    protected function trans($id, array $parameters = array(), $domain = null, $locale = null)
+    {
+        return $this->translator->trans($id, $parameters, $domain, $locale);
+    }
+
     /**
      * @return EntityManagerInterface
      */
@@ -862,51 +960,12 @@ abstract class UploadConfig
         return $this->objectManager;
     }
 
-    private function onActionException($action, $upload)
-    {
-        try {
-            if ($this->objectManager->isOpen()) {
-                $action->setNotComplete();
-                $this->objectManager->persist($upload);
-                $this->objectManager->flush($upload);
-            }
-        } catch (\Exception $e) {
-        }
-    }
-
     /**
-     * @param UploadedFile $file
-     * @param $upload
-     * @return string
+     * @param EntityManagerInterface $objectManager
      */
-    private function createUniqueFilename(UploadedFile $file, Upload $upload)
+    public function setObjectManager($objectManager)
     {
-        return sprintf(
-            '%d_%s_%s.%s',
-            $upload->getId(),
-            $upload->getUploadedAt()->format('Ymd_his'),
-            md5(uniqid($upload->getId() . $file->getClientOriginalName())),
-            $file->getClientOriginalExtension()
-        );
-    }
-
-    protected function addDeleteExclusionFilter(QueryBuilder $queryBuilder)
-    {
-        $queryBuilder->andWhere(
-            $queryBuilder->expr()->not(
-                $queryBuilder->expr()->exists('
-                SELECT act
-                FROM UploadDataBundle:UploadAction act
-                WHERE
-                    act.upload = upload
-                  AND
-                    act.name = \'delete\'
-                  AND
-                    act.status = :action_status_completed
-                ')
-            )
-        )
-            ->setParameter('action_status_completed', Upload::STATUS_COMPLETE);
+        $this->objectManager = $objectManager;
     }
 
     protected function addAttributeFilter(QueryBuilder $queryBuilder, $attribute, $value)
@@ -927,73 +986,5 @@ abstract class UploadConfig
         )
             ->setParameter("{$alias}_name", $attribute)
             ->setParameter("{$alias}_value", $value);
-    }
-
-    /**
-     * @param GroupedConstraintViolations $allViolations
-     * @param ContextualValidatorInterface $context
-     */
-    private function mergeViolations(GroupedConstraintViolations $violations, ContextualValidatorInterface $context)
-    {
-        foreach ($context->getViolations() as $violation) {
-            if ($violation instanceof ColumnError) {
-                $violations->addColumnError($violation);
-            } else {
-                $violations->add('default', $violation);
-            }
-        }
-    }
-
-    /**
-     * Determina cuando un item es considerado invalido y cuando es valido.
-     *
-     * Por defecto es invalido cuando hay errores de valicacion para la categoria|grupo por defecto.
-     *
-     * @param GroupedConstraintViolations $violations
-     * @param UploadedItem $item
-     * @return bool
-     */
-    protected function shouldItemCanBeConsideredAsValid(
-        GroupedConstraintViolations $violations,
-        UploadedItem $item
-    ) {
-        return !$violations->hasViolationsForGroup('default');
-    }
-
-    public function profileException(\Exception $e)
-    {
-        $this->exceptionProfiler->addException($e);
-    }
-
-    /**
-     * Determina si un item es completamente válido.
-     *
-     * @param UploadedItem $item
-     * @return bool
-     */
-    protected function isUploadedItemValid(UploadedItem $item)
-    {
-        return $item->getIsValid();
-    }
-
-    /**
-     * @param Upload $upload
-     * @param $name
-     * @param $prefix
-     */
-    private function callActionFilter(Upload $upload, $name, $prefix)
-    {
-        $methodPreActionName = $prefix . $this->camelize($name);
-        if (method_exists($this, $methodPreActionName)) {
-            $this->{$methodPreActionName}($upload);
-        }
-    }
-
-    private function camelize($string)
-    {
-        $words = explode('_', str_replace('-', '_', $string));
-        $words = array_map('ucfirst', $words);
-
-        return implode('', $words);
     }
 }
