@@ -9,8 +9,8 @@
 namespace Manuel\Bundle\UploadDataBundle\Validator;
 
 use Symfony\Component\Validator\ConstraintViolationInterface;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use function join;
 
 /**
  * Class GroupedConstraintViolations
@@ -150,5 +150,16 @@ class GroupedConstraintViolations implements \Countable, \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->getAll('default', false));
+    }
+
+    public function getErrorsAsSimpleFormat(string $separator = ', '):array
+    {
+        $errors = [];
+
+        foreach ($this->getAll(null, false) as $property => $propertyErrors) {
+            $errors[$property] = join($separator, $propertyErrors);
+        }
+
+        return $errors;
     }
 }

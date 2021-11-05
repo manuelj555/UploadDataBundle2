@@ -2,6 +2,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -320,9 +321,9 @@ class Upload
         $this->actions[] = $actions;
     }
 
-    public function addItem(array $data): UploadedItem
+    public function addItem(array $data, int $rowNumber): UploadedItem
     {
-        $this->items[] = $item = new UploadedItem($this, $data);
+        $this->items[] = $item = new UploadedItem($this, $data, $rowNumber);
 
         return $item;
     }
@@ -434,17 +435,12 @@ class Upload
         }
     }
 
-    /**
-     * Get attributes
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getAttributes()
+    public function getAttributes(): Collection
     {
         return $this->attributes;
     }
 
-    public function getValidItems()
+    public function getValidItems(): Collection
     {
         return $this->getItems()
             ->filter(function (UploadedItem $item) {
@@ -452,14 +448,17 @@ class Upload
             });
     }
 
-    /**
-     * Get items
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getItems()
+    public function getItems(): Collection
     {
         return $this->items;
+    }
+
+    public function getInvalidItems(): Collection
+    {
+        return $this->getItems()
+            ->filter(function (UploadedItem $item) {
+                return !$item->getIsValid();
+            });
     }
 
     public function hasInProgressActions()

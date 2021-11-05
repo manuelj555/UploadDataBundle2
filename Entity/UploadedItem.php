@@ -32,6 +32,13 @@ class UploadedItem implements \ArrayAccess
     private $upload;
 
     /**
+     * @var int|null
+     *
+     * @ORM\Column(name="file_row_number", type="integer", nullable=true)
+     */
+    private $fileRowNumber;
+
+    /**
      * @var array
      *
      * @ORM\Column(name="data", type="json", nullable=true)
@@ -71,10 +78,11 @@ class UploadedItem implements \ArrayAccess
      */
     private $hasDefaultErrors = false;
 
-    public function __construct(Upload $upload, array $data)
+    public function __construct(Upload $upload, array $data, int $rowNumber)
     {
         $this->upload = $upload;
         $this->setData($data);
+        $this->fileRowNumber = $rowNumber;
     }
 
     public function getId(): ?int
@@ -181,6 +189,11 @@ class UploadedItem implements \ArrayAccess
     public function hasExtra($key)
     {
         return array_key_exists($key, $this->extras);
+    }
+
+    public function getFileRowNumber(): ?int
+    {
+        return $this->fileRowNumber;
     }
 
     public function getErrorsAsString($separator = ', ', $showKeys = false, $allGroups = false)

@@ -577,7 +577,7 @@ abstract class UploadConfig
 
             $columnsMapper = $this->columnsMapper->getColumns();
 
-            foreach ($data as $item) {
+            foreach ($data as $dataRowNumber => $item) {
                 $formattedItemData = [];
 
                 foreach ($item as $colName => $value) {
@@ -597,7 +597,7 @@ abstract class UploadConfig
                     }
                 }
 
-                $uploadedItem = $upload->addItem($formattedItemData);
+                $uploadedItem = $upload->addItem($formattedItemData, $dataRowNumber);
                 $this->objectManager->persist($uploadedItem);
             }
 
