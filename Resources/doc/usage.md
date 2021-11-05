@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 class UploadCardConfig extends UploadConfig
 {
     
-    public function configureColumns(ColumnsMapper $mapper)
+    protected function configureColumns(ColumnsMapper $mapper)
     {
         $mapper
             ->add('email')
@@ -42,7 +42,7 @@ class UploadCardConfig extends UploadConfig
             ));
     }
 
-    public function configureValidations(ValidationBuilder $builder)
+    protected function configureValidations(ValidationBuilder $builder)
     {
         $builder
             ->for('email')
@@ -63,7 +63,7 @@ class UploadCardConfig extends UploadConfig
             ->end();
     }
 
-    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
+    protected function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
     {
         //podemos añadir más lógica de validación acá:
         if ($item['email'] == 'no-allowed-email@email.com')) {
@@ -71,7 +71,7 @@ class UploadCardConfig extends UploadConfig
         }
     }
 
-    public function transfer(Upload $upload, Collection $items)
+    protected function transfer(Upload $upload, Collection $items)
     {
         foreach ($upload->getValidItems() as $item) {
             $card = new Card();

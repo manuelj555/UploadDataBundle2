@@ -233,13 +233,7 @@ class UploadedItem implements \ArrayAccess
 
     public function getFlattenErrors()
     {
-        $errors = [];
-
-        foreach ($this->getErrors() as $data) {
-            $errors = array_merge($errors, $data);
-        }
-
-        return array_unique($errors);
+       return $this->getErrors()->getErrorsAsSimpleFormat();
     }
 
     public function hasDefaultErrors(): bool
