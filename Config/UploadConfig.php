@@ -30,6 +30,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use function get_class;
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
@@ -461,7 +462,7 @@ abstract class UploadConfig
     /**
      * @return \Manuel\Bundle\UploadDataBundle\Mapper\ListMapper
      */
-    protected function getListMapper()
+    public function getListMapper()
     {
         return $this->listMapper;
     }
@@ -485,7 +486,7 @@ abstract class UploadConfig
             $upload = $this->getInstance();
 
             $upload->setFilename($file->getClientOriginalName());
-            $upload->setType($this->getType());
+            $upload->setType(get_class($this));
 
             foreach ($attributes as $name => $attrValue) {
                 $upload->setAttributeValue($name, $attrValue);
