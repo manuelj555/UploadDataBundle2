@@ -668,7 +668,7 @@ abstract class UploadConfig
 
             /** @var UploadedItem $item */
             foreach ($items as $item) {
-                if ($this->itsAnexcludedItem($item)) {
+                if ($this->itsAnExcludedItem($item)) {
                     continue;
                 }
 
@@ -931,7 +931,7 @@ abstract class UploadConfig
         $upload->setAttributeValue('config_read', $options);
     }
 
-    protected function itsAnexcludedItem(UploadedItem $item): bool
+    protected function itsAnExcludedItem(UploadedItem $item): bool
     {
         return false;
     }
