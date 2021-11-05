@@ -1,6 +1,6 @@
 # Usando el Bundle
 
-El funcionamiento del bundle se basa en una clase de configuración que existende [UploadConfig](./Config/UploadConfig.php), por ejemplo:
+El funcionamiento del bundle se basa en una clase de configuración que existende [UploadConfig](../../Config/UploadConfig.php), por ejemplo:
 
 ```php
 <?php
