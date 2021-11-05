@@ -540,4 +540,18 @@ class Upload
 
         return $config['header_mapping'][0];
     }
+
+    public function getMappedColumns():array
+    {
+        $configured = $this->getColumnKeys();
+        $fromFile = $this->getColumnNames();
+
+        $mapping = [];
+
+        foreach ($configured as $key => $configuredKey) {
+            $mapping[$configuredKey] = $fromFile[$key] ?? '';
+        }
+
+        return $mapping;
+    }
 }

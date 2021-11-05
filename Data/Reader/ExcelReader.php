@@ -6,7 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
-use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -25,10 +25,10 @@ class ExcelReader extends BaseReader
     public function getData($filename, $options)
     {
         $filename = $this->resolveFile($filename);
+        $excel = $this->load($filename);
 
         $options = $this->resolveOptions($options);
 
-        $excel = $this->load($filename);
         $sheet = $excel->getActiveSheet();
 
         $lastColumn = $sheet->getHighestColumn($options['row_headers']);
@@ -89,10 +89,9 @@ class ExcelReader extends BaseReader
     public function getRowHeaders($filename, $options)
     {
         $filename = $this->resolveFile($filename);
+        $excel = $this->load($filename);
 
         $options = $this->resolveOptions($options, true);
-
-        $excel = $this->load($filename);
 
         $iterator = $excel->getActiveSheet()
             ->getRowIterator($options['row_headers'])
@@ -124,6 +123,13 @@ class ExcelReader extends BaseReader
         $resolver->setRequired(array(
             'row_headers',
         ));
+    }
+
+    public function loadExcelFromUpload(Upload $upload):Spreadsheet
+    {
+        $filename = $this->resolveFile($upload->getFullFilename());
+
+        return $this->load($filename);
     }
 
     protected function load($filename): Spreadsheet
