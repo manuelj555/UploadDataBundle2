@@ -669,6 +669,10 @@ abstract class UploadConfig
             /** @var UploadedItem $item */
             foreach ($items as $item) {
                 if ($this->itsAnExcludedItem($item)) {
+                    $item->setIsValid(true);
+                    ++$valids;
+
+                    $this->objectManager->persist($item);
                     continue;
                 }
 
