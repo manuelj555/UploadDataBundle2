@@ -8,7 +8,6 @@ namespace Manuel\Bundle\UploadDataBundle\Controller;
 use Manuel\Bundle\UploadDataBundle\Config\ConfigHelper;
 use Manuel\Bundle\UploadDataBundle\Config\ConfigHelperFactory;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -24,9 +23,9 @@ class AbstractUploadController extends AbstractController
             ];
     }
 
-    protected function getHelper(string $configClass): ConfigHelper
+    protected function getHelper(string $configClass, array $options = []): ConfigHelper
     {
-        return $this->get('config_helper_factory')->createForType($configClass);
+        return $this->get('config_helper_factory')->createForType($configClass, $options);
     }
 
     protected function getColumnsMatcher(): ExcelHeadersMatcher

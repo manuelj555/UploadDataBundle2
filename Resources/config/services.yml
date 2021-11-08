@@ -71,6 +71,7 @@ services:
     Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository: ~
     Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher: ~
     Manuel\Bundle\UploadDataBundle\Twig\Extention\UploadDataExtension: ~
+    Manuel\Bundle\UploadDataBundle\Validator\UploadedItemValidator: ~
 
     upload_data.file_helper.local:
         class: Manuel\Bundle\UploadDataBundle\Data\LocalUploadedFileHelper

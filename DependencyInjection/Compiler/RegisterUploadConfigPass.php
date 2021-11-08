@@ -7,6 +7,7 @@
 namespace Manuel\Bundle\UploadDataBundle\DependencyInjection\Compiler;
 
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderLoader;
+use Manuel\Bundle\UploadDataBundle\Validator\UploadedItemValidator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -43,7 +44,7 @@ class RegisterUploadConfigPass implements CompilerPassInterface
             $definition->addMethodCall('setUploadDir', array('%upload_data.files_dir%'));
         }
 
-        $definition->addMethodCall('setValidator', array(new Reference('validator')));
+        $definition->addMethodCall('setValidator', array(new Reference(UploadedItemValidator::class)));
         $definition->addMethodCall('setColumnListFactory', array(new Reference('upload_data.column_list_factory')));
         $definition->addMethodCall('setListMapper', array(new Reference('upload_data.list_mapper')));
         $definition->addMethodCall('setReaderLoader', array(new Reference(ReaderLoader::class)));

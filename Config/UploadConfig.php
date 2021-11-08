@@ -23,13 +23,13 @@ use Manuel\Bundle\UploadDataBundle\Mapper\ListMapper;
 use Manuel\Bundle\UploadDataBundle\Profiler\ExceptionProfiler;
 use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
 use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
+use Manuel\Bundle\UploadDataBundle\Validator\UploadedItemValidator;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use function get_class;
 
 /**
@@ -63,7 +63,7 @@ abstract class UploadConfig
     private $showDeleted = true;
     private $label;
     /**
-     * @var ValidatorInterface
+     * @var UploadedItemValidator
      */
     private $validator;
     /**
@@ -133,10 +133,7 @@ abstract class UploadConfig
         $this->uploadedFileHelper = $uploadedFileHelper;
     }
 
-    /**
-     * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
-     */
-    public function setValidator($validator)
+    public function setValidator(UploadedItemValidator $validator)
     {
         $this->validator = $validator;
     }
@@ -679,7 +676,7 @@ abstract class UploadConfig
                 $violations = new GroupedConstraintViolations();
                 $data = $item->getData();
                 foreach ($validations as $group => $columnValidations) {
-                    $context = $this->validator->startContext($item);
+                    $context = $this->validator->createValidationContext($item);
                     foreach ($columnValidations as $column => $constraints) {
                         $value = array_key_exists($column, $data) ? $data[$column] : null;
                         $context->atPath($column)->validate($value, $constraints, array('Default', $validationGroup));
@@ -697,7 +694,7 @@ abstract class UploadConfig
                 }
 
                 // iniciamos un nuevo contexto para las validaciones propias.
-                $context = $this->validator->startContext($item);
+                $context = $this->validator->createValidationContext($item);
                 $this->validateItem($item, $context, $upload);
 
                 $this->mergeViolations($violations, $context);
