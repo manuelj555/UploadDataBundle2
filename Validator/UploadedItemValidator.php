@@ -33,7 +33,7 @@ class UploadedItemValidator
         $this->validator = $validator;
 
         $this->contextFactory = new ExecutionContextFactory(
-            $translator, 'validators',
+            $translator, 'validators'
         );
     }
 
