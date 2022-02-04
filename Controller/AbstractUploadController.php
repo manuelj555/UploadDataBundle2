@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class AbstractUploadController extends AbstractController
 {
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return parent::getSubscribedServices() + [
                 'config_helper_factory' => ConfigHelperFactory::class,
