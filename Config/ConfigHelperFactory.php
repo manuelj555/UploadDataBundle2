@@ -18,61 +18,25 @@ use Psr\Log\LoggerInterface;
  */
 class ConfigHelperFactory
 {
-    /**
-     * @var ConfigProvider
-     */
-    private $provider;
-    /**
-     * @var ExcelHeadersMatcher
-     */
-    private $headersMatcher;
-    /**
-     * @var UploadRepository
-     */
-    private $repository;
-    /**
-     * @var PaginatorInterface|null
-     */
-    private $paginator;
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var UploadedItemRepository
-     */
-    private $itemRepository;
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-
     public function __construct(
-        ConfigProvider $provider,
-        ExcelHeadersMatcher $headersMatcher,
-        UploadRepository $repository,
-        UploadedItemRepository $itemRepository,
-        EntityManagerInterface $entityManager,
-        ?PaginatorInterface $paginator = null,
-        ?LoggerInterface $logger = null
+        private ConfigProvider $provider,
+        private UploadConfigHandler $configHandler,
+        private ExcelHeadersMatcher $headersMatcher,
+        private UploadRepository $repository,
+        private UploadedItemRepository $itemRepository,
+        private EntityManagerInterface $entityManager,
+        private ?PaginatorInterface $paginator = null,
+        private ?LoggerInterface $logger = null
     ) {
-        $this->repository = $repository;
-        $this->headersMatcher = $headersMatcher;
-        $this->itemRepository = $itemRepository;
-        $this->entityManager = $entityManager;
-        $this->provider = $provider;
-        $this->paginator = $paginator;
-        $this->logger = $logger;
     }
 
-    public function create(UploadConfig $config): ConfigHelper
+    public function create(ResolvedUploadConfig $resolvedConfig): ConfigHelper
     {
         return new ConfigHelper(
-            $config,
-            $this->headersMatcher,
+            $resolvedConfig,
             $this->entityManager,
+            $this->configHandler,
+            $this->headersMatcher,
             $this->repository,
             $this->itemRepository,
             $this->paginator,

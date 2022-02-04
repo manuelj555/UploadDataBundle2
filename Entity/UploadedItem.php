@@ -5,83 +5,41 @@ namespace Manuel\Bundle\UploadDataBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Manuel\Bundle\UploadDataBundle\Validator\GroupedConstraintViolations;
 
-/**
- * UploadedItem
- *
- * @ORM\Table(name="upload_data_uploaded_item")
- * @ORM\Entity(repositoryClass="Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository")
- * @ORM\HasLifecycleCallbacks()
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- */
+#[ORM\Table("upload_data_uploaded_item")]
+#[ORM\Entity(repositoryClass: UploadedItemRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")]
 class UploadedItem implements \ArrayAccess
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    private ?int $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\ManyToOne(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\Upload", inversedBy="items")
-     */
-    private $upload;
+    #[ORM\ManyToOne(targetEntity: Upload::class, inversedBy: "items")]
+    private Upload $upload;
 
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(name="file_row_number", type="integer", nullable=true)
-     */
-    private $fileRowNumber;
+    #[ORM\Column(name: "file_row_number", nullable: true)]
+    private ?int $fileRowNumber;
 
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="data", type="json", nullable=true)
-     */
-    private $data;
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $data;
 
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="extras", type="json", nullable=true)
-     */
-    private $extras = array();
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $extras;
 
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="errors", type="json", nullable=true)
-     */
-    private $errors;
+    #[ORM\Column(type: 'json', nullable: true)]
+    private null|array|GroupedConstraintViolations $errors;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="isValid", type="boolean", nullable=true)
-     */
-    private $isValid;
+    #[ORM\Column(nullable: true)]
+    private ?bool $valid;
 
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="status", type="integer", nullable=true)
-     */
-    private $status;
-
-    /**
-     * @var bool
-     */
-    private $hasDefaultErrors = false;
+    private bool $hasDefaultErrors = false;
 
     public function __construct(Upload $upload, array $data, int $rowNumber)
     {
         $this->upload = $upload;
-        $this->setData($data);
+        $this->data = $data;
         $this->fileRowNumber = $rowNumber;
     }
 
@@ -90,17 +48,12 @@ class UploadedItem implements \ArrayAccess
         return $this->id;
     }
 
-    public function setData(array $data): void
-    {
-        $this->data = $data;
-    }
-
-    public function getData(): array
+    public function getData(): ?array
     {
         return $this->data;
     }
 
-    public function setErrors($errors): void
+    public function setErrors(GroupedConstraintViolations|array $errors): void
     {
         if (!($errors instanceof GroupedConstraintViolations)) {
             $errors = GroupedConstraintViolations::fromArray($errors);
@@ -109,24 +62,19 @@ class UploadedItem implements \ArrayAccess
         $this->errors = $errors;
     }
 
-    /**
-     * @param null $group
-     * @param bool $grouped
-     * @return GroupedConstraintViolations|array
-     */
-    public function getErrors()
+    public function getErrors(): GroupedConstraintViolations
     {
         return $this->errors;
     }
 
-    public function setIsValid(bool $isValid): void
+    public function setValid(bool $valid): void
     {
-        $this->isValid = $isValid;
+        $this->valid = $valid;
     }
 
-    public function getIsValid(): bool
+    public function getValid(): ?bool
     {
-        return $this->isValid;
+        return $this->valid;
     }
 
     public function isValidForGroup($name): bool
@@ -141,7 +89,7 @@ class UploadedItem implements \ArrayAccess
 
     public function offsetGet($offset)
     {
-        return $this->offsetExists($offset) ? $this->data[$offset] : null;
+        return $this->data[$offset] ?? null;
     }
 
     public function offsetSet($offset, $value)
@@ -156,47 +104,33 @@ class UploadedItem implements \ArrayAccess
         }
     }
 
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
-
-    public function setStatus(int $status): void
-    {
-        $this->status = $status;
-    }
-
     public function getExtras(): array
     {
-        return $this->extras;
+        return $this->extras ?? [];
     }
 
-    public function setExtras(array $extras)
+    public function setExtras(array $extras): void
     {
         $this->extras = $extras;
     }
 
-    public function setExtra($key, $value)
+    public function setExtra($key, $value): void
     {
+        $this->extras ??= [];
         $this->extras[$key] = $value;
     }
 
     public function getExtra($key)
     {
-        return $this->hasExtra($key) ? $this->extras[$key] : null;
+        return $this->extras[$key] ?? null;
     }
 
-    public function hasExtra($key)
-    {
-        return array_key_exists($key, $this->extras);
-    }
-
-    public function getFileRowNumber(): ?int
+    public function getFileRowNumber(): int
     {
         return $this->fileRowNumber;
     }
 
-    public function getErrorsAsString($separator = ', ', $showKeys = false, $allGroups = false)
+    public function getErrorsAsString(string $separator = ', ', bool $showKeys = false, bool $allGroups = false): string
     {
         $errors = [];
         $group = $allGroups ? null : 'default';
@@ -214,7 +148,7 @@ class UploadedItem implements \ArrayAccess
         return join($separator, array_unique($errors));
     }
 
-    public function getGroupErrorsAsString($group, $separator = ', ', $showKeys = false)
+    public function getGroupErrorsAsString(string $group, string $separator = ', ', bool $showKeys = false): string
     {
         $errors = [];
 
@@ -231,9 +165,9 @@ class UploadedItem implements \ArrayAccess
         return join($separator, array_unique($errors));
     }
 
-    public function getFlattenErrors()
+    public function getFlattenErrors(): array
     {
-       return $this->getErrors()->getErrorsAsSimpleFormat();
+        return $this->getErrors()->getErrorsAsSimpleFormat();
     }
 
     public function hasDefaultErrors(): bool
@@ -246,10 +180,8 @@ class UploadedItem implements \ArrayAccess
         $this->hasDefaultErrors = $hasDefaultErrors;
     }
 
-    /**
-     * @ORM\PrePersist()
-     * @ORM\PreUpdate()
-     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function convertErrorsToArray()
     {
         if ($this->errors instanceof GroupedConstraintViolations) {
@@ -257,15 +189,11 @@ class UploadedItem implements \ArrayAccess
         }
     }
 
-    /**
-     * @ORM\PostPersist()
-     * @ORM\PostUpdate()
-     * @ORM\PostLoad()
-     */
+    #[ORM\PostLoad]
+    #[ORM\PostPersist]
+    #[ORM\PostUpdate]
     public function convertErrorsToObject()
     {
-        if (!($this->errors instanceof GroupedConstraintViolations)) {
-            $this->errors = GroupedConstraintViolations::fromArray($this->errors ?: []);
-        }
+        $this->setErrors($this->errors);
     }
 }

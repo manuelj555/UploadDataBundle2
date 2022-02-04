@@ -5,8 +5,6 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data;
 
-use Manuel\Bundle\UploadDataBundle\Entity\Upload;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -21,15 +19,12 @@ interface UploadedFileHelperInterface
      * Puede ser moverlo al sitio de lectura, crearlo, darle permisos de lectura, etc.
      *
      * @param string $filename
-     *
      * @return string la ruta al archivo que será leido.
      */
-    public function prepareFileForRead($filename);
+    public function prepareFileForRead(string $filename): string;
 
     /**
      * Se encarga de guardar el archivo en donde corresponda.
-     *
-     * @return File
      */
-    public function saveFile(UploadedFile $file, $path , $filename);
+    public function saveFile(UploadedFile $file, string $path, string $filename): string;
 }

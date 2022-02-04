@@ -3,6 +3,7 @@
 namespace Manuel\Bundle\UploadDataBundle\DependencyInjection;
 
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
+use Manuel\Bundle\UploadDataBundle\Data\Reader\ReaderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -23,15 +24,13 @@ class UploadDataExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yaml');
 
         $container->setParameter('upload_data.files_dir', $config['files_dir']);
-        $container->setParameter('upload_data.templates', $config['templates']);
-        $container->setParameter('upload_data.secuity.debugging_role', $config['debugging_role']);
-
-        $container->setAlias('upload_data.file_helper.default', $config['uploaded_file_helper']);
+        $container->setParameter('upload_data.security.debugging_role', $config['debugging_role']);
 
         $container->registerForAutoconfiguration(UploadConfig::class)->addTag('upload_data.config');
+        $container->registerForAutoconfiguration(ReaderInterface::class)->addTag('upload_data.reader');
     }
 }

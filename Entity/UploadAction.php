@@ -2,69 +2,44 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Entity;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use function strtolower;
 
-/**
- * UploadAction
- *
- * @ORM\Table(name="upload_data_upload_action")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks()
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- */
+#[ORM\Table("upload_data_upload_action")]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")]
 class UploadAction
 {
     const STATUS_NOT_COMPLETE = 0;
     const STATUS_IN_PROGRESS = 1;
     const STATUS_COMPLETE = 2;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    private ?int $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\Upload", inversedBy="actions")
-     */
-    private $upload;
+    #[ORM\ManyToOne(targetEntity: Upload::class, inversedBy: "actions")]
+    private Upload $upload;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column]
+    private string $name;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="status", type="smallint")
-     */
-    private $status;
+    #[ORM\Column(type: "smallint")]
+    private int $status;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="completedAt", type="datetime", nullable=true)
-     */
-    private $completedAt;
+    #[ORM\Column(name: "completed_at", nullable: true)]
+    private ?DateTimeImmutable $completedAt;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="completed", type="boolean")
-     */
-    private $actionCompleted = null;
+    #[ORM\Column(name: "completed", nullable: true)]
+    private ?bool $actionCompleted;
 
-    function __construct(Upload $upload, $name = null)
+    public function __construct(Upload $upload, string $name)
     {
         $this->upload = $upload;
-        $this->setName($name);
+        $this->name = strtolower($name);
         $this->setStatus(self::STATUS_NOT_COMPLETE);
         $this->actionCompleted = false;
     }
@@ -72,11 +47,6 @@ class UploadAction
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    private function setName(string $name): void
-    {
-        $this->name = strtolower($name);
     }
 
     public function getName(): string
@@ -98,12 +68,7 @@ class UploadAction
         return $this->status;
     }
 
-    public function setCompletedAt($completedAt): void
-    {
-        $this->completedAt = $completedAt;
-    }
-
-    public function getCompletedAt(): ?DateTimeInterface
+    public function getCompletedAt(): ?DateTimeImmutable
     {
         return $this->completedAt;
     }
@@ -131,7 +96,7 @@ class UploadAction
     {
         $this->setStatus(self::STATUS_COMPLETE);
         $this->actionCompleted = true;
-        $this->setCompletedAt(new \DateTime());
+        $this->completedAt = new DateTimeImmutable();
     }
 
     public function setInProgress(): void
@@ -142,12 +107,10 @@ class UploadAction
     public function setNotComplete(): void
     {
         $this->setStatus(self::STATUS_NOT_COMPLETE);
-        $this->setCompletedAt(null);
+        $this->completedAt = null;
     }
 
-    /**
-     * @ORM\PostLoad()
-     */
+    #[ORM\PostLoad]
     public function load(): void
     {
         if (!$this->actionCompleted && ($this->status == self::STATUS_COMPLETE)) {

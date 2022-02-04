@@ -7,35 +7,20 @@
 namespace Manuel\Bundle\UploadDataBundle\Profiler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Throwable;
 
 class ExceptionProfiler
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-    /**
-     * @var Profiler|null
-     */
-    private $profiler;
-
-    /**
-     * ExceptionProfiler constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param null|Profiler $profiler
-     */
-    public function __construct(EventDispatcherInterface $eventDispatcher, Profiler $profiler = null)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->profiler = $profiler;
+    public function __construct(
+        private EventDispatcherInterface $eventDispatcher,
+        private ?Profiler $profiler = null,
+    ) {
     }
 
-    public function addException(\Exception $exception)
+    public function addException(Throwable $exception)
     {
         if (null === $this->profiler) {
             return;

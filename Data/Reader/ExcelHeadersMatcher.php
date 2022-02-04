@@ -4,10 +4,11 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
+use Manuel\Bundle\UploadDataBundle\Config\ResolvedUploadConfig;
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
-use Manuel\Bundle\UploadDataBundle\Data\MatchInfo;
+use Manuel\Bundle\UploadDataBundle\Data\ColumnsMatchInfo;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
-use function dd;
+use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMatch;
 
 /**
  * Class ExcelHeadersMatcher
@@ -31,35 +32,26 @@ class ExcelHeadersMatcher
         $this->excelReader = $excelReader;
     }
 
-    /**
-     * @param UploadConfig $config
-     * @param Upload $upload
-     * @param array $options
-     * @return MatchInfo
-     */
-    public function getDefaultMatchInfo(UploadConfig $config, Upload $upload, array $options = []): MatchInfo
-    {
-        $options = array_filter([
-                'row_headers' => $upload->getAttributeValue('row_headers') ?: 1,
-            ]) + $options;
+    public function getDefaultMatchInfo(
+        ResolvedUploadConfig $resolvedConfig,
+        Upload $upload,
+        array $options = [],
+    ): ColumnsMatchInfo {
+        $headers = $this->excelReader->getHeaders($upload);
+        $matches = ColumnsMatch::match($resolvedConfig->getConfigColumns(), $headers);
 
-        $headers = $this->excelReader->getRowHeaders($upload->getFullFilename(), $options);
-        $columnsMapper = $config->getColumnsMapper();
-        $columns = $columnsMapper->getColumns();
-        $matches = $columnsMapper->match($headers);
-
-        return new MatchInfo($upload, $headers, $columns, $matches, $options);
+        return new ColumnsMatchInfo(
+            $upload,
+            $headers,
+            $resolvedConfig->getConfigColumns()->getColumns(),
+            $matches,
+            $options
+        );
     }
 
-    /**
-     * @param UploadConfig $config
-     * @param MatchInfo $info
-     * @param array $matchData
-     * @return array
-     */
-    public function applyMatch(UploadConfig $config, MatchInfo $info, array $matchData): array
+    public function applyMatch(ResolvedUploadConfig $resolvedConfig, ColumnsMatchInfo $info, array $matchData): array
     {
-        $columnsMapper = $config->getColumnsMapper();
+        $columnsMapper = $resolvedConfig->getConfigColumns();
         $upload = $info->getUpload();
         $mappedData = $columnsMapper->mapForm($matchData, $info->getFileHeaders());
 

@@ -1,0 +1,24 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $uploadDir: "%upload_data.files_dir%"
+
+    _instanceof:
+        Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface:
+            tags:
+                - { name: "controller.argument_value_resolver" }
+
+    Manuel\Bundle\UploadDataBundle\:
+        resource: '../../'
+        exclude:
+            - '../../DependencyInjection/'
+            - '../../Entity/'
+            - '../../UploadDataBundle.php'
+            - '../../Tests/'
+            - '../../Resources/'
+            - '../../Config/ResolvedUploadConfig.php'
+
+    Manuel\Bundle\UploadDataBundle\Entity\UploadRepository: ~
+    Manuel\Bundle\UploadDataBundle\Entity\UploadedItemRepository: ~

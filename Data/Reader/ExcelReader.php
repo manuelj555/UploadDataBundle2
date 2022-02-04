@@ -6,79 +6,66 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
+use LogicException;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use function array_search;
+use function current;
+use function dd;
+use function in_array;
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
 class ExcelReader extends BaseReader
 {
+    private array $extensions = ['xls', 'xlsx'];
+    private ?array $excelHeaders;
+    private ?array $columnsMapping;
 
-    protected $extensions = array('xls', 'xlsx');
-
-    public function getData($filename, $options)
+    public function getData(Upload $upload): array
     {
-        $filename = $this->resolveFile($filename);
+        $filename = $this->resolveFile($upload->getFullFilename());
+        $options = $this->resolveOptions($upload);
         $excel = $this->load($filename);
-
-        $options = $this->resolveOptions($options);
 
         $sheet = $excel->getActiveSheet();
 
-        $lastColumn = $sheet->getHighestColumn($options['row_headers']);
+        $rowHeadersIndex = $options['row_headers'];
+        $lastColumn = $sheet->getHighestColumn($rowHeadersIndex);
 
-        $excelHeaders = $sheet->rangeToArray('A' . $options['row_headers']
-            . ':' . $lastColumn . $options['row_headers'], null, true, true, true);
-        $excelHeaders = current($excelHeaders);
+        $excelHeaders = $sheet->rangeToArray('A' . $rowHeadersIndex
+            . ':' . $lastColumn . $rowHeadersIndex, null, true, true, true);
 
         $sheet->garbageCollect();
         $maxRow = $sheet->getHighestRow();
-        $rows = range($options['row_headers'] + 1, $maxRow);
-        $cols = range(0, Coordinate::columnIndexFromString($lastColumn));
+        $rows = range($rowHeadersIndex + 1, $maxRow);
+        $cols = range(1, Coordinate::columnIndexFromString($lastColumn));
 
-        list($names, $headers) = $options['header_mapping'];
-        $formattedData = array();
+        $this->excelHeaders = current($excelHeaders);
+        $this->columnsMapping = $options['columns_mapping'];
+        $formattedData = [];
 
         foreach ($rows as $rowIndex) {
-            $formattedRow = array();
+            $formattedRow = [];
 
             foreach ($cols as $colIndex) {
-                $cell = $sheet->getCellByColumnAndRow($colIndex, $rowIndex, false);
-                $colName = Coordinate::stringFromColumnIndex($colIndex);
+                [$rawValue, $value] = $this->getValuesFromCell($sheet, $colIndex, $rowIndex);
 
-                if (null !== $cell) {
-                    if ($cell->isFormula()) {
-                        $rawValue = $cell->getCalculatedValue();
-                    } else {
-                        $rawValue = $cell->getValue();
-                    }
-                    if ($rawValue !== null) {
-                        $value = NumberFormat::toFormattedString(
-                            $rawValue, $cell->getStyle()->getNumberFormat()->getFormatCode()
-                        );
-                    } else {
-                        $value = null;
-                    }
-                } else {
-                    $rawValue = $value = null;
-                }
-
-                if (isset($names[$colName])) {
-                    $formattedRow[$names[$colName]]['with_format'] = $value;
-                    $formattedRow[$names[$colName]]['without_format'] = $rawValue;
-                } elseif (isset($excelHeaders[$colName])) {
-                    $formattedRow[self::EXTRA_FIELDS_NAME][$excelHeaders[$colName]] = $value;
-                }
+                $this->addValue($formattedRow, $colIndex, $rawValue, $value);
             }
 
             $formattedData[$rowIndex] = $formattedRow;
         }
+
+        $this->excelHeaders = null;
+        $this->columnsMapping = null;
 
         $excel->disconnectWorksheets();
         unset($excel, $sheet);
@@ -86,12 +73,11 @@ class ExcelReader extends BaseReader
         return $formattedData;
     }
 
-    public function getRowHeaders($filename, $options)
+    public function getHeaders(Upload $upload): array
     {
-        $filename = $this->resolveFile($filename);
+        $filename = $this->resolveFile($upload->getFullFilename());
+        $options = $this->resolveOptions($upload, true);
         $excel = $this->load($filename);
-
-        $options = $this->resolveOptions($options, true);
 
         $iterator = $excel->getActiveSheet()
             ->getRowIterator($options['row_headers'])
@@ -111,21 +97,21 @@ class ExcelReader extends BaseReader
         return $headers;
     }
 
-    public function supports($filename)
+    public function supports(Upload $upload): bool
     {
-        return in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), $this->extensions);
+        return $this->matchExtensions($upload, $this->extensions);
     }
 
-    public function setDefaultOptions(OptionsResolver $resolver, $headers = false)
+    public function configureOptions(OptionsResolver $resolver, bool $headers = false): void
     {
-        parent::setDefaultOptions($resolver, $headers);
+        parent::configureOptions($resolver, $headers);
 
-        $resolver->setRequired(array(
+        $resolver->setRequired([
             'row_headers',
-        ));
+        ]);
     }
 
-    public function loadExcelFromUpload(Upload $upload):Spreadsheet
+    public function loadExcelFromUpload(Upload $upload): Spreadsheet
     {
         $filename = $this->resolveFile($upload->getFullFilename());
 
@@ -137,4 +123,59 @@ class ExcelReader extends BaseReader
         return IOFactory::load($filename);
     }
 
+    private function getValuesFromCell(
+        Worksheet $sheet,
+        int $colIndex,
+        int $rowIndex,
+    ): array {
+        $cell = $sheet->getCellByColumnAndRow($colIndex, $rowIndex, false);
+
+        if (null !== $cell) {
+            if ($cell->isFormula()) {
+                $rawValue = $cell->getCalculatedValue();
+            } else {
+                $rawValue = $cell->getValue();
+            }
+            if ($rawValue !== null) {
+                $value = NumberFormat::toFormattedString(
+                    $rawValue, $cell->getStyle()->getNumberFormat()->getFormatCode()
+                );
+            } else {
+                $value = null;
+            }
+        } else {
+            $rawValue = $value = null;
+        }
+
+        return [$rawValue, $value];
+    }
+
+    private function addValue(
+        array &$row,
+        int $colIndex,
+        ?string $rawValue,
+        ?string $formattedValue
+    ): void {
+        if (null === $this->excelHeaders || null === $this->columnsMapping) {
+            throw new LogicException(
+                "No se puede llamar a 'getArrayValue()' sin establecer valores para 'excelHeaders' y 'columnsMapping'"
+            );
+        }
+
+        $excelColName = Coordinate::stringFromColumnIndex($colIndex);
+
+        if (in_array($excelColName, $this->columnsMapping)) {
+            $configColumnName = array_search($excelColName, $this->columnsMapping);
+
+            $row[$configColumnName] = [
+                'with_format' => $formattedValue,
+                'without_format' => $rawValue,
+            ];
+        } elseif (isset($this->excelHeaders[$excelColName])) {
+            $row[self::EXTRA_FIELDS_NAME][$this->excelHeaders[$excelColName]] = [
+                'with_format' => $formattedValue,
+                'without_format' => $rawValue,
+            ];
+        }
+    }
 }

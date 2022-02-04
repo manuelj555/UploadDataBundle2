@@ -2,193 +2,135 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Entity;
 
+use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use function in_array;
 
-/**
- * Upload
- *
- * @ORM\Table(name="upload_data_upload")
- * @ORM\Entity(repositoryClass="Manuel\Bundle\UploadDataBundle\Entity\UploadRepository")
- * @ORM\HasLifecycleCallbacks()
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- */
+#[ORM\Table("upload_data_upload")]
+#[ORM\Entity(repositoryClass: UploadRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")]
 class Upload
 {
     const STATUS_NOT_COMPLETE = 0;
     const STATUS_IN_PROGRESS = 1;
     const STATUS_COMPLETE = 2;
 
+    #[ORM\Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    private ?int $id;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $columnsMatch;
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var ?string Nombre del archivo original que se cargó
      */
-    private $id;
+    #[ORM\Column(nullable: true)]
+    private ?string $filename;
 
     /**
-     * @var string Nombre del archivo original que se cargó
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var ?string Nombre y Ruta del archivo procesado y renombrado por el sistema
      */
-    private $filename;
+    #[ORM\Column(name: "full_filename", nullable: true)]
+    private ?string $fullFilename;
+
+    #[ORM\OneToMany(targetEntity: UploadedItem::class, mappedBy: "upload")]
+    private iterable|Collection $items;
 
     /**
-     * @var string Nombre y Ruta del archivo procesado y renombrado por el sistema
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @var ?string Nombre corto del archivo procesado y renombrado por el sistema
      */
-    private $fullFilename;
+    #[ORM\Column(nullable: true)]
+    private ?string $file;
 
-    /**
-     * @var string
-     *
-     * @ORM\OneToMany(targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadedItem", mappedBy="upload", orphanRemoval=true)
-     */
-    private $items;
+    #[ORM\Column]
+    private string $type;
 
-    /**
-     * @var string Nombre corto del archivo procesado y renombrado por el sistema
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $file;
+    #[ORM\Column(nullable: true)]
+    private ?int $valids;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="type", type="string", length=255)
-     */
-    private $type;
+    #[ORM\Column(nullable: true)]
+    private ?int $invalids;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $valids;
+    #[ORM\Column(nullable: true)]
+    private ?int $total;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $invalids;
+    #[ORM\Column(name: "uploaded_at", nullable: true)]
+    private ?DateTimeImmutable $uploadedAt;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $total;
+    #[ORM\OneToMany(
+        mappedBy: "upload",
+        targetEntity: UploadAttribute::class,
+        cascade: ["all"],
+        fetch: "EAGER",
+        orphanRemoval: true,
+    )]
+    private iterable|Collection $attributes;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="uploadedAt", type="datetime", nullable=true)
-     */
-    private $uploadedAt;
+    #[ORM\OneToMany(
+        mappedBy: "upload",
+        targetEntity: UploadAction::class,
+        cascade: ["all"],
+        fetch: "EAGER",
+        orphanRemoval: true,
+    )]
+    private iterable|Collection $actions;
 
-    /**
-     * @ORM\OneToMany(
-     *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute",
-     *      cascade={"all"},
-     *      mappedBy="upload",
-     *      fetch="EAGER",
-     *      orphanRemoval=true
-     * )
-     */
-    private $attributes;
-
-    /**
-     * @ORM\OneToMany(
-     *      targetEntity="Manuel\Bundle\UploadDataBundle\Entity\UploadAction",
-     *      cascade={"all"},
-     *      mappedBy="upload",
-     *      fetch="EAGER",
-     *      orphanRemoval=true,
-     * )
-     */
-    private $actions;
-
-    /**
-     * Constructor
-     */
     public function __construct()
     {
-        $this->items = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->attributes = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->actions = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->items = new ArrayCollection();
+        $this->attributes = new ArrayCollection();
+        $this->actions = new ArrayCollection();
     }
 
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType()
+    public function getColumnsMatch(): ?array
+    {
+        return $this->columnsMatch;
+    }
+
+    public function isColumnsMatched(): bool
+    {
+        return true || null !== $this->columnsMatch;
+    }
+
+    public function setColumnsMatch(array $columnsMatch): void
+    {
+        $this->columnsMatch = $columnsMatch;
+    }
+
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * Set type
-     *
-     * @param string $type
-     *
-     * @return Upload
-     */
-    public function setType($type)
+    public function setType(string $type): void
     {
         $this->type = $type;
-
-        return $this;
     }
 
-    public function isReadable()
+    public function isReadable(): bool
     {
         return $this->getUploadedAt() !== null
+            and $this->isColumnsMatched()
             and $this->getAction('read')->isNotComplete()
             and $this->getAction('validate')->isNotComplete()
             and $this->getAction('transfer')->isNotComplete();
     }
 
-    /**
-     * Get uploadedAt
-     *
-     * @return \DateTime
-     */
-    public function getUploadedAt()
+    public function getUploadedAt(): ?DateTimeImmutable
     {
         return $this->uploadedAt;
     }
 
-    /**
-     * Set uploadedAt
-     *
-     * @param \DateTime $uploadedAt
-     *
-     * @return Upload
-     */
-    public function setUploadedAt($uploadedAt)
-    {
-        $this->uploadedAt = $uploadedAt;
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return UploadAction|null
-     */
-    public function getAction($name)
+    public function getAction(string $name): ?UploadAction
     {
         $name = strtolower($name);
 
@@ -197,19 +139,16 @@ class Upload
                 return $action;
             }
         }
+
+        return null;
     }
 
-    /**
-     * Get actions
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getActions()
+    public function getActions(): iterable|ArrayCollection|Collection
     {
         return $this->actions;
     }
 
-    public function isValidatable()
+    public function isValidatable(): bool
     {
         return $this->getUploadedAt() !== null
             and $this->getAction('read')->isComplete()
@@ -217,7 +156,7 @@ class Upload
             and $this->getAction('transfer')->isNotComplete();
     }
 
-    public function isTransferable()
+    public function isTransferable(): bool
     {
         return $this->getUploadedAt() !== null
             and $this->getAction('read')->isComplete()
@@ -226,89 +165,71 @@ class Upload
             and $this->getValids() > 0;
     }
 
-    /**
-     * Get valids
-     *
-     * @return integer
-     */
-    public function getValids()
+    public function isDefaultAction(string $name): bool
+    {
+        return in_array($name, ['transfer', 'read', 'validate', 'delete']);
+    }
+
+    public function canExecuteDefaultAction(string $name): bool
+    {
+        if ($name == 'transfer') {
+            return $this->isTransferable();
+        }
+
+        if ($name == 'read') {
+            return $this->isReadable();
+        }
+
+        if ($name == 'validate') {
+            return $this->isValidatable();
+        }
+
+        if ($name == 'delete') {
+            return $this->isDeletable();
+        }
+
+        return false;
+    }
+
+    public function getValids(): ?int
     {
         return $this->valids;
     }
 
-    /**
-     * Set valids
-     *
-     * @param integer $valids
-     *
-     * @return Upload
-     */
-    public function setValids($valids)
+    public function setValids(int $valid): void
     {
-        $this->valids = $valids;
-
-        return $this;
+        $this->valids = $valid;
     }
 
-    public function isDeletable()
+    public function isDeletable(): bool
     {
         return $this->getAction('transfer')->isNotComplete();
     }
 
-    /**
-     * Get file
-     *
-     * @return string
-     */
-    public function getFile()
+    public function getFile(): ?string
     {
         return $this->file;
     }
 
-    /**
-     * Set file
-     *
-     * @param string $file
-     *
-     * @return Upload
-     */
-    public function setFile($file)
+    public function setFile(string $file): void
     {
         $this->file = $file;
-
-        return $this;
     }
 
-    /**
-     * Get filename
-     *
-     * @return string
-     */
-    public function getFilename()
+    public function getFilename(): ?string
     {
         return $this->filename;
     }
 
-    /**
-     * Set filename
-     *
-     * @param string $filename
-     *
-     * @return Upload
-     */
-    public function setFilename($filename)
+    public function setFilename(string $filename): void
     {
         $this->filename = $filename;
-
-        return $this;
     }
 
-    /**
-     * @ORM\PrePersist()
-     */
+    #[ORM\PrePersist]
     public function prePersist()
     {
-        $this->setUploadedAt(new \DateTime());
+        $this->uploadedAt = new DateTimeImmutable('now');
 
         $this->addAction(new UploadAction($this, 'read'));
         $this->addAction(new UploadAction($this, 'validate'));
@@ -328,89 +249,42 @@ class Upload
         return $item;
     }
 
-    /**
-     * Get fullFilename
-     *
-     * @return string
-     */
-    public function getFullFilename()
+    public function getFullFilename(): ?string
     {
         return $this->fullFilename;
     }
 
-    /**
-     * Set fullFilename
-     *
-     * @param string $fullFilename
-     *
-     * @return Upload
-     */
-    public function setFullFilename($fullFilename)
+    public function setFullFilename(string $fullFilename): void
     {
         $this->fullFilename = $fullFilename;
-
-        return $this;
     }
 
-    /**
-     * Get invalids
-     *
-     * @return integer
-     */
-    public function getInvalids()
+    public function getInvalids(): ?int
     {
         return $this->invalids;
     }
 
-    /**
-     * Set invalids
-     *
-     * @param integer $invalids
-     *
-     * @return Upload
-     */
-    public function setInvalids($invalids)
+    public function setInvalids(int $invalids): void
     {
         $this->invalids = $invalids;
-
-        return $this;
     }
 
-    /**
-     * Get total
-     *
-     * @return integer
-     */
-    public function getTotal()
+    public function getTotal(): ?int
     {
         return $this->total;
     }
 
-    /**
-     * Set total
-     *
-     * @param integer $total
-     *
-     * @return Upload
-     */
-    public function setTotal($total)
+    public function setTotal(int $total): void
     {
         $this->total = $total;
-
-        return $this;
     }
 
-    /**
-     * Remove actions
-     *
-     * @param UploadAction $actions
-     */
-    public function removeAction(UploadAction $actions)
+    public function removeAction(UploadAction $actions): void
     {
         $this->actions->removeElement($actions);
     }
 
-    public function setAttributeValue(string $name, $value)
+    public function setAttributeValue(string $name, $value): void
     {
         if ($attr = $this->getAttribute($name)) {
             $attr->setValue($value);
@@ -419,12 +293,19 @@ class Upload
         }
     }
 
-    /**
-     * @param $name
-     *
-     * @return UploadAttribute|null
-     */
-    public function getAttribute(string $name)
+    public function setAttributes(iterable $attributes): void
+    {
+        foreach ($attributes as $key => $value) {
+            $this->setAttributeValue($key, $value);
+        }
+    }
+
+    public function getAttributeValue(string $name): mixed
+    {
+        return $this->getAttribute($name)?->getValue();
+    }
+
+    public function getAttribute(string $name): ?UploadAttribute
     {
         $name = strtolower($name);
 
@@ -433,35 +314,37 @@ class Upload
                 return $item;
             }
         }
+
+        return null;
     }
 
-    public function getAttributes(): Collection
+    public function getAttributes(): iterable|ArrayCollection|Collection
     {
         return $this->attributes;
     }
 
-    public function getValidItems(): Collection
+    public function getValidItems(): iterable|ArrayCollection|Collection
     {
         return $this->getItems()
             ->filter(function (UploadedItem $item) {
-                return $item->getIsValid();
+                return $item->getValid();
             });
     }
 
-    public function getItems(): Collection
+    public function getItems(): iterable|ArrayCollection|Collection
     {
         return $this->items;
     }
 
-    public function getInvalidItems(): Collection
+    public function getInvalidItems(): iterable|ArrayCollection|Collection
     {
         return $this->getItems()
             ->filter(function (UploadedItem $item) {
-                return !$item->getIsValid();
+                return !$item->getValid();
             });
     }
 
-    public function hasInProgressActions()
+    public function hasInProgressActions(): bool
     {
         /** @var UploadAction $action */
         foreach ($this->getActions() as $action) {
@@ -473,10 +356,7 @@ class Upload
         return false;
     }
 
-    /**
-     * @return array
-     */
-    public function getColumns()
+    public function getColumns(): array
     {
         if ($columns = $this->getAttributeValue('configured_columns')) {
             return $columns;
@@ -497,27 +377,12 @@ class Upload
         return $columns;
     }
 
-    /**
-     * @param $name
-     *
-     * @return mixed|null
-     */
-    public function getAttributeValue($name)
-    {
-        if ($attr = $this->getAttribute($name)) {
-            return $attr->getValue();
-        }
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getColumnNames($all = false)
+    public function getColumnNames(bool $all = false): ?array
     {
         $config = $this->getAttributeValue('config_read');
 
         if (!isset($config['header_mapping'][1])) {
-            return;
+            return null;
         }
 
         if ($all) {
@@ -527,21 +392,14 @@ class Upload
         }
     }
 
-    /**
-     * @return array|null
-     */
-    public function getColumnKeys()
+    public function getColumnKeys(): ?array
     {
         $config = $this->getAttributeValue('config_read');
 
-        if (!isset($config['header_mapping'][0])) {
-            return;
-        }
-
-        return $config['header_mapping'][0];
+        return $config['header_mapping'][0] ?? null;
     }
 
-    public function getMappedColumns():array
+    public function getMappedColumns(): array
     {
         $configured = $this->getColumnKeys();
         $fromFile = $this->getColumnNames();
@@ -553,5 +411,13 @@ class Upload
         }
 
         return $mapping;
+    }
+
+    public function getReadOptions(): array
+    {
+        return [
+            'row_headers' => $this->getAttributeValue('row_headers') ?? 1,
+            'columns_mapping' => $this->getColumnsMatch(),
+        ];
     }
 }

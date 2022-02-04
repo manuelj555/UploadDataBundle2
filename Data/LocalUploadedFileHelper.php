@@ -5,7 +5,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data;
 
-use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -15,12 +15,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class LocalUploadedFileHelper implements UploadedFileHelperInterface
 {
-    public function prepareFileForRead($filename)
+    public function prepareFileForRead(string $filename): string
     {
         return $filename;
     }
 
-    public function saveFile(UploadedFile $file, $path, $filename)
+    public function saveFile(UploadedFile $file, string $path, string $filename): string
     {
         return $file->move($path, $filename)->getRealPath();
     }

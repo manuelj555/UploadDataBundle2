@@ -9,6 +9,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Validator\Constraint;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -18,6 +19,10 @@ use Symfony\Component\Validator\ConstraintValidator;
  *
  * @author Manuel Aguirre maguirre@optimeconsulting.com
  */
+#[AutoconfigureTag(
+    "validator.constraint_validator",
+    ['alias' => 'upload_data.entity_exists'],
+)]
 class EntityExistsValidator extends ConstraintValidator
 {
     /**

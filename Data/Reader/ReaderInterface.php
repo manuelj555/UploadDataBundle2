@@ -6,6 +6,7 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
+use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -13,17 +14,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 interface ReaderInterface
 {
-	const EXTRA_FIELDS_NAME = '__EXTRA__';
-	
-	public function getData($filename, $options);
-	
-	public function getRowHeaders($filename, $options);
-	
-	public function supports($filename);
-	
-	public function setDefaultOptions(OptionsResolver $resolver, $headers = false);
-	
-	public function setRouteConfig($route);
-	
-	public function getRouteConfig();
+    const EXTRA_FIELDS_NAME = '__EXTRA__';
+
+    public function getData(Upload $upload): array;
+
+    public function getHeaders(Upload $upload): array;
+
+    public function supports(Upload $upload): bool;
+
+    public function configureOptions(OptionsResolver $resolver, bool $headers = false): void;
 }

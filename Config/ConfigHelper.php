@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Knp\Component\Pager\PaginatorInterface;
-use Manuel\Bundle\UploadDataBundle\Data\MatchInfo;
+use Manuel\Bundle\UploadDataBundle\Data\ColumnsMatchInfo;
 use Manuel\Bundle\UploadDataBundle\Data\Reader\ExcelHeadersMatcher;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
@@ -26,64 +26,30 @@ use Symfony\Component\HttpFoundation\Request;
 class ConfigHelper
 {
     /**
-     * @var UploadConfig
-     */
-    private $config;
-    /**
-     * @var ExcelHeadersMatcher
-     */
-    private $headersMatcher;
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-    /**
-     * @var UploadRepository
-     */
-    private $repository;
-    /**
-     * @var UploadedItemRepository
-     */
-    private $itemRepository;
-    /**
-     * @var PaginatorInterface|null
-     */
-    private $paginator;
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-    /**
      * @var Exception|null
      */
-    private $lastException;
+    private ?Exception $lastException;
 
     public function __construct(
-        UploadConfig $config,
-        ExcelHeadersMatcher $headersMatcher,
-        EntityManagerInterface $entityManager,
-        UploadRepository $repository,
-        UploadedItemRepository $itemRepository,
-        ?PaginatorInterface $paginator = null,
-        ?LoggerInterface $logger = null
+        private ResolvedUploadConfig $resolvedConfig,
+        private EntityManagerInterface $entityManager,
+        private UploadConfigHandler $configHandler,
+        private ExcelHeadersMatcher $headersMatcher,
+        private UploadRepository $repository,
+        private UploadedItemRepository $itemRepository,
+        private ?PaginatorInterface $paginator = null,
+        private ?LoggerInterface $logger = null,
     ) {
-        $this->config = $config;
-        $this->headersMatcher = $headersMatcher;
-        $this->entityManager = $entityManager;
-        $this->repository = $repository;
-        $this->itemRepository = $itemRepository;
-        $this->paginator = $paginator;
-        $this->logger = $logger;
     }
 
     public function getConfig(): UploadConfig
     {
-        return $this->config;
+        return $this->resolvedConfig->getConfig();
     }
 
     public function getListData(Request $request, array $filters = null)
     {
-        $query = $this->config->getQueryList(
+        $query = $this->getConfig()->getQueryList(
             $this->repository, $filters
         );
 
@@ -92,15 +58,18 @@ class ConfigHelper
 
     public function upload(UploadedFile $uploadedFile, array $formData = [], array $uploadAttributes = []): Upload
     {
-        return $this->getConfig()->processUpload($uploadedFile, $formData, $uploadAttributes);
+        return $this->configHandler->processUpload(
+            $this->resolvedConfig,
+            $uploadedFile,
+            $formData,
+            $uploadAttributes,
+        );
     }
 
     public function read(Upload $upload, bool $throwOnFail = false): bool
     {
         try {
-            $this->getConfig()->processRead($upload);
-
-            return true;
+            return $this->configHandler->processRead($this->resolvedConfig, $upload);
         } catch (\Exception $e) {
             $this->lastException = $e;
 
@@ -123,9 +92,7 @@ class ConfigHelper
     public function validate(Upload $upload, $onlyInvalids = false, bool $throwOnFail = false): bool
     {
         try {
-            $this->getConfig()->processValidation($upload, $onlyInvalids);
-
-            return true;
+            return $this->configHandler->processValidation($this->resolvedConfig, $upload, $onlyInvalids);
         } catch (\Exception $e) {
             $this->lastException = $e;
 
@@ -148,9 +115,7 @@ class ConfigHelper
     public function transfer(Upload $upload, bool $throwOnFail = false): bool
     {
         try {
-            $this->config->processTransfer($upload);
-
-            return true;
+            return $this->configHandler->processTransfer($this->resolvedConfig, $upload);
         } catch (\Exception $e) {
             $this->lastException = $e;
 
@@ -173,9 +138,7 @@ class ConfigHelper
     public function customAction(Upload $upload, string $action, bool $throwOnFail = false): bool
     {
         try {
-            $this->config->processActionByName($upload, $action);
-
-            return true;
+            return $this->configHandler->processActionByName($this->resolvedConfig, $upload, $action);
         } catch (\Exception $e) {
             $this->lastException = $e;
 
@@ -198,7 +161,7 @@ class ConfigHelper
 
     public function processAll(Upload $upload, bool $preventTransferOnInvalid = true): bool
     {
-        if (!$upload->isReadable()) {
+        if (!$this->getConfig()->isActionable($upload, 'read')) {
             throw UploadProcessException::fromMessage(
                 'Esta carga ya fué leida y no se puede volver a procesar',
                 'process_all'
@@ -231,7 +194,7 @@ class ConfigHelper
     public function delete(Upload $upload, bool $throwOnFail = false): bool
     {
         try {
-            $this->config->processDelete($upload);
+            $this->configHandler->processDelete($this->resolvedConfig, $upload);
 
             return true;
         } catch (\Exception $e) {
@@ -271,14 +234,14 @@ class ConfigHelper
         return $this->lastException;
     }
 
-    public function getDefaultMatchInfo(Upload $upload, array $options = []): MatchInfo
+    public function getDefaultMatchInfo(Upload $upload, array $options = []): ColumnsMatchInfo
     {
-        return $this->headersMatcher->getDefaultMatchInfo($this->getConfig(), $upload, $options);
+        return $this->headersMatcher->getDefaultMatchInfo($this->resolvedConfig, $upload, $options);
     }
 
-    public function applyMatch(MatchInfo $matchInfo, array $matchData): array
+    public function applyMatch(ColumnsMatchInfo $matchInfo, array $matchData): array
     {
-        $match = $this->headersMatcher->applyMatch($this->getConfig(), $matchInfo, $matchData);
+        $match = $this->headersMatcher->applyMatch($this->resolvedConfig, $matchInfo, $matchData);
 
         $this->entityManager->persist($matchInfo->getUpload());
         $this->entityManager->flush();
@@ -286,15 +249,27 @@ class ConfigHelper
         return $match;
     }
 
+    /**
+     * Este método es para cuando se quiere hacer un match automático en los procesos de carga,
+     * es decir, que no se le quiere permitir al usuario hacer un match manual de las columnas
+     * del excel.
+     */
     public function configureDefaultMatch(Upload $upload, array $options = []): void
     {
-        $this->getConfig()->configureDefaultMatch($upload, $options);
+        isset($options['row_headers']) || $options['row_headers'] = 1;
+
+        $reader = $this->readerLoader->get($upload->getFullFilename());
+        $headers = $reader->getRowHeaders($upload->getFullFilename(), $options);
+        $mapping = $upload->getColumnsMapper()->getDefaultMapping($headers);
+        $options['header_mapping'] = $mapping;
+
+        $upload->setAttributeValue('config_read', $options);
 
         $this->entityManager->persist($upload);
         $this->entityManager->flush();
     }
 
-    private function paginateIfApply(QueryBuilder $query, Request $request)
+    private function paginateIfApply(QueryBuilder $query, Request $request): iterable
     {
         if ($this->paginator) {
             $items = $this->paginator->paginate(

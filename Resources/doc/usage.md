@@ -13,7 +13,7 @@ use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
-use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMapper;
+use Manuel\Bundle\UploadDataBundle\Mapper\ConfigColumns;
 use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
 use AppBundle\Card;
 use Symfony\Component\Validator\Constraints\CardScheme;
@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 class UploadCardConfig extends UploadConfig
 {
     
-    protected function configureColumns(ColumnsMapper $mapper)
+    protected function configureColumns(ConfigColumns $mapper)
     {
         $mapper
             ->add('email')
