@@ -6,12 +6,6 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Mapper;
 
-use Manuel\Bundle\UploadDataBundle\Mapper\Exception\DefaultMappingException;
-use function array_intersect;
-use function array_intersect_key;
-use function array_search;
-use function dd;
-
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */

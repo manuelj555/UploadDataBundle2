@@ -21,8 +21,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use function array_filter;
 use function count;
-use function dd;
 use function is_callable;
 use function sprintf;
 
@@ -122,6 +122,11 @@ final class ConfigColumns implements Countable
     public function count()
     {
         return count($this->getColumns());
+    }
+
+    public function countRequired(): int
+    {
+        return count(array_filter($this->getColumns(), fn($config) => $config['required']));
     }
 
     public function validate(): self

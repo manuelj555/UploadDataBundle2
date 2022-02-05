@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Manuel\Bundle\UploadDataBundle\Data\ColumnsMatchInfo;
 use function array_filter;
 use function in_array;
 
@@ -99,12 +100,14 @@ class Upload
 
     public function isColumnsMatched(): bool
     {
-        return true || null !== $this->columnsMatch;
+        return null !== $this->columnsMatch;
     }
 
-    public function setColumnsMatch(array $columnsMatch): void
+    public function setColumnsMatch(ColumnsMatchInfo $matchInfo): void
     {
-        $this->columnsMatch = $columnsMatch;
+        $matchInfo->validate();
+
+        $this->columnsMatch = $matchInfo->getMatchedColumns();
     }
 
     public function getType(): string

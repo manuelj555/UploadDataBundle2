@@ -243,6 +243,8 @@ class ConfigHelper
     {
         $match = $this->headersMatcher->applyMatch($matchInfo, $matchData);
 
+        $match->validate();
+
         $this->entityManager->persist($matchInfo->getUpload());
         $this->entityManager->flush();
 

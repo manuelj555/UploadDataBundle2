@@ -6,6 +6,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Form\Type;
 
 use Manuel\Bundle\UploadDataBundle\Data\ColumnsMatchInfo;
+use Manuel\Bundle\UploadDataBundle\Data\Exception\InvalidColumnsMatchException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,10 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use function array_filter;
 use function array_flip;
-use function array_unique;
-use function count;
 
 /**
  * @author Manuel Aguirre
@@ -29,7 +27,6 @@ class SelectColumnsType extends AbstractType
         /** @var ColumnsMatchInfo $matchInfo */
         $matchInfo = $options['match_info'];
         $selectChoices = array_flip($matchInfo->getFileHeaders());
-        $requiredColumnsCount = 0;
 
         foreach ($matchInfo->getConfigColumns()->getColumnsWithLabels() as $columnName => $columnLabel) {
             $required = $matchInfo->getConfigColumns()->isRequired($columnName);
@@ -40,22 +37,20 @@ class SelectColumnsType extends AbstractType
                 'required' => $required,
                 ...($required ? ['constraints' => new NotBlank()] : []),
             ]);
-
-            $required && $requiredColumnsCount++;
         }
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event)
-        use ($requiredColumnsCount) {
-            $data = $event->getData();
+        use ($matchInfo, $options) {
             $form = $event->getForm();
-            $matchedColumns = array_filter($data);
 
-            if (count($matchedColumns) < $requiredColumnsCount) {
-                $form->addError(new FormError('upload.required_fields'));
-            }
+            try {
+                $matchInfo->validateWith($event->getData());
+            } catch (InvalidColumnsMatchException $exception) {
+                if ($options['throw_exceptions']) {
+                    throw $exception;
+                }
 
-            if ($matchedColumns != array_unique($matchedColumns)) {
-                $form->addError(new FormError('upload.repeated_items'));
+                $form->addError(new FormError($exception->getMessage()));
             }
         });
     }
@@ -64,5 +59,8 @@ class SelectColumnsType extends AbstractType
     {
         $resolver->setRequired('match_info');
         $resolver->setAllowedTypes('match_info', ColumnsMatchInfo::class);
+
+        $resolver->setDefault('throw_exceptions', false);
+        $resolver->setAllowedTypes('throw_exceptions', 'bool');
     }
 }

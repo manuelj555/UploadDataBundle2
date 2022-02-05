@@ -48,15 +48,15 @@ class ExcelHeadersMatcher
 
     public function applyMatch(ColumnsMatchInfo $info, array $matchData,): ColumnsMatchInfo
     {
-        $upload = $info->getUpload();
-
-        $upload->setColumnsMatch($matchData);
-
-        return new ColumnsMatchInfo(
-            $upload,
+        $matchInfo = new ColumnsMatchInfo(
+            $info->getUpload(),
             $info->getConfigColumns(),
             $info->getFileHeaders(),
             $matchData,
         );
+
+        $matchInfo->validate();
+
+        return $matchInfo;
     }
 }
