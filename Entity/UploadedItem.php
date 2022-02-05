@@ -29,7 +29,7 @@ class UploadedItem implements \ArrayAccess
     private ?array $extras;
 
     #[ORM\Column(type: 'json', nullable: true)]
-    private null|array|GroupedConstraintViolations $errors;
+    private null|array|GroupedConstraintViolations $errors = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $valid;
@@ -89,7 +89,12 @@ class UploadedItem implements \ArrayAccess
 
     public function offsetGet($offset)
     {
-        return $this->data[$offset] ?? null;
+        return $this->get($offset);
+    }
+
+    public function get(string $key): ?string
+    {
+        return $this->data[$key] ?? null;
     }
 
     public function offsetSet($offset, $value)
@@ -132,20 +137,7 @@ class UploadedItem implements \ArrayAccess
 
     public function getErrorsAsString(string $separator = ', ', bool $showKeys = false, bool $allGroups = false): string
     {
-        $errors = [];
-        $group = $allGroups ? null : 'default';
-
-        foreach ($this->getErrors()->getAll($group, false) as $columnName => $data) {
-            if ($showKeys) {
-                $data = array_map(function ($data) use ($columnName) {
-                    return sprintf("[%s]: %s", $columnName, $data);
-                }, $data);
-            }
-
-            $errors = array_merge($errors, $data);
-        }
-
-        return join($separator, array_unique($errors));
+        return $this->getErrors()->toString($separator, $showKeys, $allGroups);
     }
 
     public function getGroupErrorsAsString(string $group, string $separator = ', ', bool $showKeys = false): string
@@ -194,6 +186,6 @@ class UploadedItem implements \ArrayAccess
     #[ORM\PostUpdate]
     public function convertErrorsToObject()
     {
-        $this->setErrors($this->errors);
+        $this->setErrors($this->errors ?? []);
     }
 }

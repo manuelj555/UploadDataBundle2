@@ -239,9 +239,9 @@ class ConfigHelper
         return $this->headersMatcher->getDefaultMatchInfo($this->resolvedConfig, $upload, $options);
     }
 
-    public function applyMatch(ColumnsMatchInfo $matchInfo, array $matchData): array
+    public function applyMatch(ColumnsMatchInfo $matchInfo, array $matchData): ColumnsMatchInfo
     {
-        $match = $this->headersMatcher->applyMatch($this->resolvedConfig, $matchInfo, $matchData);
+        $match = $this->headersMatcher->applyMatch($matchInfo, $matchData);
 
         $this->entityManager->persist($matchInfo->getUpload());
         $this->entityManager->flush();

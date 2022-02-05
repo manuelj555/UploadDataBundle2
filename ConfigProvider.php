@@ -13,14 +13,15 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function dd;
+use function sprintf;
 
 /**
  * @autor Manuel Aguirre <programador.manuel@gmail.com>
  */
 class ConfigProvider
 {
-    protected ContainerInterface $container;
+    private ContainerInterface $container;
+    private array $loadedConfigs = [];
 
     function __construct(
         #[TaggedLocator("upload_data.config")] ContainerInterface $container,
@@ -28,7 +29,16 @@ class ConfigProvider
         $this->container = $container;
     }
 
-    public function get(string $type, array $options = []): ResolvedUploadConfig
+    public function get(string $type, array $options = [], bool $forceNew = false): ResolvedUploadConfig
+    {
+        if ($forceNew) {
+            return $this->loadedConfigs[$type] = $this->doGet($type, $options);
+        }
+
+        return $this->loadedConfigs[$type] ??= $this->doGet($type, $options);
+    }
+
+    private function doGet(string $type, array $options): ResolvedUploadConfig
     {
         try {
             $config = $this->container->get($type);

@@ -28,7 +28,7 @@ abstract class UploadConfig
 
     abstract public function configureColumns(array $options): ConfigColumns;
 
-    abstract public function transfer(Upload $upload, Collection $items): void;
+    abstract public function transfer(Upload $upload): void;
 
     public function isActionable(Upload $upload, string $actionName): bool
     {

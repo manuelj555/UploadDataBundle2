@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use function count;
+use function dd;
 use function is_callable;
 use function sprintf;
 
@@ -111,6 +112,11 @@ final class ConfigColumns implements Countable
     public function getLabel(string $name): ?string
     {
         return $this->labels[$name] ?? null;
+    }
+
+    public function isRequired(string $columnName): bool
+    {
+        return $this->columns[$columnName]['required'] ?? false;
     }
 
     public function count()

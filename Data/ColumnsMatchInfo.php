@@ -5,6 +5,7 @@
 namespace Manuel\Bundle\UploadDataBundle\Data;
 
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Mapper\ConfigColumns;
 
 /**
  * Class MatchInfo
@@ -15,10 +16,9 @@ class ColumnsMatchInfo
 {
     public function __construct(
         private Upload $upload,
+        private ConfigColumns $configColumns,
         private array $fileHeaders,
-        private array $configuredColumns,
         private array $matchedColumns,
-        private array $options
     ) {
     }
 
@@ -32,9 +32,9 @@ class ColumnsMatchInfo
         return $this->fileHeaders;
     }
 
-    public function getConfiguredColumns(): ?array
+    public function getConfigColumns(): ConfigColumns
     {
-        return $this->configuredColumns;
+        return $this->configColumns;
     }
 
     public function getMatchedColumns(): ?array
@@ -42,13 +42,13 @@ class ColumnsMatchInfo
         return $this->matchedColumns;
     }
 
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
     public function matched(?string $columnName, ?string $fileHeaderName): bool
     {
         return isset($this->matchedColumns[$columnName]) && $fileHeaderName == $this->matchedColumns[$columnName];
+    }
+
+    public function getFileColumnMatch(string $configColumnName): ?string
+    {
+        return $this->matchedColumns[$configColumnName] ?? null;
     }
 }

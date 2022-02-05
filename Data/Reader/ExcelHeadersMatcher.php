@@ -5,7 +5,6 @@
 namespace Manuel\Bundle\UploadDataBundle\Data\Reader;
 
 use Manuel\Bundle\UploadDataBundle\Config\ResolvedUploadConfig;
-use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Data\ColumnsMatchInfo;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Mapper\ColumnsMatch;
@@ -35,31 +34,29 @@ class ExcelHeadersMatcher
     public function getDefaultMatchInfo(
         ResolvedUploadConfig $resolvedConfig,
         Upload $upload,
-        array $options = [],
     ): ColumnsMatchInfo {
         $headers = $this->excelReader->getHeaders($upload);
-        $matches = ColumnsMatch::match($resolvedConfig->getConfigColumns(), $headers);
+        $matches = ColumnsMatch::defaultMatch($resolvedConfig->getConfigColumns(), $headers);
 
         return new ColumnsMatchInfo(
             $upload,
+            $resolvedConfig->getConfigColumns(),
             $headers,
-            $resolvedConfig->getConfigColumns()->getColumns(),
             $matches,
-            $options
         );
     }
 
-    public function applyMatch(ResolvedUploadConfig $resolvedConfig, ColumnsMatchInfo $info, array $matchData): array
+    public function applyMatch(ColumnsMatchInfo $info, array $matchData,): ColumnsMatchInfo
     {
-        $columnsMapper = $resolvedConfig->getConfigColumns();
         $upload = $info->getUpload();
-        $mappedData = $columnsMapper->mapForm($matchData, $info->getFileHeaders());
 
-        $options = $info->getOptions();
-        $options['header_mapping'] = $mappedData;
+        $upload->setColumnsMatch($matchData);
 
-        $upload->setAttributeValue('config_read', $options);
-
-        return $mappedData;
+        return new ColumnsMatchInfo(
+            $upload,
+            $info->getConfigColumns(),
+            $info->getFileHeaders(),
+            $matchData,
+        );
     }
 }

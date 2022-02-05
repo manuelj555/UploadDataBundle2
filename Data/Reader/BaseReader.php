@@ -10,6 +10,7 @@ use Manuel\Bundle\UploadDataBundle\Data\UploadedFileHelperInterface;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Service\Attribute\Required;
+use function array_keys;
 use function in_array;
 use function pathinfo;
 use function strtolower;
@@ -38,10 +39,12 @@ abstract class BaseReader implements ReaderInterface
     protected function resolveOptions(Upload $upload, $headers = false)
     {
         $resolver = new OptionsResolver();
+        $options = $upload->getReadOptions();
+        $resolver->setDefined(array_keys($options));
 
         $this->configureOptions($resolver, $headers);
 
-        return $resolver->resolve($upload->getReadOptions());
+        return $resolver->resolve($options);
     }
 
     protected function resolveFile($filename)

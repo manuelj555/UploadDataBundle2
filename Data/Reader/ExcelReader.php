@@ -49,7 +49,7 @@ class ExcelReader extends BaseReader
         $cols = range(1, Coordinate::columnIndexFromString($lastColumn));
 
         $this->excelHeaders = current($excelHeaders);
-        $this->columnsMapping = $options['columns_mapping'];
+        $this->columnsMapping = $options['columns_mapping'] ?? [];
         $formattedData = [];
 
         foreach ($rows as $rowIndex) {

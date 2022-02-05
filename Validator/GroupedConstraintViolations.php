@@ -10,7 +10,12 @@ namespace Manuel\Bundle\UploadDataBundle\Validator;
 
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use function array_map;
+use function array_merge;
+use function array_unique;
 use function join;
+use function sprintf;
+use const PHP_EOL;
 
 /**
  * Class GroupedConstraintViolations
@@ -152,7 +157,7 @@ class GroupedConstraintViolations implements \Countable, \IteratorAggregate
         return new \ArrayIterator($this->getAll('default', false));
     }
 
-    public function getErrorsAsSimpleFormat(string $separator = ', '):array
+    public function getErrorsAsSimpleFormat(string $separator = ', '): array
     {
         $errors = [];
 
@@ -161,5 +166,28 @@ class GroupedConstraintViolations implements \Countable, \IteratorAggregate
         }
 
         return $errors;
+    }
+
+    public function toString(string $separator = ', ', bool $showKeys = false, bool $allGroups = false): string
+    {
+        $errors = [];
+        $group = $allGroups ? null : 'default';
+
+        foreach ($this->getAll($group, false) as $columnName => $data) {
+            if ($showKeys) {
+                $data = array_map(function ($data) use ($columnName) {
+                    return sprintf("[%s]: %s", $columnName, $data);
+                }, $data);
+            }
+
+            $errors = array_merge($errors, $data);
+        }
+
+        return join($separator, array_unique($errors));
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString(', ', true, true);
     }
 }

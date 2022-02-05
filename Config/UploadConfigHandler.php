@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Throwable;
 use function dd;
+use function dump;
 use function md5;
 use function sprintf;
 use function uniqid;
@@ -92,14 +93,14 @@ class UploadConfigHandler
     {
         $config = $resolvedConfig->getConfig();
 
-//        if (!$config->isActionable($upload, 'read')) {
-//            return false;
-//        }
+        if (!$config->isActionable($upload, 'read')) {
+            return false;
+        }
 
         $action = $upload->getAction('read');
 
         try {
-//            $this->setInProcessAction($action);
+            $this->setInProcessAction($action);
 
             if ($config instanceof ConfigReadFiltersAwareInterface) {
                 $config->onPreRead($upload);
@@ -107,7 +108,7 @@ class UploadConfigHandler
 
             $reader = $this->readerLoader->get($upload);
             $data = $reader->getData($upload);
-            dd($data);
+
             $columnsMapper = $resolvedConfig->getConfigColumns()->getColumns();
 
             foreach ($data as $dataRowNumber => $item) {
@@ -255,7 +256,7 @@ class UploadConfigHandler
         try {
             $this->setInProcessAction($action);
 
-            $config->transfer($upload, $upload->getItems());
+            $config->transfer($upload);
 
             $this->completeAction($upload, $action);
         } catch (\Exception $e) {

@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use function array_filter;
 use function in_array;
 
 #[ORM\Table("upload_data_upload")]
@@ -356,68 +357,11 @@ class Upload
         return false;
     }
 
-    public function getColumns(): array
-    {
-        if ($columns = $this->getAttributeValue('configured_columns')) {
-            return $columns;
-        }
-
-        $fileNames = $this->getColumnNames(true);
-        $expectedNames = $this->getColumnKeys();
-        $columns = [];
-
-        if ($expectedNames) {
-            foreach ($expectedNames as $index => $name) {
-                $key = isset($fileNames[$index]) ? $fileNames[$index] : ucfirst($name);
-
-                $columns[$key] = $name;
-            }
-        }
-
-        return $columns;
-    }
-
-    public function getColumnNames(bool $all = false): ?array
-    {
-        $config = $this->getAttributeValue('config_read');
-
-        if (!isset($config['header_mapping'][1])) {
-            return null;
-        }
-
-        if ($all) {
-            return $config['header_mapping'][1];
-        } else {
-            return array_intersect_key($config['header_mapping'][1], $config['header_mapping'][0]);
-        }
-    }
-
-    public function getColumnKeys(): ?array
-    {
-        $config = $this->getAttributeValue('config_read');
-
-        return $config['header_mapping'][0] ?? null;
-    }
-
-    public function getMappedColumns(): array
-    {
-        $configured = $this->getColumnKeys();
-        $fromFile = $this->getColumnNames();
-
-        $mapping = [];
-
-        foreach ($configured as $key => $configuredKey) {
-            $mapping[$configuredKey] = $fromFile[$key] ?? '';
-        }
-
-        return $mapping;
-    }
-
     public function getReadOptions(): array
     {
         return [
             'row_headers' => $this->getAttributeValue('row_headers') ?? 1,
-            'columns_mapping' => $this->getColumnsMatch(),
+            'columns_mapping' => array_filter($this->getColumnsMatch() ?? []),
         ];
     }
 }
