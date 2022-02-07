@@ -52,7 +52,7 @@ class UploadRuntime implements RuntimeExtensionInterface
 
     public function isActionActionable(Upload $upload, string $actionName): bool
     {
-        $config = $this->configProvider->get($upload->getType());
+        $config = $this->configProvider->get($upload->getConfigClass());
 
         return $config->getConfig()->isActionable($upload, $actionName);
     }
@@ -93,7 +93,7 @@ class UploadRuntime implements RuntimeExtensionInterface
     private function resolveConfigType(Upload|string $uploadOrConfigClass): string
     {
         return $uploadOrConfigClass instanceof Upload
-            ? $uploadOrConfigClass->getType()
+            ? $uploadOrConfigClass->getConfigClass()
             : $uploadOrConfigClass;
     }
 }

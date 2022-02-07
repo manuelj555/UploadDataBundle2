@@ -6,7 +6,6 @@
 
 namespace Manuel\Bundle\UploadDataBundle\Config;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadAction;
@@ -51,18 +50,13 @@ abstract class UploadConfig
             $search = null;
         }
 
-        $queryBuilder = $repository->getQueryForType($this->getUploadType(), $search, $order);
+        $queryBuilder = $repository->getQueryForType($this::class, $search, $order);
 
         if ($this->excludeDeletedUploads()) {
             $this->addDeleteExclusionFilter($queryBuilder);
         }
 
         return $queryBuilder;
-    }
-
-    public function getUploadType(): string
-    {
-        return $this::class;
     }
 
     protected function excludeDeletedUploads(): bool
@@ -92,7 +86,6 @@ abstract class UploadConfig
     public function getInstance(): Upload
     {
         $upload = new Upload();
-//        $upload->setAttributeValue('configured_columns');
 
         return $upload;
     }

@@ -6,9 +6,12 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
+use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Data\ColumnsMatchInfo;
 use function array_filter;
 use function in_array;
+use function is_a;
 
 #[ORM\Table("upload_data_upload")]
 #[ORM\Entity(repositoryClass: UploadRepository::class)]
@@ -49,7 +52,7 @@ class Upload
     private ?string $file;
 
     #[ORM\Column]
-    private string $type;
+    private string $configClass;
 
     #[ORM\Column(nullable: true)]
     private ?int $valids;
@@ -110,14 +113,22 @@ class Upload
         $this->columnsMatch = $matchInfo->getMatchedColumns();
     }
 
-    public function getType(): string
+    public function getConfigClass(): string
     {
-        return $this->type;
+        return $this->configClass;
     }
 
-    public function setType(string $type): void
+    public function setConfigClass(string $configClass): void
     {
-        $this->type = $type;
+        if (!is_a($configClass, UploadConfig::class, true)) {
+            throw new InvalidArgumentException(sprintf(
+                "El parametro conflig class debe ser una instancia de '%s', pero llegó '%s'",
+                UploadConfig::class,
+                $configClass,
+            ));
+        }
+
+        $this->configClass = $configClass;
     }
 
     public function isReadable(): bool

@@ -16,7 +16,7 @@ use function is_a;
  * @author Manuel Aguirre
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class LoadHelperFor
+class LoadHelper
 {
     public function __construct(
         private string $configClass,
