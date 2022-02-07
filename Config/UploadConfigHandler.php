@@ -51,12 +51,10 @@ class UploadConfigHandler
 
         try {
             $upload = $config->getInstance();
+
             $upload->setFilename($file->getClientOriginalName());
             $upload->setConfigClass($config::class);
-
-            foreach ($attributes as $name => $attrValue) {
-                $upload->setAttributeValue($name, $attrValue);
-            }
+            $upload->setAttributes($attributes);
 
             $this->objectManager->beginTransaction();
 

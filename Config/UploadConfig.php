@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
  */
 abstract class UploadConfig
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
     }
 
@@ -95,7 +95,7 @@ abstract class UploadConfig
         return $item->getValid();
     }
 
-    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
+    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload): void
     {
     }
 
@@ -115,7 +115,7 @@ abstract class UploadConfig
         return !$violations->hasViolationsForGroup('default');
     }
 
-    public function processAction(Upload $upload, UploadAction $action)
+    public function processAction(Upload $upload, UploadAction $action): void
     {
     }
 

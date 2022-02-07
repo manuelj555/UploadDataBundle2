@@ -168,10 +168,7 @@ class ConfigHelper
             );
         }
 
-        if (null == $upload->getAttributeValue('config_read')) {
-            $this->configureDefaultMatch($upload);
-        }
-
+        $this->applyDefaultMatch($upload);
         $this->read($upload, true);
         $this->validate($upload, false, true);
 
@@ -256,19 +253,10 @@ class ConfigHelper
      * es decir, que no se le quiere permitir al usuario hacer un match manual de las columnas
      * del excel.
      */
-    public function configureDefaultMatch(Upload $upload, array $options = []): void
+    public function applyDefaultMatch(Upload $upload, array $options = []): void
     {
-        isset($options['row_headers']) || $options['row_headers'] = 1;
-
-        $reader = $this->readerLoader->get($upload->getFullFilename());
-        $headers = $reader->getRowHeaders($upload->getFullFilename(), $options);
-        $mapping = $upload->getColumnsMapper()->getDefaultMapping($headers);
-        $options['header_mapping'] = $mapping;
-
-        $upload->setAttributeValue('config_read', $options);
-
-        $this->entityManager->persist($upload);
-        $this->entityManager->flush();
+        $matchInfo = $this->getDefaultMatchInfo($upload, $options);
+        $this->applyMatch($matchInfo, $matchInfo->getMatchedColumns());
     }
 
     private function paginateIfApply(QueryBuilder $query, Request $request): iterable

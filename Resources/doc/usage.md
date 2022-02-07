@@ -7,13 +7,10 @@ El funcionamiento del bundle se basa en una clase de configuración que existend
 
 namespace App\Upload;
 
-use Doctrine\Common\Collections\Collection;
-use Manuel\Bundle\UploadDataBundle\Builder\ValidationBuilder;
+use Manuel\Bundle\UploadDataBundle\Mapper\ConfigColumns;
 use Manuel\Bundle\UploadDataBundle\Config\UploadConfig;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
-use Manuel\Bundle\UploadDataBundle\Entity\UploadAttribute;
 use Manuel\Bundle\UploadDataBundle\Entity\UploadedItem;
-use Manuel\Bundle\UploadDataBundle\Mapper\ConfigColumns;
 use Manuel\Bundle\UploadDataBundle\Validator\ColumnError;
 use AppBundle\Card;
 use Symfony\Component\Validator\Constraints\CardScheme;
@@ -23,47 +20,42 @@ use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 class UploadCardConfig extends UploadConfig
 {
     
-    protected function configureColumns(ConfigColumns $mapper)
+    public function configureColumns(array $options): ConfigColumns
     {
-        $mapper
+        return ConfigColumns::new()
             ->add('email')
+            ->validate()
+                ->assertNotBlank()
+                ->assertEmail()
+                ->assertEntityExist(Card::class, 'email')
+            ->endValidate()
             ->add('card_number', array(
                 'label' => 'Card Number',
                 'aliases' => array('CardNumber', 'Num Tarjeta', 'Tarjeta'),
                 'similar' => true, 
             ))
-            ->add('expiration_date', array(
-                'required' => false,
-                //podemos formatear los datos leidos del archivo subido.
-                'formatter' => function($value) { return strtoupper($value); },
-            ))
-            ->add('name', array(
-                'required' => false,
-            ));
-    }
-
-    protected function configureValidations(ValidationBuilder $builder)
-    {
-        $builder
-            ->for('email')
-                ->assertNotBlank()
-                ->assertEmail()
-                ->assertEntityExist(Card::class, 'email')
-            ->end()
-            ->for('card_number')
+            ->validate()
                 ->assertNotBlank()
                 ->addConstraint(new CardScheme(array(
                     'schemes' => array('MASTERCARD'),
                     'message' => 'Card Number is invalid',
                 )))
-            ->end()
-            ->for('expiration_date')
+            ->endValidate()
+            ->add('expiration_date', array(
+                'required' => false,
+                //podemos formatear los datos leidos del archivo subido.
+                'formatter' => function($value) { return strtoupper($value); },
+            ))
+            ->validate()
                 ->assertNotBlank()
                 ->addConstraint(new Regex('/^(1[012]|0[1-9])\/\d{2}$/'))
-            ->end();
+            ->endValidate()
+            ->add('name', array(
+                'required' => false,
+            ));
     }
 
-    protected function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload)
+    public function validateItem(UploadedItem $item, ContextualValidatorInterface $context, Upload $upload): void
     {
         //podemos añadir más lógica de validación acá:
         if ($item['email'] == 'no-allowed-email@email.com')) {
@@ -71,7 +63,7 @@ class UploadCardConfig extends UploadConfig
         }
     }
 
-    protected function transfer(Upload $upload, Collection $items)
+    protected function transfer(Upload $upload)
     {
         foreach ($upload->getValidItems() as $item) {
             $card = new Card();
@@ -89,7 +81,7 @@ class UploadCardConfig extends UploadConfig
 }
 ```
 
-La clase consta de 4 métodos, de los cuales solo son obligatorios los métodos **configureColumns, configureValidations y transfer**, ya que es por medio de estos, que se leerá la data del archivo, se validará y se procesará para llevar los datos a la lógica de la aplicación.
+La clase de ejemplo consta de 3 métodos, de los cuales solo son obligatorios los métodos **configureColumns y transfer**, ya que es por medio de estos, que se leerá la data del archivo, se validará y se procesará para llevar los datos a la lógica de la aplicación.
 
 ## configureColumns()
 
@@ -107,9 +99,31 @@ aliases     | array()           | Permite indicar una serie de strings con otros
 similar     | false             | si es true, permite mapear una columna del archivo que tenga un nombre muy parecido al esperado
 formatter   | callback(){}      | permite definir una función que será llamada al leer cada dato de la columna en el archivo, y en ella podemos modificar el contenido leido para ajustarlo a nuestras necesidades (formatear fechas, convertir textos, etc.).
 
-## configureValidations()
+### validaciones()
 
-Este método permite especificar validaciones para cada una de las columnas que leeremos del archivo.
+Para añadir validaciones a una columna debemos hacerlo de la siguiente manera:
+
+```php
+public function configureColumns(array $options): ConfigColumns
+{
+  return ConfigColumns::new()
+      ->add('email')
+      ->validate()
+          ->assertNotBlank()
+          ->assertEmail()
+          ->assertEntityExist(Card::class, 'email')
+      ->endValidate()
+      ->add('card_number')
+      ->validate()
+          ->assertNotBlank()
+          ->forGroups("nombre_grupo_validacion")
+             ->addConstraint(new CardScheme([
+                 'schemes' => array('MASTERCARD'),
+                 'message' => 'Card Number is invalid',
+             ]))
+      ->endValidate();
+}
+```
 
 ## transfer()
 
@@ -122,22 +136,30 @@ Este es un controlador de ejemplo para llevar a cabo la carga de un archivo en d
 ```php
 <?php
 
-use Manuel\Bundle\UploadDataBundle\Controller\AbstractUploadController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Upload\UploadCardConfig;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Attribute\LoadHelper;
+use Manuel\Bundle\UploadDataBundle\Attribute\LoadHelperForUpload;
+use Manuel\Bundle\UploadDataBundle\Config\ConfigHelper;
+use Manuel\Bundle\UploadDataBundle\Form\Type\SelectColumnsType;
 
-class UploadCardController extends AbstractUploadController
+class UploadCardController extends AbstractController
 {
     /**
      * En esta ruta hacemos la carga del archivo excel y lo procesamos con el configHelper 
-     * @Route("/upload", methods={"post"})
+     * 
+     * El configHelper se carga gracias a el atributo LoadHelper al cual se le pasa
+     * el nombre de la clase de configuración, que en este caso es: UploadCardConfig
      */
-    public function process(Request $request): Response
-    {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
+    #[Route("/upload", methods=["post"])]
+    public function process(
+        Request $request,
+        #[LoadHelper(UploadCardConfig::class)] ConfigHelper $configHelper,
+    ): Response {
         $upload = $configHelper->upload(
             $request->files->get('file'), 
             [], // acá pasamos datos adicionales del formulario si hace falta
@@ -155,15 +177,28 @@ class UploadCardController extends AbstractUploadController
      * En esta ruta hacemos match de las columnas esperadas y las que tiene el excel.
      * Luego de hacerlo se ejecuta el match y se lee el archivo.
      * 
-     * @Route("/read/{id}", name="read_path")
+     * En este caso el configHelper se cargará en base a la entidad Upload que está como un
+     * parametro del controlador, se usa el atributo LoadHelperForUpload pasandole el 
+     * nombre del parametro que tiene la instancia de Upload, que en este caso es "upload"
      */
-    public function read(Request $request, Upload $upload): Response
-    {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
+    #[Route("/read/{id}", name="read_path")]   
+    public function read(
+        Request $request, 
+        Upload $upload,
+        #[LoadHelperForUpload('upload')] ConfigHelper $configHelper,
+    ): Response {
         $matchInfo = $configHelper->getDefaultMatchInfo($upload);
+        
+        $form = $this->createFormBuilder()
+           ->add('match', SelectColumnsType::class, [
+               'match_info' => $matchInfo,
+           ])
+           ->getForm();
+        $form->handleRequest($request);
 
         if ($request->isMethod('post')) {
-            $configHelper->applyMatch($matchInfo, $request->request->get('columns'));
+            $configHelper->applyMatch($matchInfo, $form['match']->getData());
+            
              if (!$configHelper->read($upload)) {
                 throw $configHelper->getLastException();
             }
@@ -182,13 +217,15 @@ class UploadCardController extends AbstractUploadController
     
     /**
      * En esta ruta validamos el archivo y mostramos los resultados.
-     *  
-     * @Route("/validate/{id}", name="validate_path")
+     *
+     * Cuando tenemos un solo parametro de tipo Upload, el configHelper
+     * Puede cargarse sin definir los atributos LoadHelperForUpload o LoadHelper
      */
-    public function validate(Upload $upload): Response
-    {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
-
+    #[Route("/validate/{id}", name="validate_path")]   
+    public function validate(
+        Upload $upload,
+        ConfigHelper $configHelper,
+    ): Response {
         if (!$configHelper->validate($upload)) {
             throw $configHelper->getLastException();
         }
@@ -203,13 +240,12 @@ class UploadCardController extends AbstractUploadController
     
     /**
      * En esta ruta Transferimos los datos del archivo a su destino final.
-     *  
-     * @Route("/transfer/{id}", name="transfer_path")
      */
-    public function transfer(Upload $upload): Response
-    {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
-
+    #[Route("/transfer/{id}", name="transfer_path")]   
+    public function transfer(
+        Upload $upload,
+        #[LoadHelperForUpload('upload')] ConfigHelper $configHelper,    
+    ): Response {
         if (!$configHelper->transfer($upload)) {
             throw $configHelper->getLastException();
         }
@@ -224,13 +260,10 @@ class UploadCardController extends AbstractUploadController
         
     /**
      * Si lo necesitamos podemos eliminar una carga de un archivo.
-     *  
-     * @Route("/delete/{id}", name="delete_path")
      */
-    public function delete(Upload $upload): Response
+    #[Route("/delete/{id}", name="delete_path")] 
+    public function delete(Upload $upload, ConfigHelper $configHelper): Response
     {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
-
         if (!$configHelper->delete($upload)) {
             throw $configHelper->getLastException();
         }
@@ -247,22 +280,27 @@ no necesita hacer un match manual de las columnas del excel:
 ```php
 <?php
 
-use Manuel\Bundle\UploadDataBundle\Controller\AbstractUploadController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Upload\UploadCardConfig;
 use Manuel\Bundle\UploadDataBundle\Entity\Upload;
+use Manuel\Bundle\UploadDataBundle\Attribute\LoadHelper;
+use Manuel\Bundle\UploadDataBundle\Attribute\LoadHelperForUpload;
+use Manuel\Bundle\UploadDataBundle\Config\ConfigHelper;
+use Manuel\Bundle\UploadDataBundle\Form\Type\SelectColumnsType;
 
 class UploadCardController extends AbstractUploadController
 {
     /**
-     * En esta ruta hacemos la carga del archivo excel y lo procesamos con el configHelper 
-     * @Route("/upload", methods={"post"})
+     * En esta ruta hacemos la carga del archivo excel y lo procesamos con el configHelper
      */
-    public function process(Request $request): Response
-    {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
+    #[Route("/upload", methods=["post"])]
+    public function process(
+        Request $request,
+        #[LoadHelper(UploadCardConfig::class)] ConfigHelper $configHelper,
+    ): Response {
         $upload = $configHelper->upload(
             $request->files->get('file'), 
             [], // acá pasamos datos adicionales del formulario si hace falta
@@ -272,7 +310,7 @@ class UploadCardController extends AbstractUploadController
         );
         // Con este método hacemos un match por defecto de las columnas del excel
         // y las columnas esperadas por nosotros:
-        $configHelper->configureDefaultMatch($upload);
+        $configHelper->applyDefaultMatch($upload);
 
         // Luego procesamos lectura, validacion y transferencia 
         try {
@@ -293,9 +331,11 @@ class UploadCardController extends AbstractUploadController
      * Este ejemplo muestra como hacer todo más simple aún:
      * @Route("/upload", methods={"post"})
      */
-    public function simpleProcess(Request $request): Response
-    {
-        $configHelper = $this->getHelper(UploadCardConfig::class);
+    #[Route("/upload", methods=["post"])]
+    public function simpleProcess(
+        Request $request,
+        #[LoadHelper(UploadCardConfig::class)] ConfigHelper $configHelper,
+    ): Response {
         $upload = $configHelper->upload(
             $request->files->get('file'), 
             [], // acá pasamos datos adicionales del formulario si hace falta
