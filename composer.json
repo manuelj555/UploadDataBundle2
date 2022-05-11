@@ -1,5 +1,5 @@
 {
-    "name": "manuel/upload-data-bundle",
+    "name": "optimeconsulting/upload-data-bundle",
     "type": "symfony-bundle",
     "description": "Symfony UploadDataBundle",
     "keywords": ["excel", "upload", "bundle"],
