@@ -8,7 +8,7 @@ Instalación
 
 Ejecutar 
 
-    composer require "manuelj555/upload-data-bundle" "~5.0@dev"
+    composer require "optimeconsulting/upload-data-bundle" "~5.0@dev"
 
 Luego de ello, registrar los bundles en el **config/bundles.php**:
 
